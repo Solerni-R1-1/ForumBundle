@@ -676,8 +676,9 @@ class ForumController extends Controller
      * Renders last messages from the forums' workspace
      *
      * @param AbstractWorkspace $workspace
+     * @param boolean $isMini
      */
-    public function forumsWorkspaceWidgetAction(AbstractWorkspace $workspace)
+    public function forumsWorkspaceWidgetAction(AbstractWorkspace $workspace, $isMini = false)
     {
         $sc = $this->get('security.context');
         $user = $sc->getToken()->getUser();
@@ -692,7 +693,7 @@ class ForumController extends Controller
         $messages = $em->getRepository('ClarolineForumBundle:Message')
                 ->findNLastByForum($workspaces, $roles,3);
 
-        return array('widgetType' => 'workspace', 'messages' => $messages);
+        return array('widgetType' => 'workspace', 'messages' => $messages, 'isMini' => $isMini);
     }
 
     /**
