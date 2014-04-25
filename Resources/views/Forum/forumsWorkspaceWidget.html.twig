@@ -1,24 +1,49 @@
 {% set nbMessages = messages|length %}
-{% if nbMessages > 0 %}
-    <div id="desktop-widget-pager">
-
-        <ul class="list-group">
-            {% for message in messages %}
-                <li class="list-group-item">
-                    <div class="list-group-item-text">
-					<a class="link-subject"
-                                href="{{ _path('claro_forum_messages', {'subject': message.getSubject().getId() }) }}"
-                            >
-                                {{ message.getSubject().getTitle() }}
-                            </a>
-					<p>{{ message.getContent()|raw }}</p>
-					<p class="text-muted">{{ 'forum_last_message_owner'|trans({}, 'widget') }} {{ message.getCreator().getFirstName() }} {{  message.getCreator().getLastName() }} {{ message.getCreationDate()| timeAgo }}</p>
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
-
-    </div>
-{% else %}
-    {{ 'no_forum_widget_message'|trans({}, 'widget') }}
-{% endif %}
+    {% if  isMini %}
+        <div id="desktop-widget-pager" class="slrn-widget-forum-mini">
+            <h3 class="slrn-widget-forum__title">{{ 'last_messages_title'|trans({}, 'lesson-widget') }}</h3>
+            <ul class="list-group slrn-list-group">
+                {% if nbMessages > 0 %}
+                    {% for message in messages %}
+                        <li class="list-group-item slrn-list-group-item">
+                            <p class="text-muted slrn-message-header">
+                                 <a class="slrn-list-group-link" href="{{ _path('claro_forum_messages', {'subject': message.getSubject().getId() }) }}">
+                                {{ 'forum_last_message_owner'|trans({}, 'lesson-widget') }} {{ message.getCreator().getFirstName() }}, {{ message.getCreationDate()| widgetForumDate(app.request.locale) }}</p>
+                                </a>
+                            <div class="list-group-item-text">
+                                <p>{{ message.getContent()| striptags | textTruncate( 25, ' [...]' ) | raw  }}</p>
+                            </div>
+                        </li>
+                    {% endfor %}
+                {% else %}
+                    {{ 'no_forum_widget_message'|trans({}, 'widget') }}
+                {% endif %}
+            </ul>
+        </div>
+    {% else %}
+        <div id="desktop-widget-pager" class="slrn-widget-forum">
+        {% if app.session.get('solerni_discuter_url') %}
+            <a class="slrn-widget-forum__afficher-tout" href="{{ app.session.get('solerni_discuter_url') }}" >Afficher tout</a>
+        {% endif %}
+            <h3 class="slrn-widget-forum__title">{{ 'last_messages_title'|trans({}, 'lesson-widget') }}</h3>
+            <ul class="list-group slrn-list-group">
+                {% if nbMessages > 0 %}
+                    {% for message in messages %}
+                        <li class="list-group-item slrn-list-group-item">
+                            <p class="text-muted slrn-message-header">{{ 'forum_last_message_owner'|trans({}, 'lesson-widget') }} {{ message.getCreator().getFirstName() }}, {{ message.getCreationDate()| widgetForumDate(app.request.locale) }}</p>
+                            <div class="list-group-item-text">
+                                <p><a class="slrn-list-group-link" href="{{ _path('claro_forum_messages', {'subject': message.getSubject().getId() }) }}">{{ message.getContent()| striptags | textTruncate( 25, ' [...]' ) | raw  }}</a></p>
+                            </div>
+                        </li>
+                    {% endfor %}
+                    {% if not isMini %}
+                    <a class="btn btn-success slrn-btn--green" href="{{ app.session.get('solerni_discuter_url') }}">
+                       {{ 'i_reply'|trans({}, 'lesson-widget') }}
+                    </a>
+                    {% endif%}
+                {% else %}
+                    {{ 'no_forum_widget_message'|trans({}, 'widget') }}
+                {% endif %}
+            </ul>
+        </div>
+    {%endif%}

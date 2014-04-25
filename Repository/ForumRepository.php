@@ -39,6 +39,7 @@ class ForumRepository extends EntityRepository
             subjectCreator.id as subject_creator_id,
             lastUser.lastName as last_message_creator_lastname,
             lastUser.firstName as last_message_creator_firstname,
+            lastUser.id as last_message_creator_id,
             s.creationDate as subject_created
             FROM Claroline\ForumBundle\Entity\Subject s
             JOIN s.messages m_count
@@ -76,7 +77,8 @@ class ForumRepository extends EntityRepository
         $dql = "
             SELECT c.id as id,
             count(m) as count_messages,
-            c.name as name
+            c.name as name,
+            c.creationDate as creation_date
             FROM Claroline\ForumBundle\Entity\Category c
             LEFT JOIN c.subjects s
             LEFT JOIN s.messages m
@@ -94,7 +96,8 @@ class ForumRepository extends EntityRepository
             SELECT m.creationDate as last_message_created,
             c.id as categoryId,
             lastUser.lastName as last_message_creator_lastname,
-            lastUser.firstName as last_message_creator_firstname
+            lastUser.firstName as last_message_creator_firstname,
+            lastUser.id as last_message_creator_id
             FROM Claroline\ForumBundle\Entity\Message m
             JOIN m.creator lastUser
             JOIN m.subject s
@@ -124,12 +127,13 @@ class ForumRepository extends EntityRepository
             $merged[$key]['last_message_created'] = null;
             $merged[$key]['last_message_creator_lastname'] = null;
             $merged[$key]['last_message_creator_firstname'] = null;
-
+            $merged[$key]['last_message_creator_id'] = null;
             foreach ($lastMessages as $lastMessage) {
                 if ($category['id'] === $lastMessage['categoryId']) {
                     $merged[$key]['last_message_created'] = $lastMessage['last_message_created'];
                     $merged[$key]['last_message_creator_lastname'] = $lastMessage['last_message_creator_lastname'];
                     $merged[$key]['last_message_creator_firstname'] = $lastMessage['last_message_creator_firstname'];
+                    $merged[$key]['last_message_creator_id'] = $lastMessage['last_message_creator_id'];
                 }
             }
         }

@@ -1,0 +1,35 @@
+{% set layout = "ClarolineCoreBundle:Workspace:layout.html.twig" %}
+{% extends layout %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('bundles/clarolineforum/css/solerni_forum.css') }}" screen="media" />
+{% endblock %}
+
+{% block bodyClasses %}{{ parent() }} body-forum {%endblock %}
+
+{% block section_content %}
+<div class="row">
+    <div class="col-xs-3 col-md-3">
+    {% render controller(
+            'ClarolineCoreBundle:Solerni:getWorkspacePresentationWidget',
+            {'workspaceId':  _resource.getResourceNode().getWorkspace().getId(), 'renderProgression' : false } 
+       ) %}
+    {% render controller( 
+            'ClarolineForumBundle:Forum:forumsWorkspaceWidget', 
+            {'workspaceId': _resource.getResourceNode().getWorkspace().getId(), 'isMini': true} 
+        ) 
+    %}
+    
+    </div>
+    <div class="col-xs-9 col-md-9">
+        {% block forum_breadcrumb %}
+        {% endblock %}
+        
+        {% block forum_content %}
+
+        {% endblock %}
+
+    </div>
+</div>
+{% endblock %}
