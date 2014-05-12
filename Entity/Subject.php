@@ -16,12 +16,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Claroline\CoreBundle\Entity\User;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Claroline\CoreBundle\Entity\AbstractIndexable;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="claro_forum_subject")
  */
-class Subject
+class Subject extends AbstractIndexable
 {
     /**
      * @ORM\Id
@@ -152,5 +153,25 @@ class Subject
     public function isSticked()
     {
         return $this->isSticked;
+    }
+    
+    public function fillIndexableDocument(&$doc)
+    {
+        $doc = parent::fillIndexableDocument($doc);
+        
+        $doc->forum_id = $this->getCategory()->getForum()->getId();
+        $doc->forum_name = $this->getCategory()->getForum()->getResourceNode()->getName();
+        $doc->forum_category_id = $this->getCategory()->getId();
+        $doc->forum_category_name = $this->getCategory()->getName();
+        $doc->content = $this->getTitle();
+        $resourceNode = $this->getCategory()->getForum()->getResourceNode();
+        $doc->resource_id = $resourceNode->getId();
+        $doc->wks_id = $resourceNode->getWorkspace()->getId();
+        $doc->creation_date = $this->getCreationDate();
+        $doc->type_name = $resourceNode->getResourceType()->getName().'_subject';
+        $doc->owner_id = $this->getCreator()->getId();
+        $doc->owner_name = $this->getCreator()->getFirstName() . ' ' .
+                           $this->getCreator()->getLastName();
+        return $doc;
     }
 }
