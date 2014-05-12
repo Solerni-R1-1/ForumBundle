@@ -15,13 +15,15 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
+use Claroline\CoreBundle\Entity\AbstractIndexable;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="claro_forum_category")
  */
-class Category
+class Category extends AbstractIndexable
 {
+    
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -109,4 +111,43 @@ class Category
     {
         $this->name = $name;
     }
+    public function getCreationDate()
+    {
+        return $this->creationDate;
+    }
+
+    public function getModificationDate()
+    {
+        return $this->modificationDate;
+    }
+
+    public function setCreationDate($creationDate)
+    {
+        $this->creationDate = $creationDate;
+    }
+
+    public function setModificationDate($modificationDate)
+    {
+        $this->modificationDate = $modificationDate;
+    }
+
+    public function fillIndexableDocument(&$doc)
+    {
+        $doc = parent::fillIndexableDocument($doc);
+        
+        $doc->forum_id = $this->getForum()->getId();
+        $doc->forum_name = $this->getForum()->getResourceNode()->getName();
+        $doc->content = $this->getName();
+        $resourceNode = $this->getForum()->getResourceNode();
+        $doc->resource_id = $resourceNode->getId();
+        $doc->wks_id = $resourceNode->getWorkspace()->getId();
+        $doc->creation_date = $this->getCreationDate();
+        $doc->modification_date = $this->getModificationDate();
+        $doc->type_name = $resourceNode->getResourceType()->getName().'_category';
+        $doc->owner_id = $resourceNode->getCreator()->getId();
+        $doc->owner_name = $resourceNode->getCreator()->getFirstName() . ' ' .
+                           $resourceNode->getCreator()->getLastName();
+        return $doc;
+    }
+
 }
