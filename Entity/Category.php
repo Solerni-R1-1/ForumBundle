@@ -43,7 +43,8 @@ class Category extends AbstractIndexable
     /**
      * @ORM\OneToMany(
      *     targetEntity="Claroline\ForumBundle\Entity\Subject",
-     *     mappedBy="category"
+     *     mappedBy="category", 
+     *     cascade={"remove"}
      * )
      * @ORM\OrderBy({"id" = "ASC"})
      */
