@@ -25,7 +25,8 @@ class Forum extends AbstractResource
     /**
      * @ORM\OneToMany(
      *     targetEntity="Claroline\ForumBundle\Entity\Category",
-     *     mappedBy="forum"
+     *     mappedBy="forum", 
+     *     cascade={"remove"}
      * )
      * @ORM\OrderBy({"id" = "ASC"})
      */

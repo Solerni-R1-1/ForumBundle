@@ -61,7 +61,8 @@ class Subject extends AbstractIndexable
     /**
      * @ORM\OneToMany(
      *     targetEntity="Claroline\ForumBundle\Entity\Message",
-     *     mappedBy="subject"
+     *     mappedBy="subject", 
+     *     cascade={"remove"}
      * )
      * @ORM\OrderBy({"id" = "ASC"})
      */
