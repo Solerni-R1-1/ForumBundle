@@ -144,7 +144,6 @@ class Category extends AbstractIndexable
         $doc->wks_id = $resourceNode->getWorkspace()->getId();
         $doc->creation_date = $this->getCreationDate();
         $doc->modification_date = $this->getModificationDate();
-        $doc->type_name = $resourceNode->getResourceType()->getName().'_category';
         $doc->owner_id = $resourceNode->getCreator()->getId();
         $doc->owner_name = $resourceNode->getCreator()->getFirstName() . ' ' .
                            $resourceNode->getCreator()->getLastName();

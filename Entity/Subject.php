@@ -169,7 +169,6 @@ class Subject extends AbstractIndexable
         $doc->resource_id = $resourceNode->getId();
         $doc->wks_id = $resourceNode->getWorkspace()->getId();
         $doc->creation_date = $this->getCreationDate();
-        $doc->type_name = $resourceNode->getResourceType()->getName().'_subject';
         $doc->owner_id = $this->getCreator()->getId();
         $doc->owner_name = $this->getCreator()->getFirstName() . ' ' .
                            $this->getCreator()->getLastName();
