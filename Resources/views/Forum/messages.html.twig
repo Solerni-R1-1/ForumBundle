@@ -81,6 +81,14 @@
                                 <h1><i class="icon-user col-md-12"></i><h1>
                         {% endif %}
                         </div>
+                        <div class="text-center">
+                        <a href="{{path('claro_profile_view', {'userId':message.getCreator().getId()})}}">
+                           {{ message.getCreator().getFirstName() }} {{ message.getCreator().getLastName() }}
+                        </a>
+                        </div>
+                        <div class="text-center">
+                            {{ message.getCreationDate()|intl_date_format() }}
+                        </div>
                     </td>
                     <td>
                         <p>{{ message.getContent()|raw }}</p>
