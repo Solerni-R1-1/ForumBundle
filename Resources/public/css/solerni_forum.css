@@ -1,0 +1,130 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 5 mars 2014, 12:08:39
+    Author     : Orange / SII
+    Description: Custom CSS for Forum Override
+*/
+/* not used or included. Will be when override forums */
+
+#subjects_table .slrn-forum-table__th 
+{
+    text-transform: uppercase;
+}
+
+#subjects_table.slrn-forum-table, 
+#subjects_table.slrn-forum-table th,
+#subjects_table.slrn-forum-table td
+{
+    padding-top: 1.2em;
+    padding-bottom: 1em;
+    padding-left: 1.2em;
+    padding-right: 1em;
+    border: 0;
+}
+
+#subjects_table .slrn-forum__tools > a {
+    margin-right: 1.5em;
+}
+
+#subjects_table .slrn-forum__tools {
+    margin-top: 1.2em;
+}
+    
+#subjects_table .slrn-forum-table__th-category {
+    width: 50%;
+}
+
+#subjects_table .slrn-forum-table__th-msg {
+    width:20%;
+    text-align: center;
+}
+
+#subjects_table .slrn-forum-table__th-lastmsg {
+    
+}
+
+.slrn-forum-table .link-category {
+    font-size: 1.2em;
+}
+
+#subjects_table .slrn-name-date,
+#messages_table .slrn-name-date{
+    margin-top: 0.8em;
+    font-size: 0.9em;
+}
+
+i.icon-question-sign,
+i.icon-comment
+{
+    color: #abbe4b;
+}
+
+.slrn-breadcrumb {
+    margin-top: 1em;
+    padding: 0;
+}
+
+.slrn-breadcrumb li{
+    display: inline;
+}
+
+.slrn-breadcrumb li:after {
+    content: " > ";
+}
+.slrn-breadcrumb li:last-child:after {
+    content: "";
+}
+
+.slrn-forum__response {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+#messages_table.row-message table tbody > tr  {
+    border-bottom: 1px solid gray;
+}
+
+.pagination .disabled a {
+    color: gray !important;
+}
+
+.panel-heading .slrn-name-date {
+    margin-bottom: 2em;
+}
+.panel-heading .slrn-panel-title {
+    margin-bottom: 0.4em;
+}
+
+/* forum mini widget */
+
+.slrn-widget-forum-mini {
+    background-color: #EEEEEF;
+}
+.slrn-widget-forum-mini h3 {
+    padding-top: 8%;
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 1em;
+    font-weight: bold;
+}
+
+.slrn-widget-forum-mini .slrn-list-group li {
+    border: 0;
+    background: #EEEEEF;
+    font-size: 0.9em;
+}
+
+.icon-flipped {
+    transform: scaleX(-1);
+    -moz-transform: scaleX(-1);
+    -webkit-transform: scaleX(-1);
+    -ms-transform: scaleX(-1);
+}
+
+.panel-body {
+    margin-top: 1.2em;
+}

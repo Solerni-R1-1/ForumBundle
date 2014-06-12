@@ -1,25 +1,22 @@
 {% from _self import renderPager %}
 
-{% set layout = "ClarolineCoreBundle:Workspace:layout.html.twig" %}
-
-{% if isDesktop() %}
-    {% set layout = "ClarolineCoreBundle:Desktop:layout.html.twig" %}
-{% endif %}
+{% set layout = "ClarolineForumBundle::layout.html.twig" %}
 
 {% extends layout %}
 
 {% block title %}{{ _resource.getResourceNode().getName() ~ ' - ' ~ parent() | striptags | raw  }}{% endblock %}
 
-{% block section_content %}
+{% block forum_content %}
     <div class="panel-heading">
-        <h3 class="panel-title">{{ _resource.getResourceNode().getName() }}</h3>
+        <a class="slrn-read-faq pink_link" href="{{ path( 'solerni_static_page', { 'name': 'cms_faq' } ) }}">{{ 'read_faq'|trans({}, 'platform') }}</a>
+        <h3 class="slrn-panel-title">{{ 'all categories'|trans({}, 'forum') }}</h3>
     </div>
     <div class="panel-body">
         <div class="navbar row">
             <div class="col-md-8">
                 {% if isModerator %}
                 <a class="btn btn-primary" href="{{ _path('claro_forum_form_category_creation', {'forum': _resource.getId()}) }}">
-                    <i class="icon-plus"></i> {{ 'new_category'|trans({}, 'forum') }}
+                    {{ 'new_category'|trans({}, 'forum') }}
                 </a>
                 {% endif %}
                 {% if is_mailer_available() %}
@@ -31,33 +28,24 @@
                         <a class="btn btn-primary" href="{{ _path('claro_forum_subscribe', {'forum': _resource.getId()}) }}">
                             {{ 'subscribe_mail_list'|trans({}, 'forum') }}
                         </a>
+                
                     {% endif %}
                 {% endif %}
             </div>
             <div class="col-md-4">
-                 <div class="input-group">
-                   <input class="form-control" type="text" id="search-items-txt" placeholder="{{ 'search'|trans({}, 'platform') }}" value="{{ search }}">
-                    <span class="input-group-btn">
-                        <button class="filter btn btn-default" type="button" id="search-button">
-                            <i class="icon-search"></i>
-                        </button>
-                    </span>
-                </div>
             </div>
         </div>
         <div class="table-responsive">
-            <table id="subjects_table" class="table table-striped table-bordered table-condensed">
+            <table id="subjects_table" class="slrn-forum-table table table-striped table-bordered table-condensed">
                 <thead>
-                    <tr>
-                        <th>{{ 'category'|trans({}, 'forum') }}</th>
-                        <th>{{ 'messages'|trans({}, 'forum') }} </th>
-                        <th>{{ 'last_message'|trans({}, 'forum') }}</th>
-                        {% if isModerator %}
-                            <th></th>
-                        {% endif %}
+                    <tr class="slrn-forum-table__th">
+                        <th class="slrn-forum-table__th-category">{{ 'category'|trans({}, 'forum') }}</th>
+                        <th class="slrn-forum-table__th-msg">{{ 'messages'|trans({}, 'forum') }} </th>
+                        <th class="slrn-forum-table__th-lastmsg">{{ 'last_message'|trans({}, 'forum') }}</th>
                     </tr>
                 </thead>
                 <tbody id="table-subjects-body">
+                {% set theme = 1 %}
                 {% for category in categories %}
                     <tr class='row-category'>
                         <td>
@@ -66,30 +54,40 @@
                             >
                                 {{ category['name'] }}
                             </a>
+                            <div class="slrn-name-date">{{ category['creation_date'] | widgetForumDate() }}</div>
                             {% if isModerator %}
-                                <a class="pull-right" href="{{ path('claro_forum_edit_category_form', {'category': category['id']}) }}">
+                            <div class="slrn-forum__tools">
+                                <a href="{{ path('claro_forum_edit_category_form', {'category': category['id']}) }}">
                                     <i class="icon-pencil"></i> {{ 'edit' | trans({}, 'platform') }}
                                 </a>
-                           {% endif %}
-                            <br>
-                        <td>
-                            {{ category['count_messages'] }}
-                        </td>
-                        <td>
-                            {{ category['last_message_creator_firstname'] }}
-                            {{ category['last_message_creator_lastname'] }}<br/>
-                            {% if  category['last_message_created'] %}
-                                 {{ category['last_message_created']|timeAgo() }}
-                            {% endif %}
-                        </td>
-                        {% if isModerator %}
-                            <td>
-                                <a id="delete-category" href="{{ path('claro_forum_delete_category', {'category': category['id']}) }}">
+                            
+                                <a href="{{ path('claro_forum_delete_category', {'category': category['id']}) }}">
                                     <i class="icon-trash"></i> {{ 'delete' | trans({}, 'platform') }}
                                 </a>
-                            </td>
-                        {% endif %}
+                            </div>
+                           {% endif %}
+                       </td>
+                        <td class="text-center">
+                            <b>{{ category['count_messages'] }}</b>
+                        </td>
+                        <td>
+                            {% if category['last_message_creator_firstname'] %}
+                                {{ 'started_by' | trans({}, 'forum') }} 
+                                <b>
+                                <a href="{{ path('claro_public_profile_view', {'publicUrl': category['last_message_creator_public_url']}) }}">
+                                    {{ category['last_message_creator_firstname'] }}
+                                    {{ category['last_message_creator_lastname'] }}
+                                </a>
+                                </b>
+                            {% endif %}
+                            {% if  category['last_message_created'] %}
+                            <div>
+                                 {{ category['last_message_created'] | widgetForumDate() }}
+                            </div>
+                            {% endif %}
+                        </td>
                     </tr>
+                    {% set theme = theme + 1 %}
                 {% endfor %}
                 </tbody>
             </table>
