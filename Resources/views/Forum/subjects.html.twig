@@ -90,7 +90,7 @@
                             <div class="slrn-name-date">
                                 {{ 'started_by' | trans({}, 'forum') }}
                                 <b>
-                                    <a href="{{ path('claro_profile_view', {'userId': subject['subject_creator_id']}) }}">
+                                    <a href="{{ path('claro_public_profile_view', {'publicUrl': subject['subject_creator_public_url']}) }}">
                                     {{ subject['subject_creator_firstname'] }}
                                     {{ subject['subject_creator_lastname'] }}</a></b>,
                                 {{ subject['subject_created'] | widgetForumDate()}}
@@ -119,7 +119,7 @@
                         <td>
                             {{ 'started_by' | trans({}, 'forum') }} 
                             <b>
-                                <a href="{{ path('claro_profile_view', {'userId': subject['last_message_creator_id']}) }}">
+                                <a href="{{ path('claro_public_profile_view', {'publicUrl': subject['last_message_creator_public_url']}) }}">
                                    {{ subject['last_message_creator_firstname'] }}
                                    {{ subject['last_message_creator_lastname'] }}
                                 </a>
