@@ -41,7 +41,7 @@
         <div class="slrn-name-date">
           {{ 'started_by' | trans({}, 'forum') }} 
           <b>
-          <a href="{{path('claro_profile_view', {'userId':subject.getCreator().getId()})}}">
+          <a href="{{path('claro_public_profile_view', {'publicUrl':subject.getCreator().getPublicUrl()})}}">
               {{ subject.getCreator().getFirstName() }} {{ subject.getCreator().getLastName() }}
           </a>
           </b>
@@ -80,6 +80,14 @@
                         {% else %}
                                 <h1><i class="icon-user col-md-12"></i><h1>
                         {% endif %}
+                        </div>
+                        <div class="text-center">
+                        <a href="{{path('claro_public_profile_view', {'publicUrl':message.getCreator().getPublicUrl()})}}">
+                           {{ message.getCreator().getFirstName() }} {{ message.getCreator().getLastName() }}
+                        </a>
+                        </div>
+                        <div class="text-center">
+                            {{ message.getCreationDate()|intl_date_format() }}
                         </div>
                     </td>
                     <td>
