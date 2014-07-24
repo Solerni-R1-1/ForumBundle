@@ -16,14 +16,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Claroline\ForumBundle\Entity\Subject;
 use Claroline\CoreBundle\Entity\User;
 use Gedmo\Mapping\Annotation as Gedmo;
-use Claroline\CoreBundle\Entity\AbstractIndexable;
+use Claroline\CoreBundle\Entity\Resource\AbstractIndexableResourceElement;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="claro_forum_message")
  * @ORM\Entity(repositoryClass="Claroline\ForumBundle\Repository\MessageRepository")
  */
-class Message extends AbstractIndexable
+class Message extends AbstractIndexableResourceElement
 {
     /**
      * @ORM\Id
@@ -131,24 +131,28 @@ class Message extends AbstractIndexable
     public function fillIndexableDocument(&$doc)
     {
         $doc = parent::fillIndexableDocument($doc);
-
+        
         $doc->forum_id = $this->getSubject()->getCategory()->getForum()->getId();
         $doc->forum_name = $this->getSubject()->getCategory()->getForum()->getResourceNode()->getName();
         $doc->forum_category_id = $this->getSubject()->getCategory()->getId();
         $doc->forum_category_name = $this->getSubject()->getCategory()->getName();
+        $doc->forum_category_url= $this->get('router')->generate('claro_forum_subjects', array(
+            'category' => $doc->forum_category_id
+        ));
         $doc->forum_subject_id = $this->getSubject()->getId();
         $doc->forum_subject_name = $this->getSubject()->getTitle();
+        $doc->forum_subject_url= $this->get('router')->generate('claro_forum_messages', array(
+            'subject' => $doc->forum_subject_id
+        ));
         $doc->content = $this->getContent();
-        $resourceNode = $this->getSubject()->getCategory()->getForum()->getResourceNode();
-        $doc->resource_id = $resourceNode->getId();
-        $doc->wks_id = $resourceNode->getWorkspace()->getId();
-        $doc->creation_date = $this->getCreationDate();
-        $doc->modification_date = $this->getUpdated();
-        $doc->owner_id = $resourceNode->getCreator()->getId();
-        $doc->owner_name = $resourceNode->getCreator()->getFirstName() . ' ' .
-                           $resourceNode->getCreator()->getLastName();
-
+        
         return $doc;
     }
+
+    public function getResourceNode()
+    {
+        return $this->getSubject()->getCategory()->getForum()->getResourceNode();
+    }
+
 
 }

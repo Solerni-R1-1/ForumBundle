@@ -15,13 +15,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
-use Claroline\CoreBundle\Entity\AbstractIndexable;
+use Claroline\CoreBundle\Entity\Resource\AbstractIndexableResourceElement;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="claro_forum_category")
  */
-class Category extends AbstractIndexable
+class Category extends AbstractIndexableResourceElement
 {
     
     /**
@@ -139,15 +139,12 @@ class Category extends AbstractIndexable
         $doc->forum_id = $this->getForum()->getId();
         $doc->forum_name = $this->getForum()->getResourceNode()->getName();
         $doc->content = $this->getName();
-        $resourceNode = $this->getForum()->getResourceNode();
-        $doc->resource_id = $resourceNode->getId();
-        $doc->wks_id = $resourceNode->getWorkspace()->getId();
-        $doc->creation_date = $this->getCreationDate();
-        $doc->modification_date = $this->getModificationDate();
-        $doc->owner_id = $resourceNode->getCreator()->getId();
-        $doc->owner_name = $resourceNode->getCreator()->getFirstName() . ' ' .
-                           $resourceNode->getCreator()->getLastName();
+        
         return $doc;
     }
 
+    public function getResourceNode()
+    {
+        return $this->getForum()->getResourceNode();
+    }
 }
