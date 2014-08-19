@@ -222,13 +222,14 @@ class ForumController extends Controller
             }
         }
 
-        throw new \Exception($form->getErrorsAsString());
+        //throw new \Exception($form->getErrorsAsString());
         $form->get('message')->addError(
             new FormError($this->get('translator')->trans('field_content_required', array(), 'forum'))
         );
 
         return array(
             'form' => $form->createView(),
+            'category' => $category,
             '_resource' => $forum
         );
     }
