@@ -6,6 +6,7 @@ category_form_name: Category
 edit_message: Edit a message
 field_content_required: Content field is required.
 forum: Forum
+forum_back_to_categories: Back to forums
 forum_category_edit: 'Edit category'
 forum_form_name: Name
 forum_message_form_content: Content
