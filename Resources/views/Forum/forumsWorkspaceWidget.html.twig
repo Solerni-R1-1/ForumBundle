@@ -37,7 +37,8 @@
                         </li>
                     {% endfor %}
                     {% if not isMini %}
-                    <a class="btn btn-success slrn-btn--green" href="{{ app.session.get('solerni_discuter_url') }}">
+                    {#<a class="btn btn-success slrn-btn--green" href="{{ app.session.get('solerni_discuter_url') }}">#}
+                    <a class="btn btn-success slrn-btn--green" href="{{ _path('claro_forum_categories', {'forum' : forum.getId() }) }}">
                        {{ 'i_reply'|trans({}, 'lesson-widget') }}
                     </a>
                     {% endif%}

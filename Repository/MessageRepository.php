@@ -43,6 +43,7 @@ class MessageRepository extends EntityRepository
 
         return $query->getSingleResult();
     }
+    
     public function findNLastByForum(array $workspaces, array $roles, $n)
     {
         
@@ -61,5 +62,28 @@ class MessageRepository extends EntityRepository
         $paginator = new Paginator($query, $fetchJoinCollection = false);
 
         return $paginator;
+    }
+    
+    public function findNLastBySession($session, array $roles, $n)
+    {
+    
+    	$dql = "SELECT m FROM Claroline\ForumBundle\Entity\Message m
+                JOIN m.subject s
+                JOIN s.category c
+                JOIN c.forum f
+                JOIN f.resourceNode n
+    			JOIN Claroline\CoreBundle\Entity\Mooc\MoocSession ms
+    			WITH ms.forum = n
+                WHERE :session = ms.id
+                ORDER BY m.creationDate DESC
+                ";
+    	$query = $this->_em->createQuery($dql);
+    	$query->setParameters(array(
+    			'session' => $session->getId()
+    	));
+    	$query->setFirstResult(0)->setMaxResults($n);
+    	$paginator = new Paginator($query, $fetchJoinCollection = false);
+    
+    	return $paginator;
     }
 }

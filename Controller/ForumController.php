@@ -29,6 +29,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration as EXT;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * ForumController
@@ -687,14 +688,24 @@ class ForumController extends Controller
         $token = $sc->getToken($user);
         $roles = $utils->getRoles($token);
 
+
+        $moocSession = $this->getDoctrine()
+	        ->getRepository( 'ClarolineCoreBundle:Mooc\\MoocSession' )
+	        ->guessMoocSession($workspace, $user);
+        
         $workspaces = array();
         $workspaces[] = $workspace;
         $em = $this->getDoctrine()->getManager();
         // Get the 3 last messages from all forums from the workspace
         $messages = $em->getRepository('ClarolineForumBundle:Message')
-                ->findNLastByForum($workspaces, $roles,3);
+                ->findNLastBySession($moocSession, $roles,3);
+        
 
-        return array('widgetType' => 'workspace', 'messages' => $messages, 'isMini' => $isMini);
+        
+        $forum = $em->getRepository('ClarolineForumBundle:Forum')
+        		->getForumAssociatedToSession($moocSession->getId());
+
+        return array('widgetType' => 'workspace', 'messages' => $messages, 'isMini' => $isMini, 'forum' => $forum);
     }
 
     /**
