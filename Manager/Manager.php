@@ -266,7 +266,7 @@ class Manager
 
         $body = "<a href='{$url}'>{$title}</a><hr>{$message->getContent()}";
 
-        $this->mailManager->send($title, $body, $users);
+        $this->mailManager->send($title, $body, $users, null, $user);
 
     }
 
