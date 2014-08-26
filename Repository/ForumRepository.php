@@ -199,6 +199,8 @@ class ForumRepository extends EntityRepository
     	
     	$query = $this->_em->createQuery($dql);
     	
-    	return $query->getResult()[0];
+    	$result = $query->getResult();
+    	
+    	return (count($result) > 0 ? $result[0] : NULL);
     }
 }
