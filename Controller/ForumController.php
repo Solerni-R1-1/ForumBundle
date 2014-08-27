@@ -51,18 +51,21 @@ class ForumController extends Controller
      */
     public function openAction(Forum $forum, User $user)
     {
-        $em = $this->getDoctrine()->getManager();
         if ($this->checkAccess($forum, false)) {
+        	$em = $this->getDoctrine()->getManager();
 	        $categories = $em->getRepository('ClarolineForumBundle:Forum')->findCategories($forum);
 	        $sc = $this->get('security.context');
 	        $isModerator = $sc->isGranted('moderate', new ResourceCollection(array($forum->getResourceNode())));
 	
+	        $moocSession = $em->getRepository('ClarolineCoreBundle:Mooc\\MoocSession')->getMoocSessionByForum($forum);
+	        
 	        return array(
 	            'search' => null,
 	            '_resource' => $forum,
 	            'isModerator' => $isModerator,
 	            'categories' => $categories,
 	            'hasSubscribed' => $this->get('claroline.manager.forum_manager')->hasSubscribed($user, $forum),
+	        	'session' => $moocSession
 	        );
         } else {
         	return $this->redirect($this->get('router')->generate('mooc_view', array('moocId' => $forum->getResourceNode()->getWorkspace()->getMooc()->getId(), 'moocName' => $forum->getResourceNode()->getWorkspace()->getMooc()->getTitle())));
@@ -87,11 +90,14 @@ class ForumController extends Controller
     {
         $forum = $category->getForum();
         if ($this->checkAccess($forum, false)) {
+        	$em = $this->getDoctrine()->getManager();
 	        $pager = $this->get('claroline.manager.forum_manager')->getSubjectsPager($category, $page, $max);
 	        $collection = new ResourceCollection(array($forum->getResourceNode()));
 	        $sc = $this->get('security.context');
 	        $canCreateSubject = $sc->isGranted('post', $collection);
 	        $isModerator = $sc->isGranted('moderate', $collection);
+	
+	        $moocSession = $em->getRepository('ClarolineCoreBundle:Mooc\\MoocSession')->getMoocSessionByForum($forum);
 	
 	        return array(
 	            'pager' => $pager,
@@ -99,7 +105,8 @@ class ForumController extends Controller
 	            'canCreateSubject' => $canCreateSubject,
 	            'isModerator' => $isModerator,
 	            'category' => $category,
-	            'max' => $max
+	            'max' => $max,
+	        	'session' => $moocSession
 	        );
         } else {
         	return $this->redirect($this->get('router')->generate('mooc_view', array('moocId' => $forum->getResourceNode()->getWorkspace()->getMooc()->getId(), 'moocName' => $forum->getResourceNode()->getWorkspace()->getMooc()->getTitle())));
@@ -261,12 +268,15 @@ class ForumController extends Controller
     {
         $forum = $subject->getCategory()->getForum();
         if ($this->checkAccess($forum, false)) {
+        	$em = $this->getDoctrine()->getManager();
 	        $isModerator = $this->get('security.context')->isGranted('moderate', new ResourceCollection(array($forum->getResourceNode())));
 	        $pager = $this->get('claroline.manager.forum_manager')->getMessagesPager($subject, $page, $max);
 	        $collection = new ResourceCollection(array($forum->getResourceNode()));
 	        $canAnswer = $this->get('security.context')->isGranted('post', $collection);
 	        $form = $this->get('form.factory')->create(new MessageType());
-	
+	        
+	        $moocSession = $em->getRepository('ClarolineCoreBundle:Mooc\\MoocSession')->getMoocSessionByForum($forum);
+			
 	        return array(
 	            'subject' => $subject,
 	            'pager' => $pager,
@@ -275,7 +285,9 @@ class ForumController extends Controller
 	            'form' => $form->createView(),
 	            'canAnswer' => $canAnswer,
 	            'category' => $subject->getCategory(),
-	            'max' => $max
+	            'max' => $max,
+	        	'session' => $moocSession
+	        
 	        );
         } else {
         	return $this->redirect($this->get('router')->generate('mooc_view', array('moocId' => $forum->getResourceNode()->getWorkspace()->getMooc()->getId(), 'moocName' => $forum->getResourceNode()->getWorkspace()->getMooc()->getTitle())));
