@@ -21,29 +21,22 @@
 {% from _self import renderPager %}
 {% from _self import renderOptions %}
 
-{% set layout = "ClarolineCoreBundle:Workspace:layout.html.twig" %}
-
-{% if isDesktop() %}
-    {% set layout = "ClarolineCoreBundle:Desktop:layout.html.twig" %}
-{% endif %}
-
+{% set layout = "ClarolineForumBundle::layout.html.twig" %}
 {% extends layout %}
 
 {% block title %}{{ _resource.getResourceNode().getName() ~ ' - ' ~ parent() | striptags | raw  }}{% endblock %}
 
-{% block resourceBreadcrumb %}
-    <li><a href="{{ path('claro_forum_categories', { 'forum': category.getForum().getId() }) }}">{{ _resource.getResourceNode().getName() }}</a></li>
-    <li class="active"> {{ category.getName() }} </li>
+{% block forum_breadcrumb %}
+    <ul class="slrn-breadcrumb">
+        <li><a href="{{ path('claro_forum_categories', { 'forum': category.getForum().getId() }) }}">Tous les thèmes</a></li>
+        <li class="active"> Tous les sujets du thème : {{ category.getName() }} </li>
+    </ul>
 {% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    <link rel='stylesheet' type='text/css' href='{{ asset('bundles/clarolineforum/css/forum.css')}}'>
-{% endblock %}
-
-{% block section_content %}
+{% block forum_content %}
     <div class="panel-heading">
-        <h3 class="panel-title">{{ _resource.getResourceNode().getName() }}</h3>
+        <a class="slrn-read-faq pink_link" href="{{ path( 'solerni_static_page', { 'name': 'cms_faq' } ) }}">{{ 'read_faq'|trans({}, 'platform') }}</a>
+        <h3 class="slrn-panel-title">Tous les sujets du thème : {{ category.getName() }}</h3>
     </div>
     <div class="panel-body">
         <div class="navbar row">
