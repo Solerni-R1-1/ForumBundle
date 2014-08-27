@@ -16,8 +16,8 @@
             {'workspaceId':  _resource.getResourceNode().getWorkspace().getId(), 'renderProgression' : false } 
        ) %}
     {% render controller( 
-            'ClarolineForumBundle:Forum:forumsWorkspaceWidget', 
-            {'workspaceId': _resource.getResourceNode().getWorkspace().getId(), 'isMini': true} 
+            'ClarolineForumBundle:Forum:forumsWidget', 
+            {'nodeId': _resource.getResourceNode().getId(), 'isMini': true} 
         ) 
     %}
     

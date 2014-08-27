@@ -203,4 +203,16 @@ class ForumRepository extends EntityRepository
     	
     	return (count($result) > 0 ? $result[0] : NULL);
     }
+    
+    public function getForumFromResourceNode($node) {
+    	$dql = "SELECT f FROM Claroline\ForumBundle\Entity\Forum f
+    			JOIN f.resourceNode rn
+    			WHERE rn = :node";
+    	$query = $this->_em->createQuery($dql);
+    	$query->setParameter('node', $node);
+    	
+    	$result = $query->getResult();
+    	
+    	return (count($result) > 0 ? $result[0] : NULL);
+    }
 }

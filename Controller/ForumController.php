@@ -30,6 +30,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration as EXT;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Claroline\CoreBundle\Entity\Resource\ResourceNode;
 
 /**
  * ForumController
@@ -722,6 +723,45 @@ class ForumController extends Controller
         		->getForumAssociatedToSession($moocSession->getId());
 
         return array('widgetType' => 'workspace', 'messages' => $messages, 'isMini' => $isMini, 'forum' => $forum);
+    }
+    
+    /**
+     * @EXT\Route(
+     *     "/forums/{nodeId}",
+     *     name="claro_forum",
+     *     options={"expose"=true}
+     * )
+     * @EXT\Method("GET")
+     * @EXT\ParamConverter(
+     *      "node",
+     *      class="ClarolineCoreBundle:Resource\ResourceNode",
+     *      options={"id" = "nodeId", "strictId" = true}
+     * )
+     *
+     * @EXT\Template()
+     *
+     * Renders last messages from the forum
+     *
+     * @param ResourceNode $node
+     * @param boolean $isMini
+     */
+    public function forumsWidgetAction(ResourceNode $node, $isMini = false)
+    {
+    	$sc = $this->get('security.context');
+    	$user = $sc->getToken()->getUser();
+    	$utils = $this->get('claroline.security.utilities');
+    	$token = $sc->getToken($user);
+    	$roles = $utils->getRoles($token);
+    	$em = $this->getDoctrine()->getManager();
+
+    	$forum = $em->getRepository('ClarolineForumBundle:Forum')
+    			->getForumFromResourceNode($node);
+        	
+    	// Get the 3 last messages from all forums from the workspace
+    	$messages = $em->getRepository('ClarolineForumBundle:Message')
+    			->findNLast($forum, $roles,3);
+    
+    	return array('widgetType' => 'workspace', 'messages' => $messages, 'isMini' => $isMini, 'forum' => $forum);
     }
     
     /**

@@ -64,7 +64,7 @@ class MessageRepository extends EntityRepository
         return $paginator;
     }
     
-    public function findNLastBySession($session, array $roles, $n)
+   public function findNLastBySession($session, array $roles, $n)
     {
     
     	$dql = "SELECT m FROM Claroline\ForumBundle\Entity\Message m
@@ -80,6 +80,26 @@ class MessageRepository extends EntityRepository
     	$query = $this->_em->createQuery($dql);
     	$query->setParameters(array(
     			'session' => $session->getId()
+    	));
+    	$query->setFirstResult(0)->setMaxResults($n);
+    	$paginator = new Paginator($query, $fetchJoinCollection = false);
+    
+    	return $paginator;
+    }
+    
+    public function findNLast($forum, array $roles, $n)
+    {
+    
+    	$dql = "SELECT m FROM Claroline\ForumBundle\Entity\Message m
+                JOIN m.subject s
+                JOIN s.category c
+                JOIN c.forum f
+                WHERE f = :forum
+                ORDER BY m.creationDate DESC
+                ";
+    	$query = $this->_em->createQuery($dql);
+    	$query->setParameters(array(
+    			'forum' => $forum
     	));
     	$query->setFirstResult(0)->setMaxResults($n);
     	$paginator = new Paginator($query, $fetchJoinCollection = false);
