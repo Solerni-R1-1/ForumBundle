@@ -40,7 +40,7 @@
     </div>
     <div class="panel-body">
         <div class="navbar row">
-            <div class="col-md-9">
+            <div class="col-md-8">
                 <a class="btn btn-default" href="{{ path('claro_forum_categories', { 'forum': category.getForum().getId() }) }}">
                     <i class="fa fa-chevron-left"></i> {{ 'forum_back_to_categories'|trans({}, 'forum') }}
                 </a>
@@ -50,7 +50,7 @@
                     </a>
                 {% endif %}
             </div>
-            <div class="col-md-3 pull-right">
+            <div class="col-md-4 pull-right">
                 <div class="input-group">
                     <select class="form-control input-md" id="max-select">
                         {{ renderOptions([20, 50, 100, 200, 500], max is defined ? max : 20) }}
