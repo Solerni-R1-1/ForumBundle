@@ -259,9 +259,18 @@ class Manager
             array('%forum%' => $forum->getResourceNode()->getName(), '%subject%' => $message->getSubject()->getTitle()),
             'forum'
         );
-
+        
+        $messages = $message->getSubject()->getMessages();
+        $index = 0;
+        foreach ($messages as $i => $msg) {
+        	if ($msg->getId() == $message->getId()) {
+        		$index = $i;
+        		break;
+        	}
+        }
+		$max = 20;
         $url = $this->router->generate(
-            'claro_forum_subjects', array('category' => $message->getSubject()->getCategory()->getId()), true
+            'claro_forum_messages', array('subject' => $message->getSubject()->getId(), 'page' => floor($index / $max) + 1, 'max' => $max), true
         );
 
         $body = "<a href='{$url}'>{$title}</a><hr>{$message->getContent()}";
