@@ -37,6 +37,18 @@ use Claroline\CoreBundle\Entity\Resource\ResourceNode;
  */
 class ForumController extends Controller
 {
+
+    private function manageAno($nextUrl){
+        if( $this->get('security.context')->getToken()->getUser() == 'anon.' ){
+            $this->get('session')->set('nextUrl', $nextUrl)
+            ;
+            $route = $this->get('router')->generate('claro_security_login', array () );
+            return $route;
+        }
+        return FALSE;
+    }
+
+
     /**
      * @Route(
      *     "/{forum}/category",
@@ -51,7 +63,17 @@ class ForumController extends Controller
      */
     public function openAction(Forum $forum, User $user)
     {
-        if ($this->checkAccess($forum, false)) {
+
+        $redirect = $this->manageAno(
+            $this->get('router')->generate('claro_forum_categories',
+                    array ( 'forum' => $forum->getId(), 'page' => $page ) )
+            );
+        if (FALSE !== $redirect) {
+            return new RedirectResponse($redirect);
+        }
+       
+
+       if ($this->checkAccess($forum, false)) {
         	$em = $this->getDoctrine()->getManager();
 	        $categories = $em->getRepository('ClarolineForumBundle:Forum')->findCategories($forum);
 	        $sc = $this->get('security.context');
@@ -88,6 +110,14 @@ class ForumController extends Controller
      */
     public function subjectsAction(Category $category, $page, $max, $user)
     {
+        $redirect = $this->manageAno(
+            $this->get('router')->generate('claro_forum_subjects',
+                    array ( 'category' => $category->getId(), 'page' => $page, '$max' => $max ) )
+            );
+        if (FALSE !== $redirect) {
+            return new RedirectResponse($redirect);
+        }
+
         $forum = $category->getForum();
         if ($this->checkAccess($forum, false)) {
         	$em = $this->getDoctrine()->getManager();
@@ -124,6 +154,14 @@ class ForumController extends Controller
      */
     public function subjectFormAction(Category $category)
     {
+        $redirect = $this->manageAno(
+            $this->get('router')->generate('claro_forum_form_subject_creation',
+                    array ( 'category' => $category->getId()) ) );
+        if (FALSE !== $redirect) {
+            return new RedirectResponse($redirect);
+        }
+
+
         $forum = $category->getForum();
         $collection = new ResourceCollection(array($forum->getResourceNode()));
 
@@ -151,6 +189,13 @@ class ForumController extends Controller
      */
     public function categoryFormAction(Forum $forum)
     {
+        $redirect = $this->manageAno(
+            $this->get('router')->generate('claro_forum_form_category_creation',
+                    array ( 'forum' => $forum->getId()) ) );
+        if (FALSE !== $redirect) {
+            return new RedirectResponse($redirect);
+        }
+
         $collection = new ResourceCollection(array($forum->getResourceNode()));
 
         if (!$this->get('security.context')->isGranted('post', $collection)) {
@@ -175,6 +220,13 @@ class ForumController extends Controller
      */
     public function createCategoryAction(Forum $forum)
     {
+        $redirect = $this->manageAno(
+            $this->get('router')->generate('claro_forum_create_category',
+                    array ( 'forum' => $forum->getId()) ) );
+        if (FALSE !== $redirect) {
+            return new RedirectResponse($redirect);
+        }
+
         $collection = new ResourceCollection(array($forum->getResourceNode()));
 
         if (!$this->get('security.context')->isGranted('post', $collection)) {
@@ -206,6 +258,13 @@ class ForumController extends Controller
      */
     public function createSubjectAction(Category $category)
     {
+        $redirect = $this->manageAno(
+            $this->get('router')->generate('claro_forum_create_subject',
+                    array ( 'category' => $category->getId()) ) );
+        if (FALSE !== $redirect) {
+            return new RedirectResponse($redirect);
+        }
+
         $forum = $category->getForum();
         $collection = new ResourceCollection(array($forum->getResourceNode()));
 
@@ -266,6 +325,14 @@ class ForumController extends Controller
      */
     public function messagesAction(Subject $subject, $page, $max, $user)
     {
+
+        $redirect = $this->manageAno(
+            $this->get('router')->generate('claro_forum_messages',
+                    array ( 'subject' => $subject->getId(), 'page' => $page , 'max' => $max) ) );
+        if (FALSE !== $redirect) {
+            return new RedirectResponse($redirect);
+        }
+
         $forum = $subject->getCategory()->getForum();
         if ($this->checkAccess($forum, false)) {
         	$em = $this->getDoctrine()->getManager();
@@ -304,6 +371,13 @@ class ForumController extends Controller
      */
     public function createMessageAction(Subject $subject)
     {
+        $redirect = $this->manageAno(
+            $this->get('router')->generate('claro_forum_create_message',
+                    array ( 'subject' => $subject->getId()) ) );
+        if (FALSE !== $redirect) {
+            return new RedirectResponse($redirect);
+        }
+
         $form = $this->container->get('form.factory')->create(new MessageType, new Message());
         $form->handleRequest($this->get('request'));
         $manager = $this->get('claroline.manager.forum_manager');
@@ -337,6 +411,13 @@ class ForumController extends Controller
      */
     public function editMessageFormAction(Message $message)
     {
+        $redirect = $this->manageAno(
+            $this->get('router')->generate('claro_forum_edit_message_form',
+                    array ( 'message' => $message->getId()) ) );
+        if (FALSE !== $redirect) {
+            return new RedirectResponse($redirect);
+        }
+
         $sc = $this->get('security.context');
         $subject = $message->getSubject();
         $forum = $subject->getCategory()->getForum();
@@ -367,6 +448,13 @@ class ForumController extends Controller
      */
     public function editMessageAction(Message $message)
     {
+        $redirect = $this->manageAno(
+            $this->get('router')->generate('claro_forum_edit_message',
+                    array ( 'message' => $message->getId()) ) );
+        if (FALSE !== $redirect) {
+            return new RedirectResponse($redirect);
+        }
+
         $sc = $this->get('security.context');
         $subject = $message->getSubject();
         $forum = $subject->getCategory()->getForum();
@@ -407,6 +495,13 @@ class ForumController extends Controller
      */
     public function editCategoryFormAction(Category $category)
     {
+        $redirect = $this->manageAno(
+            $this->get('router')->generate('claro_forum_edit_category_form',
+                    array ( 'category' => $category->getId()) ) );
+        if (FALSE !== $redirect) {
+            return new RedirectResponse($redirect);
+        }
+
         $sc = $this->get('security.context');
         $forum = $category->getForum();
         $isModerator = $sc->isGranted('moderate', new ResourceCollection(array($forum->getResourceNode())));
@@ -434,6 +529,13 @@ class ForumController extends Controller
      */
     public function editCategoryAction(Category $category)
     {
+        $redirect = $this->manageAno(
+            $this->get('router')->generate('claro_forum_edit_category',
+                    array ( 'category' => $category->getId()) ) );
+        if (FALSE !== $redirect) {
+            return new RedirectResponse($redirect);
+        }
+
         $sc = $this->get('security.context');
         $forum = $category->getForum();
         $isModerator = $sc->isGranted('moderate', new ResourceCollection(array($forum->getResourceNode())));
@@ -466,6 +568,13 @@ class ForumController extends Controller
      */
     public function deleteCategory(Category $category)
     {
+        $redirect = $this->manageAno(
+            $this->get('router')->generate('claro_forum_delete_category',
+                    array ( 'category' => $category->getId()) ) );
+        if (FALSE !== $redirect) {
+            return new RedirectResponse($redirect);
+        }
+
         $sc = $this->get('security.context');
         $forum = $category->getForum();
 
@@ -515,6 +624,13 @@ class ForumController extends Controller
      */
     public function editSubjectFormAction(Subject $subject)
     {
+        $redirect = $this->manageAno(
+            $this->get('router')->generate('claro_forum_edit_subject_form',
+                    array ( 'subject' => $subject->getId()) ) );
+        if (FALSE !== $redirect) {
+            return new RedirectResponse($redirect);
+        }
+
         $sc = $this->get('security.context');
         $isModerator = $sc->isGranted('moderate', new ResourceCollection(array($subject->getCategory()->getForum()->getResourceNode())));
 
@@ -547,6 +663,13 @@ class ForumController extends Controller
      */
     public function editSubjectAction(Subject $subject)
     {
+        $redirect = $this->manageAno(
+            $this->get('router')->generate('claro_forum_edit_subject',
+                    array ( 'subject' => $subject->getId()) ) );
+        if (FALSE !== $redirect) {
+            return new RedirectResponse($redirect);
+        }
+
         $sc = $this->get('security.context');
         $isModerator = $sc->isGranted(
             'moderate', new ResourceCollection(array($subject->getCategory()->getForum()->getResourceNode()))
@@ -587,6 +710,13 @@ class ForumController extends Controller
      */
     public function deleteMessageAction(Message $message)
     {
+        $redirect = $this->manageAno(
+            $this->get('router')->generate('claro_forum_delete_message',
+                    array ( 'message' => $message->getId()) ) );
+        if (FALSE !== $redirect) {
+            return new RedirectResponse($redirect);
+        }
+
         $sc = $this->get('security.context');
 
         if ($sc->isGranted('moderate', new ResourceCollection(array($message->getSubject()->getCategory()->getForum()->getResourceNode())))) {
@@ -612,6 +742,13 @@ class ForumController extends Controller
      */
     public function subscribeAction(Forum $forum, User $user)
     {
+        $redirect = $this->manageAno(
+            $this->get('router')->generate('claro_forum_subscribe',
+                    array ( 'forum' => $forum->getId()) ) );
+        if (FALSE !== $redirect) {
+            return new RedirectResponse($redirect);
+        }
+
         $manager = $this->get('claroline.manager.forum_manager');
         $manager->subscribe($forum, $user);
 
@@ -632,6 +769,13 @@ class ForumController extends Controller
      */
     public function unsubscribeAction(Forum $forum, User $user)
     {
+        $redirect = $this->manageAno(
+            $this->get('router')->generate('claro_forum_unsubscribe',
+                    array ( 'forum' => $forum->getId()) ) );
+        if (FALSE !== $redirect) {
+            return new RedirectResponse($redirect);
+        }
+
         $manager = $this->get('claroline.manager.forum_manager');
         $manager->unsubscribe($forum, $user);
 
@@ -650,6 +794,14 @@ class ForumController extends Controller
      */
     public function deleteSubjectAction(Subject $subject)
     {
+
+        $redirect = $this->manageAno(
+            $this->get('router')->generate('claro_forum_delete_subject',
+                    array ( 'subject' => $subject->getId()) ) );
+        if (FALSE !== $redirect) {
+            return new RedirectResponse($redirect);
+        }
+
         $sc = $this->get('security.context');
 
         if ($sc->isGranted('moderate', new ResourceCollection(array($subject->getCategory()->getForum()->getResourceNode())))) {
@@ -821,6 +973,13 @@ class ForumController extends Controller
      */
     public function moveSubjectFormAction(Subject $subject, User $user)
     {
+        $redirect = $this->manageAno(
+            $this->get('router')->generate('claro_subject_move_form',
+                    array ( 'subject' => $subject->getId()) ) );
+        if (FALSE !== $redirect) {
+            return new RedirectResponse($redirect);
+        }
+
         $category = $subject->getCategory();
         $forum = $category->getForum();
         $this->checkAccess($forum);
@@ -849,6 +1008,13 @@ class ForumController extends Controller
      */
     public function moveMessageFormAction(Message $message, $page, User $user)
     {
+        $redirect = $this->manageAno(
+            $this->get('router')->generate('claro_message_move_form',
+                    array ( 'message' => $message->getId(), 'page' => $page) ) );
+        if (FALSE !== $redirect) {
+            return new RedirectResponse($redirect);
+        }
+
         $subject = $message->getSubject();
         $category = $subject->getCategory();
         $forum = $category->getForum();
@@ -878,6 +1044,13 @@ class ForumController extends Controller
      */
     public function moveMessageAction(Message $message, Subject $newSubject, User $user)
     {
+        $redirect = $this->manageAno(
+            $this->get('router')->generate('claro_message_move_form',
+                    array ( 'message' => $message->getId(), 'newSubject' => $newSubject) ) );
+        if (FALSE !== $redirect) {
+            return new RedirectResponse($redirect);
+        }
+
         $forum = $newSubject->getCategory()->getForum();
         $this->checkAccess($forum);
         $manager = $this->get('claroline.manager.forum_manager');
@@ -902,6 +1075,13 @@ class ForumController extends Controller
      */
     public function moveSubjectAction(Subject $subject, Category $newCategory, User $user)
     {
+        $redirect = $this->manageAno(
+            $this->get('router')->generate('claro_subject_move',
+                    array ( 'subject' => $subject->getId(), 'newCategory' => $newCategory) ) );
+        if (FALSE !== $redirect) {
+            return new RedirectResponse($redirect);
+        }
+
         $forum = $newCategory->getForum();
         $this->checkAccess($forum);
         $manager = $this->get('claroline.manager.forum_manager');
@@ -925,6 +1105,14 @@ class ForumController extends Controller
      */
     public function stickSubjectAction(Subject $subject, User $user)
     {
+
+        $redirect = $this->manageAno(
+            $this->get('router')->generate('claro_subject_stick',
+                    array ( 'subject' => $subject->getId()) ) );
+        if (FALSE !== $redirect) {
+            return new RedirectResponse($redirect);
+        }
+
         $forum = $subject->getCategory()->getForum();
         $this->checkAccess($forum);
         $manager = $this->get('claroline.manager.forum_manager');
@@ -948,6 +1136,13 @@ class ForumController extends Controller
      */
     public function unstickSubjectAction(Subject $subject, User $user)
     {
+        $redirect = $this->manageAno(
+            $this->get('router')->generate('claro_subject_unstick',
+                    array ( 'subject' => $subject->getId()) ) );
+        if (FALSE !== $redirect) {
+            return new RedirectResponse($redirect);
+        }
+
         $forum = $subject->getCategory()->getForum();
         $this->checkAccess($forum);
         $manager = $this->get('claroline.manager.forum_manager');
