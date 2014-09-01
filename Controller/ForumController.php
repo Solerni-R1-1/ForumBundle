@@ -66,7 +66,7 @@ class ForumController extends Controller
 
         $redirect = $this->manageAno(
             $this->get('router')->generate('claro_forum_categories',
-                    array ( 'forum' => $forum->getId(), 'page' => $page ) )
+                    array ( 'forum' => $forum->getId() ) )
             );
         if (FALSE !== $redirect) {
             return new RedirectResponse($redirect);
