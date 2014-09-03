@@ -165,7 +165,9 @@ class ForumListener extends ContainerAware
         $em = $this->container->get('doctrine.orm.entity_manager');
         $notificationRepo = $em->getRepository('ClarolineForumBundle:Notification');
 
-        $notifications = $notificationRepo->findOneBy(array('user' => $user));
+        $user = $event->getUser();
+        
+        $notifications = $notificationRepo->findBy(array('user' => $user));
 
         foreach ($notifications as $notification) {
             $em->remove($notification);
