@@ -14,6 +14,9 @@ namespace Claroline\ForumBundle\Repository;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Claroline\ForumBundle\Entity\Subject;
+use Claroline\ForumBundle\Entity\Forum;
+use Claroline\CoreBundle\Entity\Resource\ResourceNode;
+use Claroline\CoreBundle\Entity\User;
 
 class MessageRepository extends EntityRepository
 {
@@ -105,5 +108,55 @@ class MessageRepository extends EntityRepository
     	$paginator = new Paginator($query, $fetchJoinCollection = false);
     
     	return $paginator;
+    }
+    
+    public function findAllPublicationsBetween(ResourceNode $forum, \DateTime $from, \DateTime $to) {
+    	$dql = "SELECT m FROM Claroline\ForumBundle\Entity\Message m
+                JOIN m.subject s
+                JOIN s.category c
+                JOIN c.forum f
+    			JOIN f.resourceNode rn
+                WHERE
+    				rn = :forum AND
+    				m.creationDate < :to AND
+    				m.creationDate > :from 
+                ORDER BY m.creationDate DESC";
+    	$query = $this->_em->createQuery($dql);
+    	$query->setParameters(array(
+    			"forum" => $forum,
+    			"from" => $from,
+    			"to" => $to
+    	));
+    	
+    	return $query->getResult();
+    }
+    
+    public function countMessagesForUser(ResourceNode $forum, User $user, \DateTime $from = null, \DateTime $to = null) {
+    	$dql = "SELECT count(m) FROM Claroline\ForumBundle\Entity\Message m
+                JOIN m.subject s
+                JOIN s.category c
+                JOIN c.forum f
+    			JOIN f.resourceNode rn
+                WHERE rn = :forum
+    			AND m.creator = :user";
+    	if ($from != null) {
+    		$dql = $dql." AND m.creationDate > :from";
+    	}
+    	if ($to != null) {
+    		$dql = $dql." AND m.creationDate < :to";
+    	}
+    	$query = $this->_em->createQuery($dql);
+    	$query->setParameters(array(
+    			"forum" => $forum,
+    			"user" => $user
+    	));
+    	if ($from != null) {
+    		$query->setParameter("from", $from);
+    	}
+    	if ($to != null) {
+    		$query->setParameter("to", $to);
+    	}
+    	 
+    	return $query->getSingleScalarResult();
     }
 }
