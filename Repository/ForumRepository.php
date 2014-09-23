@@ -187,4 +187,32 @@ class ForumRepository extends EntityRepository
 
         return ($getQuery) ? $query: $query->getResult();
     }
+    
+    public function getForumAssociatedToSession($sessionId) {
+    	$dql = "SELECT f FROM Claroline\ForumBundle\Entity\Forum f
+    			JOIN f.resourceNode rn
+    			JOIN Claroline\CoreBundle\Entity\Mooc\MoocSession s
+    			WITH 1 = 1
+    			WHERE s.forum = rn.id
+    			AND s.id = {$sessionId}";
+    	
+    	
+    	$query = $this->_em->createQuery($dql);
+    	
+    	$result = $query->getResult();
+    	
+    	return (count($result) > 0 ? $result[0] : NULL);
+    }
+    
+    public function getForumFromResourceNode($node) {
+    	$dql = "SELECT f FROM Claroline\ForumBundle\Entity\Forum f
+    			JOIN f.resourceNode rn
+    			WHERE rn = :node";
+    	$query = $this->_em->createQuery($dql);
+    	$query->setParameter('node', $node);
+    	
+    	$result = $query->getResult();
+    	
+    	return (count($result) > 0 ? $result[0] : NULL);
+    }
 }

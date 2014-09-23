@@ -61,7 +61,7 @@
                                     <i class="icon-pencil"></i> {{ 'edit' | trans({}, 'platform') }}
                                 </a>
                             
-                                <a href="{{ path('claro_forum_delete_category', {'category': category['id']}) }}">
+                                <a id="delete-category" href="{{ path('claro_forum_delete_category', {'category': category['id']}) }}">
                                     <i class="icon-trash"></i> {{ 'delete' | trans({}, 'platform') }}
                                 </a>
                             </div>
@@ -138,7 +138,7 @@
                     $.ajax({
                         url: tmpRoute,
                         success: function () {
-                            $(tmpEl)[0].parentElement.parentElement.remove();
+                            $(tmpEl)[0].parentElement.parentElement.parentElement.remove();
                         }
                     });
                 });
