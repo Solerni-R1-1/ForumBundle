@@ -17,6 +17,7 @@ use Claroline\ForumBundle\Entity\Subject;
 use Claroline\ForumBundle\Entity\Forum;
 use Claroline\CoreBundle\Entity\Resource\ResourceNode;
 use Claroline\CoreBundle\Entity\User;
+use ClassesWithParents\A;
 
 class MessageRepository extends EntityRepository
 {
@@ -33,7 +34,42 @@ class MessageRepository extends EntityRepository
 
         return ($getQuery) ? $query: $query->getResult();
     }
+    
 
+    public function countNbMessagesInForum(ResourceNode $forumNode)
+    {
+    	$dql = "
+	    	SELECT count(m) FROM Claroline\ForumBundle\Entity\Message m
+	    	JOIN m.subject s
+	    	JOIN s.category c
+	    	JOIN c.forum f
+    		JOIN f.resourceNode rn
+	    	WHERE rn = :forum";
+    
+    	 
+    	$query = $this->_em->createQuery($dql);
+    	$query->setParameter("forum", $forumNode);
+    
+    	return $query->getSingleScalarResult();
+    }
+    
+
+    public function getAllMessagesByForum(ResourceNode $forumNode)
+    {
+    	$dql = "
+	    	SELECT m FROM Claroline\ForumBundle\Entity\Message m
+	    	JOIN m.subject s
+	    	JOIN s.category c
+	    	JOIN c.forum f
+    		JOIN f.resourceNode rn
+	    	WHERE rn = :forum";
+    	 
+    	$query = $this->_em->createQuery($dql);
+    	$query->setParameter("forum", $forumNode);
+    
+    	return $query->getResult();
+    }
+    
     public function findInitialBySubject($subjectId)
     {
         $dql = "SELECT m FROM  Claroline\ForumBundle\Entity\Message m
