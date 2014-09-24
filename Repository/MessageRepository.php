@@ -34,7 +34,7 @@ class MessageRepository extends EntityRepository
 
         return ($getQuery) ? $query: $query->getResult();
     }
-    
+
 
     public function countNbMessagesInForum(ResourceNode $forumNode)
     {
@@ -46,11 +46,38 @@ class MessageRepository extends EntityRepository
     		JOIN f.resourceNode rn
 	    	WHERE rn = :forum";
     
-    	 
+    
     	$query = $this->_em->createQuery($dql);
     	$query->setParameter("forum", $forumNode);
     
     	return $query->getSingleScalarResult();
+    }
+    
+
+
+    public function countNbMessagesInForumGroupBySubjectSince(ResourceNode $forumNode, \DateTime $since)
+    {
+    	$dql = "
+	    	SELECT count(m) as nbMessages, s as subject FROM Claroline\ForumBundle\Entity\Subject s
+	    	JOIN s.messages m
+	    	JOIN s.category c
+	    	JOIN c.forum f
+    		JOIN f.resourceNode rn
+	    	WHERE rn = :forum
+    			AND m.creationDate >= :since
+    		GROUP BY s
+    		ORDER BY nbMessages DESC";
+    
+    
+    	$query = $this->_em->createQuery($dql);
+    	$query->setParameters(
+    			array(
+    					"forum" => $forumNode,
+    					"since" => $since
+    			)
+    	);
+    
+    	return $query->getResult();
     }
     
 
