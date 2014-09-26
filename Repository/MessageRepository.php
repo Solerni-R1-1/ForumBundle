@@ -36,46 +36,69 @@ class MessageRepository extends EntityRepository
     }
 
 
-    public function countNbMessagesInForum(ResourceNode $forumNode)
+    public function countNbMessagesInForum(ResourceNode $forumNode, array $roles = array())
     {
     	$dql = "
-	    	SELECT count(m) FROM Claroline\ForumBundle\Entity\Message m
+	    	SELECT COUNT(DISTINCT m) FROM Claroline\ForumBundle\Entity\Message m
 	    	JOIN m.subject s
 	    	JOIN s.category c
 	    	JOIN c.forum f
     		JOIN f.resourceNode rn
-	    	WHERE rn = :forum";
+    		JOIN m.creator u
+	    	WHERE rn = :forum
+    		AND u NOT IN (
+    			SELECT u2.id FROM Claroline\CoreBundle\Entity\User u2
+    			JOIN u2.roles r
+    			WHERE r.name IN (:roles))";
     
     
     	$query = $this->_em->createQuery($dql);
     	$query->setParameter("forum", $forumNode);
+    	$query->setParameter("roles", $roles);
     
     	return $query->getSingleScalarResult();
     }
     
 
 
-    public function countNbMessagesInForumGroupBySubjectSince(ResourceNode $forumNode, \DateTime $since)
+    public function countNbMessagesInForumGroupBySubjectSince(ResourceNode $forumNode, \DateTime $since, $excludeRoles = null)
     {
-    	$dql = "
-	    	SELECT count(m) as nbMessages, s as subject FROM Claroline\ForumBundle\Entity\Subject s
-	    	JOIN s.messages m
-	    	JOIN s.category c
-	    	JOIN c.forum f
-    		JOIN f.resourceNode rn
-	    	WHERE rn = :forum
-    			AND m.creationDate >= :since
-    		GROUP BY s
-    		ORDER BY nbMessages DESC";
+    	$parameters = array(
+    			"forum" => $forumNode,
+    			"since" => $since);
+    	if ($excludeRoles != null) {
+    		$parameters['roles'] = $excludeRoles;
+    		$dql = "
+		    	SELECT count(m) as nbMessages, s as subject FROM Claroline\ForumBundle\Entity\Subject s
+		    	JOIN s.messages m
+		    	JOIN s.category c
+		    	JOIN c.forum f
+	    		JOIN f.resourceNode rn
+    			JOIN m.creator u
+		    	WHERE rn = :forum
+	    			AND m.creationDate >= :since
+    				AND u NOT IN (
+    					SELECT u2.id FROM Claroline\CoreBundle\Entity\User u2
+		    			JOIN u2.roles r
+		    			WHERE r.name IN (:roles))
+	    		GROUP BY s
+	    		ORDER BY nbMessages DESC";
+    	} else {
+	    	$dql = "
+		    	SELECT count(m) as nbMessages, s as subject FROM Claroline\ForumBundle\Entity\Subject s
+		    	JOIN s.messages m
+		    	JOIN s.category c
+		    	JOIN c.forum f
+	    		JOIN f.resourceNode rn
+		    	WHERE rn = :forum
+	    			AND m.creationDate >= :since
+	    		GROUP BY s
+	    		ORDER BY nbMessages DESC";
+    	}
     
     
     	$query = $this->_em->createQuery($dql);
-    	$query->setParameters(
-    			array(
-    					"forum" => $forumNode,
-    					"since" => $since
-    			)
-    	);
+    	$query->setParameters($parameters);
     
     	return $query->getResult();
     }
@@ -173,23 +196,42 @@ class MessageRepository extends EntityRepository
     	return $paginator;
     }
     
-    public function findAllPublicationsBetween(ResourceNode $forum, \DateTime $from, \DateTime $to) {
-    	$dql = "SELECT m FROM Claroline\ForumBundle\Entity\Message m
-                JOIN m.subject s
-                JOIN s.category c
-                JOIN c.forum f
-    			JOIN f.resourceNode rn
-                WHERE
-    				rn = :forum AND
-    				m.creationDate < :to AND
-    				m.creationDate > :from 
-                ORDER BY m.creationDate DESC";
-    	$query = $this->_em->createQuery($dql);
-    	$query->setParameters(array(
+    public function findAllPublicationsBetween(ResourceNode $forum, \DateTime $from, \DateTime $to, $excludeRoles = null) {
+    	$parameters = array(
     			"forum" => $forum,
     			"from" => $from,
     			"to" => $to
-    	));
+    	);
+    	if ($excludeRoles != null) {
+    		$parameters['roles'] = $excludeRoles;
+    		$dql = "SELECT m FROM Claroline\ForumBundle\Entity\Message m
+	                JOIN m.subject s
+	                JOIN s.category c
+	                JOIN c.forum f
+	    			JOIN f.resourceNode rn
+    				JOIN m.creator u
+	                WHERE rn = :forum 
+    				AND m.creationDate < :to
+    				AND m.creationDate > :from
+    				AND u NOT IN (
+    					SELECT u2.id FROM Claroline\CoreBundle\Entity\User u2
+		    			JOIN u2.roles r
+		    			WHERE r.name IN (:roles))
+	                ORDER BY m.creationDate DESC";
+    	} else {
+	    	$dql = "SELECT m FROM Claroline\ForumBundle\Entity\Message m
+	                JOIN m.subject s
+	                JOIN s.category c
+	                JOIN c.forum f
+	    			JOIN f.resourceNode rn
+	                WHERE
+	    				rn = :forum AND
+	    				m.creationDate < :to AND
+	    				m.creationDate > :from 
+	                ORDER BY m.creationDate DESC";
+    	}
+    	$query = $this->_em->createQuery($dql);
+    	$query->setParameters($parameters);
     	
     	return $query->getResult();
     }
