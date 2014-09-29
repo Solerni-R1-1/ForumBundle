@@ -393,10 +393,28 @@ class Manager
      */
     public function getMessagesPager(Subject $subject, $page = 1, $max = 20)
     {
-        $messages = $this->messageRepo->findBySubject($subject);
-
-        return $this->pagerFactory->createPagerFromArray($messages, $page, $max);
+    	$messages = $this->messageRepo->findBySubject($subject->getId());
+    
+    	return $this->pagerFactory->createPagerFromArray($messages, $page, $max);
     }
+    
+
+    /**
+     * Get the pager for the message list of a subject.
+     *
+     * @param \Claroline\ForumBundle\Entity\Subject $subject
+     * @param integer $page
+     * @param integer $max
+     *
+     * @return \Pagerfanta\Pagerfanta
+     */
+    public function getMessagesPagerById($subjectId, $page = 1, $max = 20)
+    {
+    	$messages = $this->messageRepo->findBySubject($subjectId);
+    
+    	return $this->pagerFactory->createPagerFromArray($messages, $page, $max);
+    }
+    
 
     /**
      * Get the pager for the forum search.
