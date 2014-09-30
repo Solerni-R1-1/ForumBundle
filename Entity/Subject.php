@@ -164,7 +164,7 @@ class Subject extends AbstractIndexableResourceElement
         $doc->forum_name = $this->getCategory()->getForum()->getResourceNode()->getName();
         $doc->forum_category_id = $this->getCategory()->getId();
         $doc->forum_category_name = $this->getCategory()->getName();
-        $doc->content = $this->getTitle();
+        $doc->content_t = $this->getTitle();
         
         return $doc;
     }
