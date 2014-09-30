@@ -144,7 +144,7 @@ class Message extends AbstractIndexableResourceElement
         $doc->forum_subject_url= $this->get('router')->generate('claro_forum_messages', array(
             'subject' => $doc->forum_subject_id
         ));
-        $doc->content = $this->getContent();
+        $doc->content_t = $this->getContent();
         
         return $doc;
     }

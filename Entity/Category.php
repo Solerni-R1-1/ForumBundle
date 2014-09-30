@@ -138,7 +138,7 @@ class Category extends AbstractIndexableResourceElement
         
         $doc->forum_id = $this->getForum()->getId();
         $doc->forum_name = $this->getForum()->getResourceNode()->getName();
-        $doc->content = $this->getName();
+        $doc->content_t = $this->getName();
         
         return $doc;
     }
