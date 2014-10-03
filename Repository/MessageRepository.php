@@ -63,38 +63,16 @@ class MessageRepository extends EntityRepository
 
     public function countNbMessagesInForumGroupBySubjectSince(ResourceNode $forumNode, \DateTime $since, $excludeRoles = null)
     {
-    	$parameters = array(
-    			"forum" => $forumNode,
-    			"since" => $since);
-    	if ($excludeRoles != null) {
-    		$parameters['roles'] = $excludeRoles;
-    		$dql = "
-		    	SELECT count(m) as nbMessages, s as subject FROM Claroline\ForumBundle\Entity\Subject s
-		    	JOIN s.messages m
-		    	JOIN s.category c
-		    	JOIN c.forum f
-	    		JOIN f.resourceNode rn
-    			JOIN m.creator u
-		    	WHERE rn = :forum
-	    			AND m.creationDate >= :since
-    				AND u NOT IN (
-    					SELECT u2.id FROM Claroline\CoreBundle\Entity\User u2
-		    			JOIN u2.roles r
-		    			WHERE r.name IN (:roles))
-	    		GROUP BY s
-	    		ORDER BY nbMessages DESC";
-    	} else {
-	    	$dql = "
-		    	SELECT count(m) as nbMessages, s as subject FROM Claroline\ForumBundle\Entity\Subject s
-		    	JOIN s.messages m
-		    	JOIN s.category c
-		    	JOIN c.forum f
-	    		JOIN f.resourceNode rn
-		    	WHERE rn = :forum
-	    			AND m.creationDate >= :since
-	    		GROUP BY s
-	    		ORDER BY nbMessages DESC";
-    	}
+    	$dql = "
+	    	SELECT s.title as subject, count(m) as nbMessages FROM Claroline\ForumBundle\Entity\Subject s
+	    	JOIN s.messages m
+	    	JOIN s.category c
+	    	JOIN c.forum f
+    		JOIN f.resourceNode rn
+	    	WHERE rn = :forum
+    			AND m.creationDate >= :since
+    		GROUP BY s
+    		ORDER BY nbMessages DESC";
     
     
     	$query = $this->_em->createQuery($dql);
