@@ -18,6 +18,8 @@ use Claroline\ForumBundle\Entity\Forum;
 use Claroline\CoreBundle\Entity\Resource\ResourceNode;
 use Claroline\CoreBundle\Entity\User;
 use ClassesWithParents\A;
+use Claroline\CoreBundle\Entity\Workspace\AbstractWorkspace;
+use Claroline\CoreBundle\Entity\Mooc\MoocSession;
 
 class MessageRepository extends EntityRepository
 {
@@ -63,6 +65,10 @@ class MessageRepository extends EntityRepository
 
     public function countNbMessagesInForumGroupBySubjectSince(ResourceNode $forumNode, \DateTime $since, $excludeRoles = null)
     {
+    	$parameters = array(
+    			"since" => $since,
+    			"forum" => $forumNode
+    	);
     	$dql = "
 	    	SELECT s.title as subject, count(m) as nbMessages FROM Claroline\ForumBundle\Entity\Subject s
 	    	JOIN s.messages m
@@ -241,5 +247,38 @@ class MessageRepository extends EntityRepository
     	}
     	 
     	return $query->getSingleScalarResult();
+    }
+    
+    public function getPreparationForUserAnalytics(ResourceNode $forum, $from, $to, $excludeRoles = array()) {
+    	$dql = "SELECT u AS user,
+    				SUBSTRING(m.creationDate, 1, 10) AS date,
+    				COUNT(m) AS nbMessages
+    			FROM Claroline\CoreBundle\Entity\User u
+    			JOIN Claroline\ForumBundle\Entity\Message m
+    				WITH m.creator = u
+                JOIN m.subject s
+                JOIN s.category c
+                JOIN c.forum f
+    			JOIN f.resourceNode rn
+                WHERE rn = :forum
+    			AND m.creationDate >= :from
+    			AND m.creationDate <= :to
+    			AND (m.creator NOT IN (
+		   					SELECT u3 FROM Claroline\CoreBundle\Entity\User u3
+		   					JOIN u3.roles as r2
+		   					WHERE r2.name IN (:roles)))
+    			GROUP BY date, m.creator";
+    	
+    	$parameters = array(
+    			"from" 		=> $from,
+    			"to" 		=> $to,
+    			"forum" 	=> $forum,
+    			"roles"		=> $excludeRoles
+    	);
+    
+    	$query = $this->_em->createQuery($dql);
+    	$query->setParameters($parameters);
+    	 
+    	return $query->getResult();
     }
 }
