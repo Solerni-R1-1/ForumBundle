@@ -665,7 +665,7 @@ class ForumController extends Controller
     {
         $redirect = $this->manageAno(
             $this->get('router')->generate('claro_forum_edit_subject',
-                    array ( 'subject' => $subject->getId()) ) );
+                    array ( 'subjectId' => $subject->getId()) ) );
         if (FALSE !== $redirect) {
             return new RedirectResponse($redirect);
         }
