@@ -25,6 +25,9 @@ use Claroline\ForumBundle\Entity\Message;
 use Claroline\ForumBundle\Form\ForumType;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Claroline\ForumBundle\Entity\Category;
+use Doctrine\ORM\EntityManager;
+use Claroline\ForumBundle\Repository\ForumRepository;
 
 class ForumListener extends ContainerAware
 {
@@ -86,31 +89,50 @@ class ForumListener extends ContainerAware
 
     public function onCopy(CopyResourceEvent $event)
     {
+    	/* @var $em EntityManager */
         $em = $this->container->get('doctrine.orm.entity_manager');
-        $resource = $event->getResource();
+        $oldForum = $event->getResource();
+        /* @var $forumRepo ForumRepository */
+        //$forumRepo = $em->getRepository("ClarolineForumBundle:Forum");
+        //$oldForum = $forumRepo->getForumFromResourceNode($resource->getResourceNode());
         $forum = new Forum();
-        $forum->setName($resource->getName());
-        $oldSubjects = $forum->getSubjects();
+        $forum->setName($oldForum->getName());
+		$oldCategories = $oldForum->getCategories();
+        foreach ($oldCategories as $oldCategory) {
+        	/* @var $oldCategory Category */
+        	$newCategory = new Category();
+        	$newCategory->setForum($forum);
+        	$newCategory->setModificationDate($oldCategory->getModificationDate());
+        	$newCategory->setCreationDate($oldCategory->getCreationDate());
+        	$newCategory->setName($oldCategory->getName());
+        	
+        	$oldSubjects = $oldCategory->getSubjects();
+	        
+	        foreach ($oldSubjects as $oldSubject) {
+	        	/* @var $oldSubject Subject */
+	            $newSubject = new Subject();
+	            $newSubject->setCategory($newCategory);
+	            $newSubject->setTitle($oldSubject->getTitle());
+	            $newSubject->setCreator($oldSubject->getCreator());
+	            $oldMessages = $oldSubject->getMessages();
+	
+	            foreach ($oldMessages as $oldMessage) {
+	                $newMessage = new Message();
+	                $newMessage->setSubject($newSubject);
+	                $newMessage->setCreator($oldMessage->getCreator());
+	                $newMessage->setContent($oldMessage->getContent());
+	
+	                $em->persist($newMessage);
+	            }
+	
+	            $em->persist($newSubject);
+	        }
 
-        foreach ($oldSubjects as $oldSubject) {
-            $newSubject = new Subject;
-            $newSubject->setForum($forum);
-            $newSubject->setTitle($oldSubject->getTitle());
-            $newSubject->setCreator($oldSubject->getCreator());
-            $oldMessages = $oldSubjects->getMessages();
-
-            foreach ($oldMessages as $oldMessage) {
-                $newMessage = new Message();
-                $newMessage->setSubject($newSubject);
-                $newMessage->setCreator($oldMessage->getCreator());
-                $newMessage->setContent($oldMessage->getContent());
-
-                $em->persist($newMessage);
-            }
-
-            $em->persist($newSubject);
+	        $em->persist($newCategory);
         }
 
+        $em->persist($forum);
+	       
         $event->setCopy($forum);
         $event->stopPropagation();
     }
