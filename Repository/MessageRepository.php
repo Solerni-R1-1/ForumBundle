@@ -67,7 +67,8 @@ class MessageRepository extends EntityRepository
     {
     	$parameters = array(
     			"since" => $since,
-    			"forum" => $forumNode
+    			"forum" => $forumNode,
+    			"roles" => $excludeRoles
     	);
     	$dql = "
 	    	SELECT s.title as subject, count(m) as nbMessages FROM Claroline\ForumBundle\Entity\Subject s
@@ -77,6 +78,10 @@ class MessageRepository extends EntityRepository
     		JOIN f.resourceNode rn
 	    	WHERE rn = :forum
     			AND m.creationDate >= :since
+    			AND m.creator NOT IN (
+    				SELECT u FROM Claroline\CoreBundle\Entity\User u
+    				JOIN u.roles as r
+		   			WHERE r.name IN (:roles))
     		GROUP BY s
     		ORDER BY nbMessages DESC";
     
