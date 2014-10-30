@@ -41,6 +41,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use JMS\DiExtraBundle\Annotation as DI;
+use Claroline\ForumBundle\Entity\LastMessage;
 
 /**
  * @DI\Service("claroline.manager.forum_manager")
@@ -53,6 +54,7 @@ class Manager
     private $notificationRepo;
     private $subjectRepo;
     private $messageRepo;
+    private $lastMessageRepo;
     private $forumRepo;
     private $messageManager;
     private $translator;
@@ -90,6 +92,7 @@ class Manager
         $this->notificationRepo = $om->getRepository('ClarolineForumBundle:Notification');
         $this->subjectRepo = $om->getRepository('ClarolineForumBundle:Subject');
         $this->messageRepo = $om->getRepository('ClarolineForumBundle:Message');
+        $this->lastMessageRepo = $om->getRepository('ClarolineForumBundle:LastMessage');
         $this->forumRepo = $om->getRepository('ClarolineForumBundle:Forum');
         $this->dispatcher = $dispatcher;
         $this->messageManager = $messageManager;
@@ -180,8 +183,17 @@ class Manager
      */
     public function createMessage(Message $message)
     {
+    	$lastMessage = new LastMessage();
+    	$lastMessage->setMessage($message);
+    	$lastMessage->setCategory($message->getSubject()->getCategory());
+    	$lastMessage->setForum($message->getSubject()->getCategory()->getForum());
+    	$lastMessage->setUser($message->getCreator());
+    	
+    	$this->lastMessageRepo->deleteAllForCategory($lastMessage->getCategory());
+    	
         $this->om->startFlushSuite();
         $this->om->persist($message);
+        $this->om->persist($lastMessage);
         $this->dispatch(new CreateMessageEvent($message));
         $this->om->endFlushSuite();
         $this->sendMessageNotification($message, $message->getCreator());

@@ -86,7 +86,7 @@ class ForumRepository extends EntityRepository
             LEFT JOIN s.messages m
             JOIN c.forum forum
             WHERE forum.id = :forumId
-            GROUP BY c
+            GROUP BY c.id
         ";
 
         $query = $this->_em->createQuery($dql);
@@ -94,34 +94,25 @@ class ForumRepository extends EntityRepository
 
         $categories = $query->getResult();
 
-        $dql = "
-            SELECT m.creationDate as last_message_created,
-            c.id as categoryId,
-            lastUser.lastName as last_message_creator_lastname,
-            lastUser.firstName as last_message_creator_firstname,
-            lastUser.id as last_message_creator_id,
-            lastUser.publicUrl as last_message_creator_public_url
-            FROM Claroline\ForumBundle\Entity\Message m
-            JOIN m.creator lastUser
-            JOIN m.subject s
-            JOIN s.category c
-            JOIN c.forum forum
-            WHERE forum.id = :forumId
-            AND m.id IN (
-                SELECT max(m2.id) FROM Claroline\ForumBundle\Entity\Message m2
-                JOIN m2.subject s2
-                JOIN s2.category c2
-                where c2.id = c.id
-                GROUP BY c.id
-            )
-            GROUP BY c
-        ";
-
+        $dql = "SELECT
+	        		m.creationDate as last_message_created,
+		            c.id as categoryId,
+		            lastUser.lastName as last_message_creator_lastname,
+		            lastUser.firstName as last_message_creator_firstname,
+		            lastUser.id as last_message_creator_id,
+		            lastUser.publicUrl as last_message_creator_public_url 
+        		FROM Claroline\ForumBundle\Entity\LastMessage lm
+        		JOIN lm.message m
+        		JOIN lm.category c
+        		JOIN lm.user lastUser
+        		
+        		WHERE lm.forum = :forum
+        		GROUP BY lm.category";
+        
         $query = $this->_em->createQuery($dql);
-        $query->setParameter('forumId', $forum->getId());
-
+        $query->setParameter('forum', $forum);
         $lastMessages = $query->getResult();
-
+        
         //merge both results
         $merged = $categories;
 
