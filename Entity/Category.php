@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Claroline\CoreBundle\Entity\Resource\AbstractIndexableResourceElement;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Claroline\ForumBundle\Repository\CategoryRepository")
  * @ORM\Table(name="claro_forum_category")
  */
 class Category extends AbstractIndexableResourceElement
@@ -146,5 +146,9 @@ class Category extends AbstractIndexableResourceElement
     public function getResourceNode()
     {
         return $this->getForum()->getResourceNode();
+    }
+    
+    public function getForumNameAndCategoryName() {
+    	return $this->getForum()->getResourceNode()->getName()." -- ".$this->getName();
     }
 }
