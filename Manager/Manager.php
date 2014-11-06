@@ -196,7 +196,8 @@ class Manager
         $this->om->persist($lastMessage);
         $this->dispatch(new CreateMessageEvent($message));
         $this->om->endFlushSuite();
-        $this->sendMessageNotification($message, $message->getCreator());
+        // Notifications are desactivated
+        //$this->sendMessageNotification($message, $message->getCreator());
 
         return $message;
     }
@@ -248,6 +249,7 @@ class Manager
         $notify = $this->notificationRepo->findBy(array('user' => $user, 'forum' => $forum));
 
         return count($notify) === 1 ? true : false;
+        
     }
 
     /**

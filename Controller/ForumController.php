@@ -86,7 +86,7 @@ class ForumController extends Controller
 	            '_resource' => $forum,
 	            'isModerator' => $isModerator,
 	            'categories' => $categories,
-	            'hasSubscribed' => $this->get('claroline.manager.forum_manager')->hasSubscribed($user, $forum),
+	            //'hasSubscribed' => $this->get('claroline.manager.forum_manager')->hasSubscribed($user, $forum),
 	        	'session' => $moocSession
 	        );
         } else {
