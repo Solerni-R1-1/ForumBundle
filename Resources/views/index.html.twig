@@ -20,7 +20,7 @@
                 <a class="btn btn-primary" href="{{ _path('claro_forum_form_category_creation', {'forum': _resource.getId()}) }}">
                     {{ 'new_category'|trans({}, 'forum') }}
                 </a>
-                {# Removing subscribe button. Don't forget to change publish function if reactivated #}
+                {# Removing subscribe button. Don't forget to uncomment sendMail on createMessage function if reactivated #}
                 {#% if is_mailer_available() %}
                     {% if hasSubscribed %}
                         <a class="btn btn-primary" href="{{ _path('claro_forum_unsubscribe', {'forum': _resource.getId()}) }}">

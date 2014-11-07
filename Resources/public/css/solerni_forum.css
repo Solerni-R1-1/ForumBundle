@@ -128,3 +128,7 @@ i.icon-comment
 .panel-body {
     margin-top: 1.2em;
 }
+
+.row-message-unique {
+    border-bottom: 1px solid #DDD;
+}

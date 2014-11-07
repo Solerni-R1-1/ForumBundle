@@ -337,6 +337,7 @@ class ForumController extends Controller
         if ($this->checkAccess($forum, false)) {
         	$em = $this->getDoctrine()->getManager();
 	        $isModerator = $this->get('security.context')->isGranted('moderate', new ResourceCollection(array($forum->getResourceNode())));
+            $firstMessage = $this->getDoctrine()->getRepository( 'ClarolineForumBundle:Message' )->findInitialBySubject($subject->getid());
 	        $pager = $this->get('claroline.manager.forum_manager')->getMessagesPager($subject, $page, $max);
 	        $collection = new ResourceCollection(array($forum->getResourceNode()));
 	        $canAnswer = $this->get('security.context')->isGranted('post', $collection);
@@ -346,6 +347,7 @@ class ForumController extends Controller
 			
 	        return array(
 	            'subject' => $subject,
+                'firstMessage' => $firstMessage,
 	            'pager' => $pager,
 	            '_resource' => $forum,
 	            'isModerator' => $isModerator,
@@ -353,6 +355,7 @@ class ForumController extends Controller
 	            'canAnswer' => $canAnswer,
 	            'category' => $subject->getCategory(),
 	            'max' => $max,
+                'page' => $page,
 	        	'session' => $moocSession
 	        
 	        );
