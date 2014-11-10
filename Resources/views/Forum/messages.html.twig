@@ -1,4 +1,4 @@
-{% macro renderPager(subjectId, pager, max) %}
+{% macro renderPager(subjectId, pager, max, order) %}
     {{
         pagerfanta(
             pager,
@@ -6,7 +6,9 @@
             {
                 'proximity' : 1,
                 'routeName': 'claro_forum_messages',
-                'routeParams': {'subject': subjectId, 'max': max},
+                'routeParams': {'subject': subjectId, 'max': max, 'order': order},
+                'next_message': '>',
+                'prev_message': '<'
             }
         )
     }}
@@ -115,7 +117,6 @@
         <table id="messages_table" class="slrn-forum-table table table-striped table-condensed">
             <tbody id='table-message-body'>
             {% for message in pager.currentPageResults %}
-                {% if page != 1 or ( page == 1 and loop.index != 1 ) %} {# dont display the first message in first page #}
                 <tr class="row-message">
                     <td width="125px">
                         <div class="text-center">
@@ -155,14 +156,39 @@
                         </div>
                      </td>
                 </tr>
-                {% endif %}
             {% endfor %}
             </tbody>
         </table>
-        <div>
-            {{ renderPager(subject.getId(), pager, max) }}
+        <div class="slrn-forum-options-pagination">
+            
+            <div class="slrn-posts-per-page">
+                AFFICHER : 
+                {% set postPerPage = [5,10,20,50,100] %}
+                {% for number in postPerPage %}
+                    <a class="slrn-posts-per-page__item{% if number == max %} slrn-posts-per-page__item--active{% endif %}" 
+                       href="{{ path('claro_forum_messages', {'subject': subject.getId(), 'page': page , 'max': number, 'order': order }) }}"
+                       title="Afficher {{number}} résultats par page">
+                        {{number}}</a>
+                {% endfor %}
+            </div>
+            {# generate a div.pagination element#}
+            {{ renderPager(subject.getId(), pager, max, order) }}
         </div>
-
+        <div class="slrn-forum-options-pagination slrn-forum-options-pagination--ordering">
+            <form class="form-ordering js-form-ordering">
+                <select>
+                    <option value="{{ path('claro_forum_messages', {'subject': subject.getId(), 'page': page , 'max': max, 'order': "ASC" }) }}" {% if order == "ASC" %}selected{% endif %}>Trier les messages par ordre croissant</option>
+                    <option value="{{ path('claro_forum_messages', {'subject': subject.getId(), 'page': page , 'max': max, 'order': "DESC" }) }}" {% if order == "DESC" %}selected{% endif %}>Trier les messages par ordre décroissant</option>
+                </select>
+            </form>
+            <script>
+                $(document).ready(function() {
+                    $('.js-form-ordering').change(function() {
+                        window.location = $(this).find('option:selected').val();
+                    });
+                });
+            </script>
+        </div>
     </div>
 
 {% endblock %}

@@ -311,9 +311,9 @@ class ForumController extends Controller
 
     /**
      * @Route(
-     *     "/subject/{subject}/messages/page/{page}/max/{max}",
+     *     "/subject/{subject}/messages/page/{page}/max/{max}/order/{order}",
      *     name="claro_forum_messages",
-     *     defaults={"page"=1, "max"= 20},
+     *     defaults={"page"=1, "max"= 20, "order"="ASC"},
      *     options={"expose"=true}
      * )
      * @EXT\ParamConverter("user", options={"authenticatedUser" = true})
@@ -323,22 +323,25 @@ class ForumController extends Controller
      * @param integer $page
      * @param integer $max
      */
-    public function messagesAction(Subject $subject, $page, $max, $user)
+    public function messagesAction(Subject $subject, $page, $max, $user, $order)
     {
+
+        /* limit order values */
+        $order = ($order === "DESC") ? "DESC" : "ASC";
 
         $redirect = $this->manageAno(
             $this->get('router')->generate('claro_forum_messages',
-                    array ( 'subject' => $subject->getId(), 'page' => $page , 'max' => $max) ) );
+                    array ( 'subject' => $subject->getId(), 'page' => $page , 'max' => $max, 'order' => $order ) ) );
         if (FALSE !== $redirect) {
             return new RedirectResponse($redirect);
         }
-
+        
         $forum = $subject->getCategory()->getForum();
         if ($this->checkAccess($forum, false)) {
         	$em = $this->getDoctrine()->getManager();
 	        $isModerator = $this->get('security.context')->isGranted('moderate', new ResourceCollection(array($forum->getResourceNode())));
             $firstMessage = $this->getDoctrine()->getRepository( 'ClarolineForumBundle:Message' )->findInitialBySubject($subject->getid());
-	        $pager = $this->get('claroline.manager.forum_manager')->getMessagesPager($subject, $page, $max);
+	        $pager = $this->get('claroline.manager.forum_manager')->getMessagesPager($subject, $page, $max, $order);
 	        $collection = new ResourceCollection(array($forum->getResourceNode()));
 	        $canAnswer = $this->get('security.context')->isGranted('post', $collection);
 	        $form = $this->get('form.factory')->create(new MessageType());
@@ -356,6 +359,7 @@ class ForumController extends Controller
 	            'category' => $subject->getCategory(),
 	            'max' => $max,
                 'page' => $page,
+                'order' => $order,
 	        	'session' => $moocSession
 	        
 	        );

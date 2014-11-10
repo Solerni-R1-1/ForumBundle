@@ -23,14 +23,14 @@ use Claroline\CoreBundle\Entity\Mooc\MoocSession;
 
 class MessageRepository extends EntityRepository
 {
-    public function findBySubject($subjectId, $getQuery = false)
+    public function findBySubject($subjectId, $getQuery = false, $order = "ASC")
     {
         $dql = "
-            SELECT m, u, pws FROM Claroline\ForumBundle\Entity\Message m
+            SELECT m, u FROM Claroline\ForumBundle\Entity\Message m
             JOIN m.creator u
-            JOIN u.personalWorkspace pws
             JOIN m.subject subject
-            WHERE subject.id = {$subjectId}";
+            WHERE subject.id = {$subjectId}
+            ORDER BY m.id {$order}";
 
         $query = $this->_em->createQuery($dql);
 

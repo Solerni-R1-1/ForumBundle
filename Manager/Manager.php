@@ -405,11 +405,11 @@ class Manager
      *
      * @return \Pagerfanta\Pagerfanta
      */
-    public function getMessagesPager(Subject $subject, $page = 1, $max = 20)
+    public function getMessagesPager(Subject $subject, $page = 1, $max = 20, $order = "ASC")
     {
-    	$messages = $this->messageRepo->findBySubject($subject->getId());
+    	$messages = $this->messageRepo->findBySubject($subject->getId(), true, $order);
     
-    	return $this->pagerFactory->createPagerFromArray($messages, $page, $max);
+    	return $this->pagerFactory->createPager($messages, $page, $max, false);
     }
     
 
