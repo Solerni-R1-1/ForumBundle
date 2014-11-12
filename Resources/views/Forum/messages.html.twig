@@ -57,7 +57,7 @@
                      <td width="125px">
                          <div class="text-center">
                              {% if firstMessage.getCreator().getPicture() != "" %}
-                             <img src="{{ image('uploads/pictures/' ~ message.getCreator().getPicture()).scaleResize(85, 85) }}" class="col-md-12">
+                             <img src="{{ image('uploads/pictures/' ~ firstMessage.getCreator().getPicture()).scaleResize(85, 85) }}" class="col-md-12">
                          {% else %}
                                  <h1><i class="icon-user col-md-12"></i><h1>
                          {% endif %}
