@@ -177,8 +177,8 @@
         <div class="slrn-forum-options-pagination slrn-forum-options-pagination--ordering">
             <form class="form-ordering js-form-ordering">
                 <select>
-                    <option value="{{ path('claro_forum_messages', {'subject': subject.getId(), 'page': page , 'max': max, 'order': "ASC" }) }}" {% if order == "ASC" %}selected{% endif %}>Trier les messages par ordre croissant</option>
-                    <option value="{{ path('claro_forum_messages', {'subject': subject.getId(), 'page': page , 'max': max, 'order': "DESC" }) }}" {% if order == "DESC" %}selected{% endif %}>Trier les messages par ordre décroissant</option>
+                    <option value="{{ path('claro_forum_messages', {'subject': subject.getId(), 'page': page , 'max': max, 'order': "ASC" }) }}" {% if order == "ASC" %}selected{% endif %}>Trier les messages du plus ancien au plus récent</option>
+                    <option value="{{ path('claro_forum_messages', {'subject': subject.getId(), 'page': page , 'max': max, 'order': "DESC" }) }}" {% if order == "DESC" %}selected{% endif %}>Trier les messages du plus récent au plus ancien</option>
                 </select>
             </form>
             <script>
