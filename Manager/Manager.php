@@ -170,6 +170,9 @@ class Manager
      */
     public function deleteCategory(Category $category)
     {
+        // delete last message in category
+        $this->lastMessageRepo->deleteAllForCategory( $category );
+        
         $this->om->startFlushSuite();
         $this->om->remove($category);
         $this->dispatch(new DeleteCategoryEvent($category));
@@ -207,10 +210,29 @@ class Manager
      */
     public function deleteMessage(Message $message)
     {
+        $isLast = $this->lastMessageRepo->isMessageLastInCategory( $message );
+
+        // check if current message is last message inside a category as this info is stored in a separate table
+        // If this is the last message, erase it from table, search next to last and register it as new one
+        if ( $isLast ) {
+            $category = $message->getSubject()->getCategory();
+            $NextLastMessageInCategory = $this->messageRepo->findOneFromLastInCategory( $category, 1 );
+            $this->lastMessageRepo->deleteAllForCategory( $category );
+            $lastMessage = new LastMessage();
+            $lastMessage->setMessage($NextLastMessageInCategory);
+            $lastMessage->setCategory($NextLastMessageInCategory->getSubject()->getCategory());
+            $lastMessage->setForum($NextLastMessageInCategory->getSubject()->getCategory()->getForum());
+            $lastMessage->setUser($NextLastMessageInCategory->getCreator());
+        }
+        
         $this->om->startFlushSuite();
         $this->om->remove($message);
+        if ( $isLast ) {
+            $this->om->persist($lastMessage); 
+        }
         $this->dispatch(new DeleteMessageEvent($message));
         $this->om->endFlushSuite();
+        
     }
 
     /**
@@ -218,8 +240,24 @@ class Manager
      */
     public function deleteSubject(Subject $subject)
     {
+        // Is one last message of category is in the delete subject ?
+        $isOne = $this->lastMessageRepo->hasOneLastInSubject( $subject );
+        if ( $isOne ) {
+            $category = $subject->getCategory();
+            $NextLastMessageInCategory = $this->messageRepo->findOneFromLastInCategory( $category, 1 );
+            $this->lastMessageRepo->deleteAllForCategory( $category );
+            $lastMessage = new LastMessage();
+            $lastMessage->setMessage($NextLastMessageInCategory);
+            $lastMessage->setCategory($NextLastMessageInCategory->getSubject()->getCategory());
+            $lastMessage->setForum($NextLastMessageInCategory->getSubject()->getCategory()->getForum());
+            $lastMessage->setUser($NextLastMessageInCategory->getCreator());
+        }
+        
         $this->om->startFlushSuite();
         $this->om->remove($subject);
+        if ( $isOne ) {
+            $this->om->persist($lastMessage);
+        }
         $this->dispatch(new DeleteSubjectEvent($subject));
         $this->om->endFlushSuite();
     }

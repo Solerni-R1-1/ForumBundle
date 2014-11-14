@@ -20,6 +20,8 @@ use Claroline\CoreBundle\Entity\User;
 use ClassesWithParents\A;
 use Claroline\CoreBundle\Entity\Workspace\AbstractWorkspace;
 use Claroline\CoreBundle\Entity\Mooc\MoocSession;
+use Claroline\ForumBundle\Entity\Message;
+use Claroline\ForumBundle\Entity\Category;
 
 class MessageRepository extends EntityRepository
 {
@@ -183,6 +185,25 @@ class MessageRepository extends EntityRepository
     	$paginator = new Paginator($query, $fetchJoinCollection = false);
     
     	return $paginator;
+    }
+    
+    public function findOneFromLastInCategory(Category $category, $offset = 0)
+    {
+    
+    	$dql = "SELECT m FROM Claroline\ForumBundle\Entity\Message m
+                JOIN m.subject s
+                JOIN s.category c
+                JOIN c.forum f
+                WHERE c = :category
+                ORDER BY m.creationDate DESC
+                ";
+    	$query = $this->_em->createQuery($dql);
+        $query->setFirstResult($offset)->setMaxResults(1);
+    	$query->setParameters(array(
+    			'category' => $category
+    	));
+    
+    	return $query->getOneOrNullResult();
     }
     
     public function findAllPublicationsBetween(ResourceNode $forum, \DateTime $from, \DateTime $to, $excludeRoles = null) {

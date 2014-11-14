@@ -21,6 +21,7 @@ use ClassesWithParents\A;
 use Claroline\CoreBundle\Entity\Workspace\AbstractWorkspace;
 use Claroline\CoreBundle\Entity\Mooc\MoocSession;
 use Claroline\ForumBundle\Entity\Category;
+use Claroline\ForumBundle\Entity\Message;
 
 class LastMessageRepository extends EntityRepository {
 
@@ -30,4 +31,30 @@ class LastMessageRepository extends EntityRepository {
 		
 		return $this->_em->createQuery($dql)->execute(array("category" => $category));
 	}
+    
+    public function isMessageLastInCategory(Message $message) {
+                     
+		$dql = "SELECT lm FROM Claroline\ForumBundle\Entity\LastMessage lm
+                WHERE lm.category = {$message->getSubject()->getCategory()->getId()}
+                AND lm.message = {$message->getId()}";
+		
+		return $boolean = ($this->_em->createQuery($dql)->getOneOrNullResult()) ? true : false;
+        
+    }
+    
+    /* Return last message Object or null
+     * 
+     */
+    public function hasOneLastInSubject(Subject $subject) {
+        
+                   
+		$dql = "SELECT lm FROM Claroline\ForumBundle\Entity\LastMessage lm
+                WHERE lm.category = {$subject->getCategory()->getId()}";
+		
+		$lastInCategory = $this->_em->createQuery($dql)->getOneOrNullResult();
+        
+        return ( $lastInCategory->getMessage()->getSubject()->getId() == $subject->getId() ) ? $lastInCategory : false;
+    }
+    
+    
 }
