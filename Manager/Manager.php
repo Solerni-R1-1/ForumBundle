@@ -218,17 +218,19 @@ class Manager
             $category = $message->getSubject()->getCategory();
             $NextLastMessageInCategory = $this->messageRepo->findOneFromLastInCategory( $category, 1 );
             $this->lastMessageRepo->deleteAllForCategory( $category );
-            $lastMessage = new LastMessage();
-            $lastMessage->setMessage($NextLastMessageInCategory);
-            $lastMessage->setCategory($NextLastMessageInCategory->getSubject()->getCategory());
-            $lastMessage->setForum($NextLastMessageInCategory->getSubject()->getCategory()->getForum());
-            $lastMessage->setUser($NextLastMessageInCategory->getCreator());
+            if ( $NextLastMessageInCategory ) {
+                $lastMessage = new LastMessage();
+                $lastMessage->setMessage($NextLastMessageInCategory);
+                $lastMessage->setCategory($NextLastMessageInCategory->getSubject()->getCategory());
+                $lastMessage->setForum($NextLastMessageInCategory->getSubject()->getCategory()->getForum());
+                $lastMessage->setUser($NextLastMessageInCategory->getCreator());
+            }
         }
         
         $this->om->startFlushSuite();
         $this->om->remove($message);
-        if ( $isLast ) {
-            $this->om->persist($lastMessage); 
+        if ( $isLast && $NextLastMessageInCategory ) {
+            $this->om->persist($lastMessage);
         }
         $this->dispatch(new DeleteMessageEvent($message));
         $this->om->endFlushSuite();
@@ -246,16 +248,18 @@ class Manager
             $category = $subject->getCategory();
             $NextLastMessageInCategory = $this->messageRepo->findOneFromLastInCategory( $category, 0, $subject );
             $this->lastMessageRepo->deleteAllForCategory( $category );
-            $lastMessage = new LastMessage();
-            $lastMessage->setMessage($NextLastMessageInCategory);
-            $lastMessage->setCategory($NextLastMessageInCategory->getSubject()->getCategory());
-            $lastMessage->setForum($NextLastMessageInCategory->getSubject()->getCategory()->getForum());
-            $lastMessage->setUser($NextLastMessageInCategory->getCreator());
+            if ( $NextLastMessageInCategory ) {
+                $lastMessage = new LastMessage();
+                $lastMessage->setMessage($NextLastMessageInCategory);
+                $lastMessage->setCategory($NextLastMessageInCategory->getSubject()->getCategory());
+                $lastMessage->setForum($NextLastMessageInCategory->getSubject()->getCategory()->getForum());
+                $lastMessage->setUser($NextLastMessageInCategory->getCreator());
+            }
         }
         
         $this->om->startFlushSuite();
         $this->om->remove($subject);
-        if ( $isOne ) {
+        if ( $isOne && $NextLastMessageInCategory ) {
             $this->om->persist($lastMessage);
         }
         $this->dispatch(new DeleteSubjectEvent($subject));
