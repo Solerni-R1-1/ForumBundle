@@ -26,6 +26,12 @@ and open the template in the editor.
     border: 0;
 }
 
+#messages_table.slrn-forum-table th,
+#messages_table.slrn-forum-table td
+{
+    padding: 10px 5px;
+}
+
 #subjects_table .slrn-forum__tools > a {
     margin-right: 1.5em;
 }
@@ -127,4 +133,80 @@ i.icon-comment
 
 .panel-body {
     margin-top: 1.2em;
+}
+
+.row-message-unique {
+    border-bottom: 1px solid #DDD;
+}
+/* forum pagination */
+
+.slrn-forum-options-pagination {
+    margin-top:         2em;
+    padding:            1em;
+    background-color:   #EEEEEF;
+    overflow:           hidden;
+}
+
+.slrn-forum-options-pagination + .slrn-forum-options-pagination {
+    margin-top: 0;
+}
+
+.slrn-posts-per-page {
+    float:          left;
+    overflow:       hidden;
+}
+
+.slrn-posts-per-page__item,
+.slrn-forum-options-pagination .pagination a {
+    padding:        3px 5px;
+    line-height:    20px;
+    display:        inline-block;
+}
+
+.slrn-forum-options-pagination .pagination a {
+        margin: 0 5px 0 0;
+}
+
+.slrn-posts-per-page__item:hover,
+.slrn-forum-options-pagination .pagination a:hover {
+    background-color:   #4B667C;
+    color:              #FFF;
+    text-decoration:    none;
+}
+
+.slrn-forum-options-pagination .pagination a {
+    background-color:   transparent;
+    border:             0;
+}
+
+.slrn-forum-options-pagination .pagination {
+    float:          right;
+    line-height:    0;
+}
+
+.slrn-forum-options-pagination .pagination ul {
+    margin: 0;
+}
+
+.slrn-forum-options-pagination .pagination .disabled {
+    display: none;
+}
+
+.slrn-posts-per-page__item--active, 
+.slrn-posts-per-page__item--active:hover,
+.slrn-forum-options-pagination .pagination .active a,
+.slrn-forum-options-pagination .pagination .active a:hover {
+    background-color:   #FF004F;
+    color:              #FFF;
+    text-decoration:    none;
+    border:             0;
+}
+
+.slrn-forum-options-pagination .pagination .next a,
+.slrn-forum-options-pagination .pagination .prev a {
+    border-radius: 0;
+}
+
+.form-ordering {
+    text-align: center;
 }

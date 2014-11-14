@@ -170,6 +170,9 @@ class Manager
      */
     public function deleteCategory(Category $category)
     {
+        // delete last message in category
+        $this->lastMessageRepo->deleteAllForCategory( $category );
+        
         $this->om->startFlushSuite();
         $this->om->remove($category);
         $this->dispatch(new DeleteCategoryEvent($category));
@@ -196,7 +199,8 @@ class Manager
         $this->om->persist($lastMessage);
         $this->dispatch(new CreateMessageEvent($message));
         $this->om->endFlushSuite();
-        $this->sendMessageNotification($message, $message->getCreator());
+        // Notifications are desactivated
+        //$this->sendMessageNotification($message, $message->getCreator());
 
         return $message;
     }
@@ -206,10 +210,31 @@ class Manager
      */
     public function deleteMessage(Message $message)
     {
+        $isLast = $this->lastMessageRepo->isMessageLastInCategory( $message );
+
+        // check if current message is last message inside a category as this info is stored in a separate table
+        // If this is the last message, erase it from table, search next to last and register it as new one
+        if ( $isLast ) {
+            $category = $message->getSubject()->getCategory();
+            $NextLastMessageInCategory = $this->messageRepo->findOneFromLastInCategory( $category, 1 );
+            $this->lastMessageRepo->deleteAllForCategory( $category );
+            if ( $NextLastMessageInCategory ) {
+                $lastMessage = new LastMessage();
+                $lastMessage->setMessage($NextLastMessageInCategory);
+                $lastMessage->setCategory($NextLastMessageInCategory->getSubject()->getCategory());
+                $lastMessage->setForum($NextLastMessageInCategory->getSubject()->getCategory()->getForum());
+                $lastMessage->setUser($NextLastMessageInCategory->getCreator());
+            }
+        }
+        
         $this->om->startFlushSuite();
         $this->om->remove($message);
+        if ( $isLast && $NextLastMessageInCategory ) {
+            $this->om->persist($lastMessage);
+        }
         $this->dispatch(new DeleteMessageEvent($message));
         $this->om->endFlushSuite();
+        
     }
 
     /**
@@ -217,8 +242,26 @@ class Manager
      */
     public function deleteSubject(Subject $subject)
     {
+        // Is one last message of category is in the delete subject ?
+        $isOne = $this->lastMessageRepo->hasOneLastInSubject( $subject );
+        if ( $isOne ) {
+            $category = $subject->getCategory();
+            $NextLastMessageInCategory = $this->messageRepo->findOneFromLastInCategory( $category, 0, $subject );
+            $this->lastMessageRepo->deleteAllForCategory( $category );
+            if ( $NextLastMessageInCategory ) {
+                $lastMessage = new LastMessage();
+                $lastMessage->setMessage($NextLastMessageInCategory);
+                $lastMessage->setCategory($NextLastMessageInCategory->getSubject()->getCategory());
+                $lastMessage->setForum($NextLastMessageInCategory->getSubject()->getCategory()->getForum());
+                $lastMessage->setUser($NextLastMessageInCategory->getCreator());
+            }
+        }
+        
         $this->om->startFlushSuite();
         $this->om->remove($subject);
+        if ( $isOne && $NextLastMessageInCategory ) {
+            $this->om->persist($lastMessage);
+        }
         $this->dispatch(new DeleteSubjectEvent($subject));
         $this->om->endFlushSuite();
     }
@@ -248,6 +291,7 @@ class Manager
         $notify = $this->notificationRepo->findBy(array('user' => $user, 'forum' => $forum));
 
         return count($notify) === 1 ? true : false;
+        
     }
 
     /**
@@ -403,11 +447,11 @@ class Manager
      *
      * @return \Pagerfanta\Pagerfanta
      */
-    public function getMessagesPager(Subject $subject, $page = 1, $max = 20)
+    public function getMessagesPager(Subject $subject, $page = 1, $max = 20, $order = "ASC")
     {
-    	$messages = $this->messageRepo->findBySubject($subject->getId());
+    	$messages = $this->messageRepo->findBySubject($subject->getId(), true, $order);
     
-    	return $this->pagerFactory->createPagerFromArray($messages, $page, $max);
+    	return $this->pagerFactory->createPager($messages, $page, $max, false);
     }
     
 

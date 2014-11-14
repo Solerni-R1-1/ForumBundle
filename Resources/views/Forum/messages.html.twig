@@ -1,4 +1,4 @@
-{% macro renderPager(subjectId, pager, max) %}
+{% macro renderPager(subjectId, pager, max, order) %}
     {{
         pagerfanta(
             pager,
@@ -6,7 +6,9 @@
             {
                 'proximity' : 1,
                 'routeName': 'claro_forum_messages',
-                'routeParams': {'subject': subjectId, 'max': max},
+                'routeParams': {'subject': subjectId, 'max': max, 'order': order},
+                'next_message': '>',
+                'prev_message': '<'
             }
         )
     }}
@@ -48,15 +50,58 @@
           {{ subject.getCreationDate() | widgetForumDate()  }}
         </div>
     </div>
+    {% if firstMessage|default %}
+        <table id="messages_table" class="slrn-forum-table table table-striped table-condensed">
+             <tbody id='table-message-body'>
+                 <tr class="row-message row-message-unique">
+                     <td width="125px">
+                         <div class="text-center">
+                             {% if firstMessage.getCreator().getPicture() != "" %}
+                             <img src="{{ image('uploads/pictures/' ~ firstMessage.getCreator().getPicture()).scaleResize(85, 85) }}" class="col-md-12">
+                         {% else %}
+                                 <h1><i class="icon-user col-md-12"></i><h1>
+                         {% endif %}
+                         </div>
+                         <div class="text-center">
+                         <a href="{{path('claro_public_profile_view', {'publicUrl':firstMessage.getCreator().getPublicUrl()})}}">
+                            {{ firstMessage.getCreator().getFirstName() }} {{ firstMessage.getCreator().getLastName() }}
+                         </a>
+                         </div>
+                         <div class="text-center">
+                             {{ firstMessage.getCreationDate()|intl_date_format() }}
+                         </div>
+                     </td>
+                     <td>
+                         <p>{{ firstMessage.getContent()|raw }}</p>
+                         <p class="text-muted">{{ firstMessage.getCreationDate()| timeAgo }}</p>
+                         <hr>
+                         <div class="pull-right clearfix">
+                         {% if isModerator or app.security.token.user == firstMessage.getCreator() %}
+                             <a class="btn btn-default" href="{{ path('claro_forum_edit_message_form', {'message': firstMessage.getId()}) }}">
+                                 <i class="icon-pencil"></i> {{ 'edit'|trans({}, 'platform') }}
+                             </a>
+                         {% endif %}
+                         {% if isModerator %}
+                             <a id="move-message" class="btn btn-default" href="{{ path('claro_message_move_form', {'message': firstMessage.getId()}) }}">
+                                 <i class="icon-arrow-right"></i> {{ 'move'|trans({}, 'platform') }}
+                             </a>
+                             <a id="delete-message" class="btn btn-default" href="{{ path('claro_forum_delete_message', {'message': firstMessage.getId()}) }}">
+                                 <i class="icon-remove"></i> {{ 'delete'|trans({}, 'platform') }}
+                             </a>
+                         {% endif %}
+                         </div>
+                      </td>
+                 </tr>
+             </tbody>
+         </table>
+    {% endif %}
     <div class="panel-body">
-        
         {% if canAnswer %}
             <div>
                 <textarea class="forum-answer claroline-tiny-mce hide"></textarea>
                 {{ form_widget(form._token) }}
             </div>
         {% endif %}
-            
         <div class="panel-footer clearfix slrn-forum__response">
             <div class="pull-right">
                 {#<a class="btn btn-default" href='{{ path('claro_forum_subjects', { 'category': category.getId() }) }}'>
@@ -114,10 +159,36 @@
             {% endfor %}
             </tbody>
         </table>
-        <div>
-            {{ renderPager(subject.getId(), pager, max) }}
+        <div class="slrn-forum-options-pagination">
+            
+            <div class="slrn-posts-per-page">
+                AFFICHER : 
+                {% set postPerPage = [5,10,20,50,100] %}
+                {% for number in postPerPage %}
+                    <a class="slrn-posts-per-page__item{% if number == max %} slrn-posts-per-page__item--active{% endif %}" 
+                       href="{{ path('claro_forum_messages', {'subject': subject.getId(), 'page': page , 'max': number, 'order': order }) }}"
+                       title="Afficher {{number}} résultats par page">
+                        {{number}}</a>
+                {% endfor %}
+            </div>
+            {# generate a div.pagination element#}
+            {{ renderPager(subject.getId(), pager, max, order) }}
         </div>
-
+        <div class="slrn-forum-options-pagination slrn-forum-options-pagination--ordering">
+            <form class="form-ordering js-form-ordering">
+                <select>
+                    <option value="{{ path('claro_forum_messages', {'subject': subject.getId(), 'page': page , 'max': max, 'order': "ASC" }) }}" {% if order == "ASC" %}selected{% endif %}>Trier les messages du plus ancien au plus récent</option>
+                    <option value="{{ path('claro_forum_messages', {'subject': subject.getId(), 'page': page , 'max': max, 'order': "DESC" }) }}" {% if order == "DESC" %}selected{% endif %}>Trier les messages du plus récent au plus ancien</option>
+                </select>
+            </form>
+            <script>
+                $(document).ready(function() {
+                    $('.js-form-ordering').change(function() {
+                        window.location = $(this).find('option:selected').val();
+                    });
+                });
+            </script>
+        </div>
     </div>
 
 {% endblock %}

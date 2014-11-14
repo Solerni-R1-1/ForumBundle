@@ -12,14 +12,16 @@
         <h3 class="slrn-panel-title">{{ 'all categories'|trans({}, 'forum') }}</h3>
     </div>
     <div class="panel-body">
+        {% if isModerator %}
         <div class="navbar row">
+
             <div class="col-md-8">
-                {% if isModerator %}
+                
                 <a class="btn btn-primary" href="{{ _path('claro_forum_form_category_creation', {'forum': _resource.getId()}) }}">
                     {{ 'new_category'|trans({}, 'forum') }}
                 </a>
-                {% endif %}
-                {% if is_mailer_available() %}
+                {# Removing subscribe button. Don't forget to uncomment sendMail on createMessage function if reactivated #}
+                {#% if is_mailer_available() %}
                     {% if hasSubscribed %}
                         <a class="btn btn-primary" href="{{ _path('claro_forum_unsubscribe', {'forum': _resource.getId()}) }}">
                             {{ 'unsubscribe_mail_list'|trans({}, 'forum') }}
@@ -30,11 +32,12 @@
                         </a>
                 
                     {% endif %}
-                {% endif %}
+                {% endif %#}
             </div>
             <div class="col-md-4">
             </div>
         </div>
+        {% endif %}
         <div class="table-responsive">
             <table id="subjects_table" class="slrn-forum-table table table-striped table-bordered table-condensed">
                 <thead>

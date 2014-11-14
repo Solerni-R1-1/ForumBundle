@@ -20,17 +20,19 @@ use Claroline\CoreBundle\Entity\User;
 use ClassesWithParents\A;
 use Claroline\CoreBundle\Entity\Workspace\AbstractWorkspace;
 use Claroline\CoreBundle\Entity\Mooc\MoocSession;
+use Claroline\ForumBundle\Entity\Message;
+use Claroline\ForumBundle\Entity\Category;
 
 class MessageRepository extends EntityRepository
 {
-    public function findBySubject($subjectId, $getQuery = false)
+    public function findBySubject($subjectId, $getQuery = false, $order = "ASC")
     {
         $dql = "
-            SELECT m, u, pws FROM Claroline\ForumBundle\Entity\Message m
+            SELECT m, u FROM Claroline\ForumBundle\Entity\Message m
             JOIN m.creator u
-            JOIN u.personalWorkspace pws
             JOIN m.subject subject
-            WHERE subject.id = {$subjectId}";
+            WHERE subject.id = {$subjectId}
+            ORDER BY m.id {$order}";
 
         $query = $this->_em->createQuery($dql);
 
@@ -183,6 +185,36 @@ class MessageRepository extends EntityRepository
     	$paginator = new Paginator($query, $fetchJoinCollection = false);
     
     	return $paginator;
+    }
+    
+    public function findOneFromLastInCategory(Category $category, $offset = 0, $excludeSubject = null )
+    {
+    
+        $parameters = array('category' => $category );
+        
+        if ( $excludeSubject  ) {
+            $dql = "SELECT m FROM Claroline\ForumBundle\Entity\Message m
+                JOIN m.subject s
+                    WITH s != :subject
+                JOIN s.category c
+                    WITH c = :category
+                ORDER BY m.creationDate DESC
+                ";
+            $parameters['subject'] =  $excludeSubject;
+        } else {
+            $dql = "SELECT m FROM Claroline\ForumBundle\Entity\Message m
+                JOIN m.subject s
+                JOIN s.category c
+                    WITH c = :category
+                ORDER BY m.creationDate DESC
+                ";
+        }
+        
+    	$query = $this->_em->createQuery($dql);
+        $query->setFirstResult($offset)->setMaxResults(1);
+    	$query->setParameters($parameters);
+    
+    	return $query->getOneOrNullResult();
     }
     
     public function findAllPublicationsBetween(ResourceNode $forum, \DateTime $from, \DateTime $to, $excludeRoles = null) {
