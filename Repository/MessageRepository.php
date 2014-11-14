@@ -187,21 +187,32 @@ class MessageRepository extends EntityRepository
     	return $paginator;
     }
     
-    public function findOneFromLastInCategory(Category $category, $offset = 0)
+    public function findOneFromLastInCategory(Category $category, $offset = 0, $excludeSubject = null )
     {
     
-    	$dql = "SELECT m FROM Claroline\ForumBundle\Entity\Message m
+        $parameters = array('category' => $category );
+        
+        if ( $excludeSubject  ) {
+            $dql = "SELECT m FROM Claroline\ForumBundle\Entity\Message m
                 JOIN m.subject s
+                    WITH s != :subject
                 JOIN s.category c
-                JOIN c.forum f
-                WHERE c = :category
+                    WITH c = :category
                 ORDER BY m.creationDate DESC
                 ";
+            $parameters['subject'] =  $excludeSubject;
+        } else {
+            $dql = "SELECT m FROM Claroline\ForumBundle\Entity\Message m
+                JOIN m.subject s
+                JOIN s.category c
+                    WITH c = :category
+                ORDER BY m.creationDate DESC
+                ";
+        }
+        
     	$query = $this->_em->createQuery($dql);
         $query->setFirstResult($offset)->setMaxResults(1);
-    	$query->setParameters(array(
-    			'category' => $category
-    	));
+    	$query->setParameters($parameters);
     
     	return $query->getOneOrNullResult();
     }

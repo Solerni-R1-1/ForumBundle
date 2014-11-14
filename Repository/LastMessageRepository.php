@@ -47,13 +47,18 @@ class LastMessageRepository extends EntityRepository {
      */
     public function hasOneLastInSubject(Subject $subject) {
         
-                   
+        $return = null;
+        
 		$dql = "SELECT lm FROM Claroline\ForumBundle\Entity\LastMessage lm
                 WHERE lm.category = {$subject->getCategory()->getId()}";
 		
 		$lastInCategory = $this->_em->createQuery($dql)->getOneOrNullResult();
         
-        return ( $lastInCategory->getMessage()->getSubject()->getId() == $subject->getId() ) ? $lastInCategory : false;
+        if ( $lastInCategory ) {
+            $return = ( $lastInCategory->getMessage()->getSubject()->getId() == $subject->getId() ) ? $lastInCategory : false;
+        }
+        
+        return $return;
     }
     
     

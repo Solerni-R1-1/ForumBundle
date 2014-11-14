@@ -244,7 +244,7 @@ class Manager
         $isOne = $this->lastMessageRepo->hasOneLastInSubject( $subject );
         if ( $isOne ) {
             $category = $subject->getCategory();
-            $NextLastMessageInCategory = $this->messageRepo->findOneFromLastInCategory( $category, 1 );
+            $NextLastMessageInCategory = $this->messageRepo->findOneFromLastInCategory( $category, 0, $subject );
             $this->lastMessageRepo->deleteAllForCategory( $category );
             $lastMessage = new LastMessage();
             $lastMessage->setMessage($NextLastMessageInCategory);
