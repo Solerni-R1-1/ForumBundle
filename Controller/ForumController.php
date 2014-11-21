@@ -316,6 +316,12 @@ class ForumController extends Controller
      *     defaults={"page"=1, "max"= 20, "order"="ASC"},
      *     options={"expose"=true}
      * )
+     * @Route(
+     *     "/subject/{subject}/messages/page/{page}/max/",
+     *     name="claro_forum_messages_unordered",
+     *     defaults={"page"=1, "max"= 20, "order"="ASC"},
+     *     options={"expose"=true}
+     * )
      * @EXT\ParamConverter("user", options={"authenticatedUser" = true})
      * @Template()
      *
