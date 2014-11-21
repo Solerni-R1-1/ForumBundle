@@ -51,47 +51,51 @@
         </div>
     </div>
     {% if firstMessage|default %}
-        <table id="messages_table" class="slrn-forum-table table table-striped table-condensed">
-             <tbody id='table-message-body'>
-                 <tr class="row-message row-message-unique">
-                     <td width="125px">
-                         <div class="text-center">
-                             {% if firstMessage.getCreator().getPicture() != "" %}
-                             <img src="{{ image('uploads/pictures/' ~ firstMessage.getCreator().getPicture()).scaleResize(85, 85) }}" class="col-md-12">
+        <table id="messages_table_unique" class="slrn-forum-table table table-condensed">
+            <tbody id='table-unique-message-body'>
+                <tr class="row-message row-message-unique">
+                    <td class="slrn-forum-td slrn-forum-td--avatar">
+                        <div class="text-center">
+                        {% if firstMessage.getCreator().getPicture() != "" %}
+                             <img src="{{ image('uploads/pictures/' ~ firstMessage.getCreator().getPicture()).scaleResize(100, 100) }}" class="slrn-avatar-image">
                          {% else %}
-                                 <h1><i class="icon-user col-md-12"></i><h1>
+                             <i class="icon-user slrn-avatar-image"></i>
                          {% endif %}
                          </div>
-                         <div class="text-center">
-                         <a href="{{path('claro_public_profile_view', {'publicUrl':firstMessage.getCreator().getPublicUrl()})}}">
-                            {{ firstMessage.getCreator().getFirstName() }} {{ firstMessage.getCreator().getLastName() }}
-                         </a>
+                         <div class="text-center slrn-message-username">
+                            <a href="{{path('claro_public_profile_view', {'publicUrl':firstMessage.getCreator().getPublicUrl()})}}">
+                               {{ firstMessage.getCreator().getFirstName() }} {{ firstMessage.getCreator().getLastName() }}
+                            </a>
                          </div>
-                         <div class="text-center">
+                         <div class="text-center slrn-message-horodatage">
                              {{ firstMessage.getCreationDate()|intl_date_format() }}
                          </div>
                      </td>
-                     <td>
-                         <p>{{ firstMessage.getContent()|raw }}</p>
-                         <p class="text-muted">{{ firstMessage.getCreationDate()| timeAgo }}</p>
-                         <hr>
-                         <div class="pull-right clearfix">
-                         {% if isModerator or app.security.token.user == firstMessage.getCreator() %}
-                             <a class="btn btn-default" href="{{ path('claro_forum_edit_message_form', {'message': firstMessage.getId()}) }}">
-                                 <i class="icon-pencil"></i> {{ 'edit'|trans({}, 'platform') }}
-                             </a>
-                         {% endif %}
-                         {% if isModerator %}
-                             <a id="move-message" class="btn btn-default" href="{{ path('claro_message_move_form', {'message': firstMessage.getId()}) }}">
-                                 <i class="icon-arrow-right"></i> {{ 'move'|trans({}, 'platform') }}
-                             </a>
-                             <a id="delete-message" class="btn btn-default" href="{{ path('claro_forum_delete_message', {'message': firstMessage.getId()}) }}">
-                                 <i class="icon-remove"></i> {{ 'delete'|trans({}, 'platform') }}
-                             </a>
-                         {% endif %}
-                         </div>
-                      </td>
-                 </tr>
+                    <td class="slrn-forum-td slrn-message-content">
+                        <p>{{ firstMessage.getContent()|raw }}</p>
+                        <p class="text-muted slrn-message-date">{{ firstMessage.getCreationDate()| timeAgo }}</p>
+                    </td>
+                </tr>
+                {# edition tools #}
+                {% if isModerator or app.security.token.user == firstMessage.getCreator() %}
+                    <tr class="slrn-forum-message-edition">
+                        <td colspan="2" class="slrn-forum-td">
+                            <div class="pull-right clearfix">
+                            <a class="btn btn-default" href="{{ path('claro_forum_edit_message_form', {'message': firstMessage.getId()}) }}">
+                                <i class="icon-pencil"></i> {{ 'edit'|trans({}, 'platform') }}
+                            </a>
+                            {% if isModerator %}
+                                <a id="move-message" class="btn btn-default" href="{{ path('claro_message_move_form', {'message': firstMessage.getId()}) }}">
+                                    <i class="icon-arrow-right"></i> {{ 'move'|trans({}, 'platform') }}
+                                </a>
+                                <a id="delete-message" class="btn btn-default" href="{{ path('claro_forum_delete_message', {'message': firstMessage.getId()}) }}">
+                                    <i class="icon-remove"></i> {{ 'delete'|trans({}, 'platform') }}
+                                </a>
+                            {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                 {% endif %}
              </tbody>
          </table>
     {% endif %}
@@ -104,59 +108,72 @@
         {% endif %}
         <div class="panel-footer clearfix slrn-forum__response">
             <div class="pull-right">
-                {#<a class="btn btn-default" href='{{ path('claro_forum_subjects', { 'category': category.getId() }) }}'>
-                   {{ 'back'|trans({}, 'platform') }}
-                </a>#}
                 {% if canAnswer %}
                     <a class="btn btn-primary">
-                       {{ 'new_message' | trans({}, 'forum') }}
+                       {{ 'post_my_message' | trans({}, 'forum') }}
                     </a>
                 {% endif %}
             </div>
         </div>
-        <table id="messages_table" class="slrn-forum-table table table-striped table-condensed">
+        <table id="messages_table" class="slrn-forum-table table table-condensed">
             <tbody id='table-message-body'>
-            {% for message in pager.currentPageResults %}
-                <tr class="row-message">
-                    <td width="125px">
-                        <div class="text-center">
-                            {% if message.getCreator().getPicture() != "" %}
-                            <img src="{{ image('uploads/pictures/' ~ message.getCreator().getPicture()).scaleResize(85, 85) }}" class="col-md-12">
-                        {% else %}
-                                <h1><i class="icon-user col-md-12"></i><h1>
-                        {% endif %}
-                        </div>
-                        <div class="text-center">
-                        <a href="{{path('claro_public_profile_view', {'publicUrl':message.getCreator().getPublicUrl()})}}">
-                           {{ message.getCreator().getFirstName() }} {{ message.getCreator().getLastName() }}
-                        </a>
-                        </div>
-                        <div class="text-center">
-                            {{ message.getCreationDate()|intl_date_format() }}
-                        </div>
-                    </td>
+                <tr>
                     <td>
-                        <p>{{ message.getContent()|raw }}</p>
-                        <p class="text-muted">{{ message.getCreationDate()| timeAgo }}</p>
-                        <hr>
-                        <div class="pull-right clearfix">
-                        {% if isModerator or app.security.token.user == message.getCreator() %}
-                            <a class="btn btn-default" href="{{ path('claro_forum_edit_message_form', {'message': message.getId()}) }}">
-                                <i class="icon-pencil"></i> {{ 'edit'|trans({}, 'platform') }}
-                            </a>
-                        {% endif %}
-                        {% if isModerator %}
-                            <a id="move-message" class="btn btn-default" href="{{ path('claro_message_move_form', {'message': message.getId()}) }}">
-                                <i class="icon-arrow-right"></i> {{ 'move'|trans({}, 'platform') }}
-                            </a>
-                            <a id="delete-message" class="btn btn-default" href="{{ path('claro_forum_delete_message', {'message': message.getId()}) }}">
-                                <i class="icon-remove"></i> {{ 'delete'|trans({}, 'platform') }}
-                            </a>
-                        {% endif %}
-                        </div>
-                     </td>
+                        {% for message in pager.currentPageResults %}
+                        <table class="slrn-table-message">
+                            <tr class="row-message">
+                                <td class="slrn-forum-td slrn-forum-td--avatar">
+                                    <div class="text-center">
+                                        {% if message.getCreator().getPicture() != "" %}
+                                        <img src="{{ image('uploads/pictures/' ~ message.getCreator().getPicture()).scaleResize(100, 100) }}" class="slrn-avatar-image">
+                                    {% else %}
+                                        <i class="icon-user slrn-avatar-image"></i>
+                                    {% endif %}
+                                    </div>
+                                    <div class="text-center slrn-message-username">
+                                    <a href="{{path('claro_public_profile_view', {'publicUrl':message.getCreator().getPublicUrl()})}}">
+                                       {{ message.getCreator().getFirstName() }} {{ message.getCreator().getLastName() }}
+                                    </a>
+                                    </div>
+                                    <div class="text-center slrn-message-horodatage">
+                                        {{ message.getCreationDate()|intl_date_format() }}
+                                    </div>
+                                </td>
+                                <td class="slrn-forum-td slrn-message-content">
+                                    <p>{{ message.getContent()|raw }}</p>
+                                    <p class="text-muted slrn-message-date">{{ message.getCreationDate()| timeAgo }}</p>
+                                </td>
+                            </tr>
+                            <tr class="row-message">
+                                <td class="slrn-forum-td">&nbsp;</td>
+                                <td class="slrn-forum-td slrn-forum-td--tools">
+                                    {% render controller("ClarolineForumBundle:Forum:renderMessageLikeBar", {'user': app.user, 'message': message}) %}
+                                </td>
+                            </tr>
+                            {# edition tools #}
+                            {% if isModerator or app.security.token.user == message.getCreator() %}
+                                <tr class="slrn-forum-message-edition">
+                                    <td colspan="2" class="slrn-forum-td">
+                                        <div class="pull-right clearfix">
+                                        <a class="btn btn-default" href="{{ path('claro_forum_edit_message_form', {'message': firstMessage.getId()}) }}">
+                                            <i class="icon-pencil"></i> {{ 'edit'|trans({}, 'platform') }}
+                                        </a>
+                                        {% if isModerator %}
+                                            <a id="move-message" class="btn btn-default" href="{{ path('claro_message_move_form', {'message': firstMessage.getId()}) }}">
+                                                <i class="icon-arrow-right"></i> {{ 'move'|trans({}, 'platform') }}
+                                            </a>
+                                            <a id="delete-message" class="btn btn-default" href="{{ path('claro_forum_delete_message', {'message': firstMessage.getId()}) }}">
+                                                <i class="icon-remove"></i> {{ 'delete'|trans({}, 'platform') }}
+                                            </a>
+                                        {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                             {% endif %}
+                        </table>
+                        {% endfor %}
+                    </td>
                 </tr>
-            {% endfor %}
             </tbody>
         </table>
         <div class="slrn-forum-options-pagination">
@@ -267,5 +284,51 @@
             });
         </script>
     {% endif %}
+    <script>
+        jQuery( document ).ready(function() {
+            
+            function updateIHM(jqXHR, textStatus, element) {
+                jQuery('#' + element.data('vote-number')).html(jqXHR.numberLikes);
+                element.toggleClass('active');
+            }
+            
+            function displayError(jqXHR, textStatus, error) {
+                alert('Votre vote n\'a pas pu être pris en compte : '+ error);
+                return false;
+            }
+            
+            function updateDOM(jqXHR, textStatus, element) {
+                console.log('done');
+            }
+            
+            function AjaxVote( element, actionUrl ) {
+                jQuery.ajax({
+                    url: actionUrl,
+                    dataType: 'json',
+                    actionElement: element,
+                    success: function(jqXHR, textStatus) { updateIHM(jqXHR, textStatus, this.actionElement) },
+                    error: function(jqXHR, textStatus, error) { displayError(jqXHR, textStatus, error) },
+                    complete: function(jqXHR, textStatus) { updateDOM(jqXHR, textStatus, this.actionElement) }
+                });
+            }
+            
+            jQuery('.js-message-like').on('click', function(e) {
+                e.preventDefault();
+                userVote = jQuery(this).data('vote-user');
+                
+                if ( userVote == 1 ) {
+                    actionUrl = jQuery(this).data('vote-neutral');
+                }
+                
+                if ( ! userVote || userVote == 0 ) {
+                    actionUrl = jQuery(this).data('vote-like');
+                }
+                
+                AjaxVote( jQuery(this), actionUrl );
+                
+            });
+            
+        });
+    </script>
 {% endblock %}
 

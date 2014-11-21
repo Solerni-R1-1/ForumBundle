@@ -67,6 +67,15 @@ class Message extends AbstractIndexableResourceElement
      * @ORM\JoinColumn(name="user_id")
      */
     protected $creator;
+    
+    /**
+     * @ORM\OneToMany(
+     *     targetEntity="Claroline\ForumBundle\Entity\Like",
+     *     mappedBy="message",
+     *     cascade={"remove"}
+     * )
+     */
+    protected $likes;
 
     /**
      * Returns the resource id.
@@ -153,6 +162,9 @@ class Message extends AbstractIndexableResourceElement
     {
         return $this->getSubject()->getCategory()->getForum()->getResourceNode();
     }
-
+    
+    public function getLikes() {
+        return $this->likes;
+    }
 
 }

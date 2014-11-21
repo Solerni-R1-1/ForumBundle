@@ -31,6 +31,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration as EXT;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Claroline\CoreBundle\Entity\Resource\ResourceNode;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * ForumController
@@ -82,12 +83,12 @@ class ForumController extends Controller
 	        $moocSession = $em->getRepository('ClarolineCoreBundle:Mooc\\MoocSession')->getMoocSessionByForum($forum);
 	        
 	        return array(
-	            'search' => null,
-	            '_resource' => $forum,
-	            'isModerator' => $isModerator,
-	            'categories' => $categories,
+	            'search'        => null,
+	            '_resource'     => $forum,
+	            'isModerator'   => $isModerator,
+	            'categories'    => $categories,
 	            //'hasSubscribed' => $this->get('claroline.manager.forum_manager')->hasSubscribed($user, $forum),
-	        	'session' => $moocSession
+	        	'session'       => $moocSession
 	        );
         } else {
         	return $this->redirect($this->get('router')->generate('mooc_view', array('moocId' => $forum->getResourceNode()->getWorkspace()->getMooc()->getId(), 'moocName' => $forum->getResourceNode()->getWorkspace()->getMooc()->getTitle())));
@@ -313,6 +314,12 @@ class ForumController extends Controller
      * @Route(
      *     "/subject/{subject}/messages/page/{page}/max/{max}/order/{order}",
      *     name="claro_forum_messages",
+     *     defaults={"page"=1, "max"= 20, "order"="ASC"},
+     *     options={"expose"=true}
+     * )
+     * @Route(
+     *     "/subject/{subject}/messages/page/{page}/max/",
+     *     name="claro_forum_messages_unordered",
      *     defaults={"page"=1, "max"= 20, "order"="ASC"},
      *     options={"expose"=true}
      * )
@@ -1159,4 +1166,54 @@ class ForumController extends Controller
             $this->generateUrl('claro_forum_subjects', array('category' => $subject->getCategory()->getId()))
         );
     }
+    
+     /**
+     * @EXT\ParamConverter("user", options={"authenticatedUser" = true})
+     * @EXT\Method("GET")
+     * @EXT\Template("ClarolineForumBundle:Forum:messageLikeBar.html.twig")
+     * 
+     * @param User $user
+     * @param Message $message 
+     */
+    public function renderMessageLikeBarAction(User $user, Message $message) {
+        
+        $manager = $this->get('claroline.manager.forum_manager');
+        
+        $numberLikes = $manager->getNumberLikes($message, 1);
+        /* user Weight Value could be : null (no vote), 1 (like), 0 (removing previous vote), -1 (dislike) */
+        $userWeightValue = $manager->getUserLikeValue($message, $user);
+        
+        return array(
+            'message'           => $message,
+            'numberLikes'       => $numberLikes,
+            'userWeightValue'   => $userWeightValue
+        );
+        
+    }
+    
+    /**
+     * @EXT\Route(
+     *     "/vote/message/{message}/{weight}",
+     *     name="claro_forum_message_vote",
+     *     requirements={"weight"="-1|0|1"}
+     * )
+     * @EXT\ParamConverter("user", options={"authenticatedUser" = true})
+     * @EXT\Method("GET")
+     *
+     * @param Message $message
+     */
+    public function voteMessageAction(Message $message, User $user, $weight) {
+        
+        $manager = $this->get('claroline.manager.forum_manager');
+        $like = $manager->setOrCreateUserVote($message, $user, $weight);
+        
+        $numberLikes = $manager->getNumberLikes($message, 1);
+        
+        $response = new JsonResponse();
+        $response->setData(array('numberLikes' => $numberLikes));
+        
+        return $response;
+        
+    }
+    
 }
