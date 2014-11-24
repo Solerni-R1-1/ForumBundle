@@ -6,7 +6,6 @@
         {% set class = 'active' %}
     {% endif %}
     <a class="js-message-like slrn-like-bar__elem slrn-like-thumb{% if class|default %} {{class}}{% endif %}"
-       href="#"
        data-vote-number="number-likes-{{message.getId()}}"
        data-vote-user="{{ userWeightValue }}"
        data-vote-like="{{ likeLink }}"

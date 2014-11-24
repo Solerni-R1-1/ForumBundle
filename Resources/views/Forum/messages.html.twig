@@ -115,6 +115,41 @@
                 {% endif %}
             </div>
         </div>
+        <div class="slrn-forum-meta">
+            <span class="slrn-forum-num-messages">{{ pager.getNbResults() }} messages</span>
+        </div>
+        <div class="slrn-forum-options-pagination slrn-forum-options-pagination--top">
+            {% set options = {
+                    'ASC': { 'url': path('claro_forum_messages', {'subject': subject.getId(), 'page': page , 'max': max, 'order': "ASC" }), 'label': 'most_recent_order' },
+                    'DESC': { 'url': path('claro_forum_messages', {'subject': subject.getId(), 'page': page , 'max': max, 'order': "DESC" }), 'label': 'most_ancient_order' },
+                    'POP': { 'url': path('claro_forum_messages', {'subject': subject.getId(), 'page': page , 'max': max, 'order': "POP" }), 'label': 'most_popular_order' }
+            } %}
+            <span class="slrn-select__label">{{'orderby'|trans({}, 'forum')}}</span>
+            <ul class="slrn-select">
+                <li class="slrn-selected slrn-select__item dropdown">
+                    {% for key, option in options if key == order %}
+                    <span data-toggle="dropdown" class="slrn-selected__inner">{{option.label|trans({}, 'forum')}}</span><i class="caret"></i>
+                    {% endfor %}
+                    <ul class="slrn-select slrn-sub-select dropdown-menu">
+                    {% for key, option in options if key != order %}
+                        <li class="slrn-select__item slrn-sub-select__item"><a href="{{option.url}}">{{option.label|trans({}, 'forum')}}</a></li>
+                    {% endfor %}
+                    </ul>
+                </li>
+            </ul>
+            <div class="slrn-posts-per-page">
+                <span class="slrn-select__label">{{'show'|trans({}, 'forum')}}</span>
+                {% set postPerPage = [20,50,100, 'tout'] %}
+                {% for number in postPerPage %}
+                    <a class="slrn-posts-per-page__item{% if number == max %} slrn-posts-per-page__item--active{% endif %}" 
+                       href="{{ path('claro_forum_messages', {'subject': subject.getId(), 'page': page , 'max': number, 'order': order }) }}"
+                       title="Afficher {{number}} résultats par page">
+                        {{number}}</a>
+                {% endfor %}
+            </div>
+            {# generate a div.pagination element#}
+            {{ renderPager(subject.getId(), pager, max, order) }}
+        </div>
         <table id="messages_table" class="slrn-forum-table table table-condensed">
             <tbody id='table-message-body'>
                 <tr>
@@ -176,38 +211,11 @@
                 </tr>
             </tbody>
         </table>
-        <div class="slrn-forum-options-pagination">
-            
-            <div class="slrn-posts-per-page">
-                AFFICHER : 
-                {% set postPerPage = [5,10,20,50,100] %}
-                {% for number in postPerPage %}
-                    <a class="slrn-posts-per-page__item{% if number == max %} slrn-posts-per-page__item--active{% endif %}" 
-                       href="{{ path('claro_forum_messages', {'subject': subject.getId(), 'page': page , 'max': number, 'order': order }) }}"
-                       title="Afficher {{number}} résultats par page">
-                        {{number}}</a>
-                {% endfor %}
-            </div>
+        <div class="slrn-forum-options-pagination slrn-forum-options-pagination--bottom">
             {# generate a div.pagination element#}
             {{ renderPager(subject.getId(), pager, max, order) }}
         </div>
-        <div class="slrn-forum-options-pagination slrn-forum-options-pagination--ordering">
-            <form class="form-ordering js-form-ordering">
-                <select>
-                    <option value="{{ path('claro_forum_messages', {'subject': subject.getId(), 'page': page , 'max': max, 'order': "ASC" }) }}" {% if order == "ASC" %}selected{% endif %}>Trier les messages du plus ancien au plus récent</option>
-                    <option value="{{ path('claro_forum_messages', {'subject': subject.getId(), 'page': page , 'max': max, 'order': "DESC" }) }}" {% if order == "DESC" %}selected{% endif %}>Trier les messages du plus récent au plus ancien</option>
-                </select>
-            </form>
-            <script>
-                $(document).ready(function() {
-                    $('.js-form-ordering').change(function() {
-                        window.location = $(this).find('option:selected').val();
-                    });
-                });
-            </script>
-        </div>
     </div>
-
 {% endblock %}
 
 {% block javascripts %}
@@ -287,47 +295,48 @@
     <script>
         jQuery( document ).ready(function() {
             
-            function updateIHM(jqXHR, textStatus, element) {
-                jQuery('#' + element.data('vote-number')).html(jqXHR.numberLikes);
-                element.toggleClass('active');
+            function updateIHM( jqXHR, textStatus, element ) {
+                jQuery( '#' + element.data( 'vote-number' ) ).html( jqXHR.numberLikes );
+                thumbStatus = ( jqXHR.hasVoted == 1 ) ? element.addClass( 'active' ) : element.removeClass( 'active' );          
             }
             
             function displayError(jqXHR, textStatus, error) {
-                alert('Votre vote n\'a pas pu être pris en compte : '+ error);
+                alert( 'Votre vote n\'a pas pu être pris en compte : ' + error );
                 return false;
             }
             
-            function updateDOM(jqXHR, textStatus, element) {
-                console.log('done');
-            }
+            function updateDOM(jqXHR, textStatus, element, userVote) {
+                userVote = ( userVote ==  1 ) ? 0 : 1;
+                element.data( 'vote-user', userVote );
+             }
             
-            function AjaxVote( element, actionUrl ) {
+            function AjaxVote( element, actionUrl, userVote ) {
                 jQuery.ajax({
                     url: actionUrl,
                     dataType: 'json',
                     actionElement: element,
-                    success: function(jqXHR, textStatus) { updateIHM(jqXHR, textStatus, this.actionElement) },
-                    error: function(jqXHR, textStatus, error) { displayError(jqXHR, textStatus, error) },
-                    complete: function(jqXHR, textStatus) { updateDOM(jqXHR, textStatus, this.actionElement) }
+                    userVote: userVote,
+                    success: function( jqXHR, textStatus ) { updateIHM( jqXHR, textStatus, this.actionElement ) },
+                    error: function( jqXHR, textStatus, error ) { displayError( jqXHR, textStatus, error ) },
+                    complete: function( jqXHR, textStatus ) { updateDOM( jqXHR, textStatus, this.actionElement, this.userVote ) }
                 });
             }
             
-            jQuery('.js-message-like').on('click', function(e) {
+            jQuery( '.js-message-like' ).on( 'click', function(e) {
                 e.preventDefault();
-                userVote = jQuery(this).data('vote-user');
+                userVote = jQuery(this).data( 'vote-user' );
                 
                 if ( userVote == 1 ) {
-                    actionUrl = jQuery(this).data('vote-neutral');
+                    actionUrl = jQuery(this).data( 'vote-neutral' );
                 }
                 
                 if ( ! userVote || userVote == 0 ) {
-                    actionUrl = jQuery(this).data('vote-like');
+                    actionUrl = jQuery(this).data( 'vote-like' );
                 }
                 
-                AjaxVote( jQuery(this), actionUrl );
+                AjaxVote( jQuery(this), actionUrl, userVote );
                 
             });
-            
         });
     </script>
 {% endblock %}

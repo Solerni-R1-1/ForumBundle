@@ -335,6 +335,15 @@ class ForumController extends Controller
 
         /* limit order values */
         $order = ($order === "DESC") ? "DESC" : "ASC";
+        
+        /* interpret $max */
+        if ( ! is_numeric($max) ) {
+            if ( $max == 'tout' ) {
+                $max = 9999; /* over nine thousand */
+            } else {
+                $max = 20;
+            }
+        }
 
         $redirect = $this->manageAno(
             $this->get('router')->generate('claro_forum_messages',
@@ -364,7 +373,7 @@ class ForumController extends Controller
 	            'form' => $form->createView(),
 	            'canAnswer' => $canAnswer,
 	            'category' => $subject->getCategory(),
-	            'max' => $max,
+	            'max' => ( $max == 9999 ) ? 'tout' : $max,
                 'page' => $page,
                 'order' => $order,
 	        	'session' => $moocSession
@@ -1210,7 +1219,7 @@ class ForumController extends Controller
         $numberLikes = $manager->getNumberLikes($message, 1);
         
         $response = new JsonResponse();
-        $response->setData(array('numberLikes' => $numberLikes));
+        $response->setData(array('numberLikes' => $numberLikes, 'hasVoted' => $weight));
         
         return $response;
         
