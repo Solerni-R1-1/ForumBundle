@@ -49,3 +49,5 @@ most_ancient_order: messages les plus anciens
 most_popular_order: messages les plus populaires
 orderby: 'trier par :'
 show: 'affichage :'
+lock_subject: 'Verrouiller le sujet'
+unlock_subject: 'Déverrouiller le sujet'

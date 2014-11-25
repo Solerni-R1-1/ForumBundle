@@ -127,6 +127,7 @@ class ForumController extends Controller
 	        $sc = $this->get('security.context');
 	        $canCreateSubject = $sc->isGranted('post', $collection);
 	        $isModerator = $sc->isGranted('moderate', $collection);
+            $isUserLocked = $category->getIsUserLocked();
 	
 	        $moocSession = $em->getRepository('ClarolineCoreBundle:Mooc\\MoocSession')->getMoocSessionByForum($forum);
 	
@@ -135,6 +136,7 @@ class ForumController extends Controller
 	            '_resource' => $forum,
 	            'canCreateSubject' => $canCreateSubject,
 	            'isModerator' => $isModerator,
+                'isUserLocked' => $isUserLocked,
 	            'category' => $category,
 	            'max' => $max,
 	        	'session' => $moocSession
@@ -1199,6 +1201,37 @@ class ForumController extends Controller
         
         $response = new JsonResponse();
         $response->setData(array('numberLikes' => $numberLikes, 'hasVoted' => $weight));
+        
+        return $response;
+        
+    }
+    
+     /**
+     * @EXT\Route(
+     *     "/category/{category}/is_user_locked/{boolean}",
+     *     name="claro_forum_category_userlock",
+     *     requirements={"boolean"="0|1"}
+     * )
+     * @EXT\ParamConverter("user", options={"authenticatedUser" = true})
+     * @EXT\Method("GET")
+     *
+     * @param Message $message
+     */
+    public function categoryUserLockAction(Category $category, User $user, $boolean) {
+        
+        $sc = $this->get('security.context');
+        $collection = new ResourceCollection(array($category->getForum()->getResourceNode()));
+        $isModerator = $sc->isGranted('moderate', $collection);
+        
+        if ( ! $isModerator ) {
+            throw new \Symfony\Component\Security\Core\Exception\AccessDeniedException();
+        }
+        
+        $manager = $this->get('claroline.manager.forum_manager');
+        $isUserLocked = $manager->setCategoryUserLock($category, $boolean);
+        
+        $response = new JsonResponse();
+        $response->setData(array('hasSetLock' => $boolean));
         
         return $response;
         

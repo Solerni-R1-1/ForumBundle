@@ -570,4 +570,16 @@ class Manager
         
         return $like;
     }
+    
+    public function setCategoryUserLock($category, $boolean) {
+        
+        $this->om->startFlushSuite();
+        $category->setIsUserLocked($boolean);
+        $this->om->persist($category);
+        $this->om->endFlushSuite();
+        
+        return $boolean;
+
+        
+    }
 }

@@ -67,6 +67,11 @@ class Category extends AbstractIndexableResourceElement
      * @Assert\NotBlank()
      */
     protected $name;
+    
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    protected $isUserLocked = false;
 
     public function __construct()
     {
@@ -151,4 +156,16 @@ class Category extends AbstractIndexableResourceElement
     public function getForumNameAndCategoryName() {
     	return $this->getForum()->getResourceNode()->getName()." -- ".$this->getName();
     }
+    
+    public function getIsUserLocked() {
+        return $this->isUserLocked;
+    }
+
+    public function setIsUserLocked($isUserLocked) {
+        $this->isUserLocked = $isUserLocked;
+        
+        return $this;
+    }
+
+
 }

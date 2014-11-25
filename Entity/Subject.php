@@ -81,6 +81,11 @@ class Subject extends AbstractIndexableResourceElement
      * @ORM\Column(type="boolean")
      */
     protected $isSticked = false;
+    
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    protected $isUserLocked = false;
 
     /**
      * Constructor.
@@ -140,7 +145,11 @@ class Subject extends AbstractIndexableResourceElement
     {
         return $this->creationDate;
     }
-
+    
+    public function getUpdated() {
+        return $this->updated;
+    }
+    
     public function getMessages()
     {
         return $this->messages;
@@ -173,4 +182,14 @@ class Subject extends AbstractIndexableResourceElement
     {
         return $this->getCategory()->getForum()->getResourceNode();
     }
+    
+    public function getIsUserLocked() {
+        return $this->isUserLocked;
+    }
+
+    public function setIsUserLocked($isUserLocked) {
+        $this->isUserLocked = $isUserLocked;
+    }
+
+
 }

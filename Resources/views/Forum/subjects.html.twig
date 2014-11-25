@@ -44,7 +44,7 @@
                 <a class="btn btn-default" href="{{ path('claro_forum_categories', { 'forum': category.getForum().getId() }) }}">
                     <i class="fa fa-chevron-left"></i> {{ 'forum_back_to_categories'|trans({}, 'forum') }}
                 </a>
-                {% if canCreateSubject %}
+                {% if ( canCreateSubject and not isUserLocked ) or isModerator %}
                     <a class="btn btn-primary" href="{{ _path('claro_forum_form_subject_creation', {'category': category.getId()}) }}">
                         <i class="fa fa-plus"></i> {{ 'new_subject'|trans({}, 'forum') }}
                     </a>
@@ -59,6 +59,26 @@
                 </div>
             </div>
         </div>
+        {% if isModerator %}
+            <div class="navbar row">
+                <div class="col-md-12">
+                    {% if isUserLocked %}
+                        {% set btnClasses, btnText = ' btn-gris', 'unlock_subject' %}
+                    {% else %}
+                        {% set btnClasses, btnText = ' btn-primary', 'lock_subject' %}
+                    {% endif %}
+                    <a class="js-trigger-lock btn{{ btnClasses }}"
+                       data-current-lock="{{ isUserLocked }}"
+                       data-lock-url="{{ path('claro_forum_category_userlock', {'category': category.getId(), 'boolean': 1}) }}"
+                       data-unlock-url="{{ path('claro_forum_category_userlock', {'category': category.getId(), 'boolean': 0}) }}"
+                       data-lock-text="{{'lock_subject'|trans({}, 'forum') }}"
+                       data-unlock-text="{{'unlock_subject'|trans({}, 'forum') }}"
+                       >
+                        {{ btnText|trans({}, 'forum') }}
+                    </a>
+                </div>
+            </div>
+        {% endif %}
         <div id="subjects-table-container" class="table-responsive">
             <table class="table table-striped table-bordered table-condensed">
                 <thead>
@@ -213,5 +233,54 @@
                 );
             });
         </script>
+         <script>
+        jQuery( document ).ready(function() {
+                       
+            function displayError(jqXHR, textStatus, error) {
+                alert( 'Le verrouillage du sujet n\'a pas pu être pris en compte : ' + error );
+                return false;
+            }
+            
+            function updateDOM(jqXHR, textStatus, element, currentLock) {
+                currentLock = ( currentLock ==  1 ) ? 0 : 1;
+                element.data( 'current-lock', currentLock );
+                
+                if ( currentLock == 1 ) {
+                    element.html( element.data('unlock-text') );
+                    element.addClass('btn-gris').removeClass('btn-primary');
+                } else {
+                   element.html( element.data('lock-text') );
+                    element.addClass('btn-primary').removeClass('btn-gris');
+                }
+             }
+            
+            function AjaxLock( element, actionUrl, currentLock ) {
+                jQuery.ajax({
+                    url: actionUrl,
+                    dataType: 'json',
+                    actionElement: element,
+                    currentLock: currentLock,
+                    success: function( jqXHR, textStatus ) { updateDOM( jqXHR, textStatus, this.actionElement, this.currentLock ) },
+                    error: function( jqXHR, textStatus, error ) { displayError( jqXHR, textStatus, error ) }
+                });
+            }
+            
+            jQuery( '.js-trigger-lock' ).on( 'click', function(e) {
+                e.preventDefault();
+                currentLock = jQuery(this).data( 'current-lock' );
+                
+                if ( currentLock == 1 ) {
+                    actionUrl = jQuery(this).data( 'unlock-url' );
+                }
+                
+                if ( ! currentLock || currentLock == 0 ) {
+                    actionUrl = jQuery(this).data( 'lock-url' );
+                }
+                
+                AjaxLock( jQuery(this), actionUrl, currentLock );
+                
+            });
+        });
+    </script>
     {% endif %}
 {% endblock %}
