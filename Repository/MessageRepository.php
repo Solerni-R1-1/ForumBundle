@@ -279,6 +279,17 @@ class MessageRepository extends EntityRepository
     	return $query->getResult();
     }
     
+    public function countUserMessages(User $user) {
+    	$dql = "SELECT count(m)
+    			FROM Claroline\ForumBundle\Entity\Message m
+    			WHERE m.creator = :user";
+    	
+    	$query = $this->_em->createQuery($dql);
+    	$query->setParameter("user", $user);
+    	
+    	return $query->getSingleScalarResult();
+    }
+    
     public function countMessagesForUser(ResourceNode $forum, User $user, \DateTime $from = null, \DateTime $to = null) {
     	$dql = "SELECT count(m) FROM Claroline\ForumBundle\Entity\Message m
                 JOIN m.subject s
