@@ -334,7 +334,10 @@ class ForumController extends Controller
     {
 
         /* limit order values */
-        $order = ($order === "DESC") ? "DESC" : "ASC";
+        $authorisedValues = ['POP', 'ASC', 'DESC'];
+        if ( ! in_array($order, $authorisedValues ) ) {
+            $order = 'ASC';
+        }
         
         /* interpret $max */
         if ( ! is_numeric($max) ) {
@@ -1175,31 +1178,7 @@ class ForumController extends Controller
             $this->generateUrl('claro_forum_subjects', array('category' => $subject->getCategory()->getId()))
         );
     }
-    
-     /**
-     * @EXT\ParamConverter("user", options={"authenticatedUser" = true})
-     * @EXT\Method("GET")
-     * @EXT\Template("ClarolineForumBundle:Forum:messageLikeBar.html.twig")
-     * 
-     * @param User $user
-     * @param Message $message 
-     */
-    public function renderMessageLikeBarAction(User $user, Message $message) {
-        
-        $manager = $this->get('claroline.manager.forum_manager');
-        
-        $numberLikes = $manager->getNumberLikes($message, 1);
-        /* user Weight Value could be : null (no vote), 1 (like), 0 (removing previous vote), -1 (dislike) */
-        $userWeightValue = $manager->getUserLikeValue($message, $user);
-        
-        return array(
-            'message'           => $message,
-            'numberLikes'       => $numberLikes,
-            'userWeightValue'   => $userWeightValue
-        );
-        
-    }
-    
+       
     /**
      * @EXT\Route(
      *     "/vote/message/{message}/{weight}",

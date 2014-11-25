@@ -120,8 +120,8 @@
         </div>
         <div class="slrn-forum-options-pagination slrn-forum-options-pagination--top">
             {% set options = {
-                    'ASC': { 'url': path('claro_forum_messages', {'subject': subject.getId(), 'page': page , 'max': max, 'order': "ASC" }), 'label': 'most_recent_order' },
-                    'DESC': { 'url': path('claro_forum_messages', {'subject': subject.getId(), 'page': page , 'max': max, 'order': "DESC" }), 'label': 'most_ancient_order' },
+                    'ASC': { 'url': path('claro_forum_messages', {'subject': subject.getId(), 'page': page , 'max': max, 'order': "ASC" }), 'label': 'most_ancient_order' },
+                    'DESC': { 'url': path('claro_forum_messages', {'subject': subject.getId(), 'page': page , 'max': max, 'order': "DESC" }), 'label': 'most_recent_order' },
                     'POP': { 'url': path('claro_forum_messages', {'subject': subject.getId(), 'page': page , 'max': max, 'order': "POP" }), 'label': 'most_popular_order' }
             } %}
             <span class="slrn-select__label">{{'orderby'|trans({}, 'forum')}}</span>
@@ -154,7 +154,8 @@
             <tbody id='table-message-body'>
                 <tr>
                     <td>
-                        {% for message in pager.currentPageResults %}
+                        {% for messageArray in pager.currentPageResults %}
+                        {% set message, nbLikes, userWeightValue, userNbPosts = messageArray['message'], messageArray['nbLikes'], messageArray['hasVoted'], messageArray['nbCreatorMessages'] %}
                         <table class="slrn-table-message">
                             <tr class="row-message">
                                 <td class="slrn-forum-td slrn-forum-td--avatar">
@@ -173,6 +174,9 @@
                                     <div class="text-center slrn-message-horodatage">
                                         {{ message.getCreationDate()|intl_date_format() }}
                                     </div>
+                                    <div class="text-center slrn-message-user-nb-messages">
+                                        <p>{{userNbPosts}} posts</p>
+                                    </div>
                                 </td>
                                 <td class="slrn-forum-td slrn-message-content">
                                     <p>{{ message.getContent()|raw }}</p>
@@ -182,7 +186,18 @@
                             <tr class="row-message">
                                 <td class="slrn-forum-td">&nbsp;</td>
                                 <td class="slrn-forum-td slrn-forum-td--tools">
-                                    {% render controller("ClarolineForumBundle:Forum:renderMessageLikeBar", {'user': app.user, 'message': message}) %}
+                                    <div class="slrn-like-bar">
+                                        <span id="number-likes-{{ message.getId() }}" class="slrn-like-bar__elem slrn-like-num">{{ nbLikes }}</span>
+                                        {% set likeLink = path('claro_forum_message_vote', {'weight': 1, 'message': message.getId()}) %}
+                                        {% set neutrallikeLink = path('claro_forum_message_vote', {'weight': 0, 'message': message.getId()}) %}
+                                        <a class="js-message-like slrn-like-bar__elem slrn-like-thumb{% if userWeightValue == 1 %} active{% endif %}"
+                                           data-vote-number="number-likes-{{message.getId()}}"
+                                           data-vote-user="{{ userWeightValue }}"
+                                           data-vote-like="{{ likeLink }}"
+                                           data-vote-neutral="{{ neutrallikeLink }}">
+                                            + <i class="icon-thumbs-up icon-thumb"></i>
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                             {# edition tools #}
@@ -190,14 +205,14 @@
                                 <tr class="slrn-forum-message-edition">
                                     <td colspan="2" class="slrn-forum-td">
                                         <div class="pull-right clearfix">
-                                        <a class="btn btn-default" href="{{ path('claro_forum_edit_message_form', {'message': firstMessage.getId()}) }}">
+                                        <a class="btn btn-default" href="{{ path('claro_forum_edit_message_form', {'message': message.getId()}) }}">
                                             <i class="icon-pencil"></i> {{ 'edit'|trans({}, 'platform') }}
                                         </a>
                                         {% if isModerator %}
-                                            <a id="move-message" class="btn btn-default" href="{{ path('claro_message_move_form', {'message': firstMessage.getId()}) }}">
+                                            <a id="move-message" class="btn btn-default" href="{{ path('claro_message_move_form', {'message': message.getId()}) }}">
                                                 <i class="icon-arrow-right"></i> {{ 'move'|trans({}, 'platform') }}
                                             </a>
-                                            <a id="delete-message" class="btn btn-default" href="{{ path('claro_forum_delete_message', {'message': firstMessage.getId()}) }}">
+                                            <a id="delete-message" class="btn btn-default" href="{{ path('claro_forum_delete_message', {'message': message.getId()}) }}">
                                                 <i class="icon-remove"></i> {{ 'delete'|trans({}, 'platform') }}
                                             </a>
                                         {% endif %}

@@ -19,8 +19,8 @@ class LikeRepository extends EntityRepository {
 
 	public function getLikes( Message $message, $weight ) {
         
-        
-        if ( $weight !== -1 && $weight !== 0 && $weight !== 1 ) {
+        $authorizedValues = [-1, 0, 1];
+        if ( ! in_array( $weight, $authorizedValues ) ) {
             $dql = "
                 SELECT l FROM Claroline\ForumBundle\Entity\Like l
                 WHERE l.message = {$message->getId()}";

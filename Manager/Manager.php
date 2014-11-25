@@ -452,12 +452,12 @@ class Manager
      */
     public function getMessagesPager(Subject $subject, $page = 1, $max = 20, $order = "ASC")
     {
-    	$messages = $this->messageRepo->findBySubject($subject->getId(), true, $order);
+        $user = $this->container->get('security.context')->getToken()->getUser();
+    	$messages = $this->messageRepo->findBySubject($subject->getId(), $user->getId(), true, $order);
     
     	return $this->pagerFactory->createPager($messages, $page, $max, false);
     }
     
-
     /**
      * Get the pager for the message list of a subject.
      *

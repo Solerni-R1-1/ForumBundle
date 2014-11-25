@@ -426,3 +426,7 @@ i.icon-comment
 .slrn-sub-select {
     display: none;
 }
+
+.slrn-message-user-nb-messages {
+    margin-top: 1em;
+}
