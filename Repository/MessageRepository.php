@@ -352,7 +352,6 @@ class MessageRepository extends EntityRepository
     	return $query->getResult();
     }
 
-
     public function countUserMessagesLiked(User $user) {
     	$dql = "SELECT COUNT(DISTINCT m)
     			FROM Claroline\ForumBundle\Entity\Message m
