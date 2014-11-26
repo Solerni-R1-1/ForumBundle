@@ -16,7 +16,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Claroline\ForumBundle\Entity\Subject;
 use Claroline\CoreBundle\Entity\User;
 use Gedmo\Mapping\Annotation as Gedmo;
-use Claroline\CoreBundle\Entity\Resource\AbstractIndexableResourceElement;
 
 /**
  * @ORM\Entity
