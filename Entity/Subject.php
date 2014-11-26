@@ -173,8 +173,17 @@ class Subject extends AbstractIndexableResourceElement
         $doc->forum_name = $this->getCategory()->getForum()->getResourceNode()->getName();
         $doc->forum_category_id = $this->getCategory()->getId();
         $doc->forum_category_name = $this->getCategory()->getName();
+        $doc->forum_category_url= $this->get('router')->generate('claro_forum_subjects', array(
+            'category' => $doc->forum_category_id
+        ));
+        $doc->forum_subject_id = $this->getId();
+        $doc->forum_subject_name = $this->getTitle();
+        $doc->forum_subject_url= $this->get('router')->generate('claro_forum_messages', array(
+            'subject' => $doc->forum_subject_id
+        ));
+
         $doc->content_t = $this->getTitle();
-        
+
         return $doc;
     }
     
