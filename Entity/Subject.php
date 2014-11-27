@@ -184,6 +184,12 @@ class Subject extends AbstractIndexableResourceElement
 
         $doc->content_t = $this->getTitle();
 
+        $doc->forum_creator_id = $this->getCreator()->getId();
+        $doc->forum_creator_name = $this->getCreator()->getFirstName().' '.$this->getCreator()->getLastName();
+        $doc->forum_creator_profil_url =  $this->get('router')->generate('claro_public_profile_view', array(
+            'publicUrl' => $this->getCreator()->getPublicUrl()
+        ));
+
         return $doc;
     }
     
