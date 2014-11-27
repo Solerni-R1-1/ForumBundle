@@ -99,7 +99,7 @@
              </tbody>
          </table>
     {% endif %}
-    <div class="panel-body">
+    <div class="panel-body panel-body--forum">
         {% if canAnswer %}
             <div class="tiny_editor">
                 <textarea class="forum-answer claroline-tiny-mce hide"></textarea>
@@ -190,7 +190,14 @@
                                         <span id="number-likes-{{ message.getId() }}" class="slrn-like-bar__elem slrn-like-num">{{ nbLikes }}</span>
                                         {% set likeLink = path('claro_forum_message_vote', {'weight': 1, 'message': message.getId()}) %}
                                         {% set neutrallikeLink = path('claro_forum_message_vote', {'weight': 0, 'message': message.getId()}) %}
+                                        {% set tooltipVote = 'tooltip_vote'|trans({}, 'forum') %}
+                                        {% set tooltipUnvote = 'tooltip_unvote'|trans({}, 'forum') %}
                                         <a class="js-message-like slrn-like-bar__elem slrn-like-thumb{% if userWeightValue == 1 %} active{% endif %}"
+                                           data-toggle="tooltip"
+                                           title="{% if userWeightValue == 1 %}{{ tooltipUnvote }}{% else %}{{tooltipVote}}{% endif %}"
+                                           data-original-title=""
+                                           data-unvote-title="{{ tooltipUnvote }}"
+                                           data-vote-title="{{ tooltipVote }}"
                                            data-vote-number="number-likes-{{message.getId()}}"
                                            data-vote-user="{{ userWeightValue }}"
                                            data-vote-like="{{ likeLink }}"
@@ -200,6 +207,9 @@
                                     </div>
                                     <div class="col-md-4">
                                         <a data-target="msg_{{ message.getId() }}" class="js-trigger-citation forum_citation_link pink_link" href="#">{{'citation_answer'|trans({}, 'forum') }}</a>
+                                    </div>
+                                    <div class="col-md-4 back-top-top-cell">
+                                        <a data-toggle='tooltip' title="{{'move_to_top'|trans({}, 'forum')}}" href="#" class="forum-to-top js-forum-to-top"><i class="icon-long-arrow-up"></i></a>
                                     </div>
                                 </td>
                             </tr>
@@ -315,7 +325,22 @@
             
             function updateIHM( jqXHR, textStatus, element ) {
                 jQuery( '#' + element.data( 'vote-number' ) ).html( jqXHR.numberLikes );
-                thumbStatus = ( jqXHR.hasVoted == 1 ) ? element.addClass( 'active' ) : element.removeClass( 'active' );          
+                
+                if ( jqXHR.hasVoted == 1 ) {
+                    element
+                            .addClass( 'active' )
+                            .tooltip('hide')
+                            .attr('data-original-title', element.data('unvote-title'))
+                            .tooltip('fixTitle')
+                            //.tooltip('show')
+                } else {
+                    element
+                            .removeClass( 'active' )
+                            .tooltip('hide')
+                            .attr('data-original-title', element.data('vote-title'))
+                            .tooltip('fixTitle')
+                            //.tooltip('show')
+                }
             }
             
             function displayError(jqXHR, textStatus, error) {
@@ -365,6 +390,11 @@
                 node = targetTiny.dom.select('div#focus');
                 targetTiny.selection.select(node[0]);
                 targetTiny.selection.collapse(false);
+            });
+            
+            jQuery('.js-forum-to-top').on ('click', function(e) {
+                e.preventDefault();
+                jQuery('html,body').animate({scrollTop: 0}, 'fast');
             });
         });
     </script>

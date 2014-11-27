@@ -449,3 +449,37 @@ i.icon-comment
 .forum_citation_link {
     line-height: 35px;
 }
+
+.back-top-top-cell {
+    text-align: right;
+}
+
+.forum-to-top {
+    display: inline-block;
+    text-align: center;
+    padding: .5em;
+    height: 35px;
+    font-size: 1.3em;
+    position: relative;
+    left: .5em;
+    line-height: 0;
+}
+
+.forum-to-top .icon-long-arrow-up {
+    height: 35px;
+    width: 100%;
+}
+
+.forum-to-top:hover {
+    text-decoration: none;
+}
+
+.panel-body--forum .tooltip-inner {
+    min-width: 120px;
+    background-color: #999;
+    color: #FFF;
+}
+
+.panel-body--forum .tooltip > .tooltip-arrow {
+    border-top-color: #999;
+}

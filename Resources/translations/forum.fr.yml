@@ -52,3 +52,6 @@ show: 'affichage :'
 lock_subject: 'Verrouiller le sujet'
 unlock_subject: 'Déverrouiller le sujet'
 citation_answer: répondre en citant
+move_to_top: haut de page
+tooltip_vote: Cliquez pour voter pour cette contribution
+tooltip_unvote: Vous avez déjà voté pour cette contribution, cliquez pour annuler votre vote
