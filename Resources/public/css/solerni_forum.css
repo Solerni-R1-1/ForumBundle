@@ -430,3 +430,22 @@ i.icon-comment
 .slrn-message-user-nb-messages {
     margin-top: 1em;
 }
+
+.slrn-message-content_html blockquote {
+    padding:10px 20px;
+    margin:0 0 20px; 
+    border: 1px solid #A5B2BD; 
+    border-left:5px solid #A5B2BD; 
+    background-color: #EEEEEF;
+}
+
+.slrn-message-content_html blockquote p {
+    font-size:1em;
+    font-weight:normal;
+    line-height:1.25; 
+    margin: .5em;
+}
+
+.forum_citation_link {
+    line-height: 35px;
+}

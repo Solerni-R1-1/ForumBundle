@@ -101,7 +101,7 @@
     {% endif %}
     <div class="panel-body">
         {% if canAnswer %}
-            <div>
+            <div class="tiny_editor">
                 <textarea class="forum-answer claroline-tiny-mce hide"></textarea>
                 {{ form_widget(form._token) }}
             </div>
@@ -156,7 +156,7 @@
                     <td>
                         {% for messageArray in pager.currentPageResults %}
                         {% set message, nbLikes, userWeightValue, userNbPosts = messageArray['message'], messageArray['nbLikes'], messageArray['hasVoted'], messageArray['nbCreatorMessages'] %}
-                        <table class="slrn-table-message">
+                        <table id="msg_{{ message.getId() }}"  class="slrn-table-message">
                             <tr class="row-message">
                                 <td class="slrn-forum-td slrn-forum-td--avatar">
                                     <div class="text-center">
@@ -179,14 +179,14 @@
                                     </div>
                                 </td>
                                 <td class="slrn-forum-td slrn-message-content">
-                                    <p>{{ message.getContent()|raw }}</p>
+                                    <div class="slrn-message-content_html">{{ message.getContent()|raw }}</p></div>
                                     <p class="text-muted slrn-message-date">{{ message.getCreationDate()| timeAgo }}</p>
                                 </td>
                             </tr>
                             <tr class="row-message">
                                 <td class="slrn-forum-td">&nbsp;</td>
                                 <td class="slrn-forum-td slrn-forum-td--tools">
-                                    <div class="slrn-like-bar">
+                                    <div class="slrn-like-bar col-md-4">
                                         <span id="number-likes-{{ message.getId() }}" class="slrn-like-bar__elem slrn-like-num">{{ nbLikes }}</span>
                                         {% set likeLink = path('claro_forum_message_vote', {'weight': 1, 'message': message.getId()}) %}
                                         {% set neutrallikeLink = path('claro_forum_message_vote', {'weight': 0, 'message': message.getId()}) %}
@@ -195,8 +195,11 @@
                                            data-vote-user="{{ userWeightValue }}"
                                            data-vote-like="{{ likeLink }}"
                                            data-vote-neutral="{{ neutrallikeLink }}">
-                                            + <i class="icon-thumbs-up icon-thumb"></i>
+                                           + <i class="icon-thumbs-up icon-thumb"></i>
                                         </a>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <a data-target="msg_{{ message.getId() }}" class="js-trigger-citation forum_citation_link pink_link" href="#">{{'citation_answer'|trans({}, 'forum') }}</a>
                                     </div>
                                 </td>
                             </tr>
@@ -351,6 +354,17 @@
                 
                 AjaxVote( jQuery(this), actionUrl, userVote );
                 
+            });
+            
+            jQuery('.js-trigger-citation').on ('click', function() {
+                targetTiny = tinymce.editors[0]; 
+                citation = '<blockquote><i>' + jQuery( '#' + jQuery(this).data('target') + ' .slrn-message-username' ).html() + ' a écrit:</i>' + jQuery( '#' + jQuery(this).data('target') + ' .slrn-message-content_html' ).html() + '</blockquote><div id="focus">&nbsp;</div>';
+                targetTiny.execCommand('mceInsertRawHTML', false, citation );
+                destination = jQuery('.tiny_editor').position().top - 40;
+                jQuery('html,body').animate({scrollTop: destination}, 'fast');
+                node = targetTiny.dom.select('div#focus');
+                targetTiny.selection.select(node[0]);
+                targetTiny.selection.collapse(false);
             });
         });
     </script>
