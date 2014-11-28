@@ -69,6 +69,15 @@ class Message extends AbstractIndexableResourceElement
     protected $creator;
     
     /**
+     * @ORM\ManyToOne(
+     *     targetEntity="Claroline\CoreBundle\Entity\User",
+     *     cascade={"persist"}
+     * )
+     * @ORM\JoinColumn(name="last_editor_id")
+     */
+    protected $lastEditedBy;
+    
+    /**
      * @ORM\OneToMany(
      *     targetEntity="Claroline\ForumBundle\Entity\Like",
      *     mappedBy="message",
@@ -175,5 +184,15 @@ class Message extends AbstractIndexableResourceElement
     public function getLikes() {
         return $this->likes;
     }
+    
+    public function getlastEditedBy() {
+        return $this->lastEditedBy;
+    }
+
+    public function setlastEditedBy($lastEditedBy) {
+        $this->lastEditedBy = $lastEditedBy;
+    }
+
+
 
 }

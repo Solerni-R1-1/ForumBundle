@@ -496,3 +496,7 @@ i.icon-comment
     border-bottom: 2px solid #D90045; 
 }
 
+.slrn-message-horodatage--edited {
+    margin-top: 1em;
+    font-size: .8em;
+}

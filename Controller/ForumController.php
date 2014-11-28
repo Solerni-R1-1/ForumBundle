@@ -471,10 +471,12 @@ class ForumController extends Controller
      *     name="claro_forum_edit_message"
      * )
      *
+     * @EXT\ParamConverter("user", options={"authenticatedUser" = true})
+     * 
      * @Template("ClarolineForumBundle:Forum:editMessageForm.html.twig")
      * @param Message $message
      */
-    public function editMessageAction(Message $message)
+    public function editMessageAction(Message $message, User $user)
     {
         $redirect = $this->manageAno(
             $this->get('router')->generate('claro_forum_edit_message',
@@ -493,15 +495,16 @@ class ForumController extends Controller
         }
 
         $oldContent = $message->getContent();
+        
         $form = $this->container->get('form.factory')->create(new MessageType, new Message());
         $form->handleRequest($this->get('request'));
 
         if ($form->isValid()) {
             $newContent = $form->get('content')->getData();
-            $this->get('claroline.manager.forum_manager')->editMessage($message, $oldContent, $newContent);
+            $this->get('claroline.manager.forum_manager')->editMessage($message, $oldContent, $newContent, $user);
 
             return new RedirectResponse(
-                $this->generateUrl('claro_forum_messages', array('subject' => $subject->getId()))
+                $this->generateUrl('claro_forum_show_message', array('message' => $message->getId()))
             );
         }
 

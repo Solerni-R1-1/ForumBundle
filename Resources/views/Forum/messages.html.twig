@@ -181,7 +181,17 @@
                                 </td>
                                 <td class="slrn-forum-td slrn-message-content">
                                     <div class="slrn-message-content_html">{{ message.getContent()|raw }}</p></div>
-                                    <p class="text-muted slrn-message-date">{{ message.getCreationDate()| timeAgo }}</p>
+                                    <p class="text-muted slrn-message-date">{{ message.getCreationDate()| timeAgo }}
+                                         {% if message.getlastEditedBy()|default %}
+                                            <i>( message 
+                                                {{'edited_by'|trans({}, 'forum')}}
+                                                <a href="{{path('claro_public_profile_view', {'publicUrl':message.getlastEditedBy().getPublicUrl()})}}">
+                                                    {{message.getlastEditedBy().getFirstName()}} {{message.getlastEditedBy().getLastName()}}</a>
+                                                {{'edited_on'|trans({}, 'forum')}}
+                                                {{ message.getUpdated()|intl_date_format() }}
+                                            )</i>
+                                        {% endif %}
+                                    </p>
                                 </td>
                             </tr>
                             <tr class="row-message">

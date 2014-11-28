@@ -496,10 +496,11 @@ class Manager
      * @param string $oldContent
      * @param string $newContent
      */
-    public function editMessage(Message $message, $oldContent, $newContent)
+    public function editMessage(Message $message, $oldContent, $newContent, $user)
     {
         $this->om->startFlushSuite();
         $message->setContent($newContent);
+        $message->setlastEditedBy($user);
         $this->om->persist($message);
         $this->dispatch(new EditMessageEvent($message, $oldContent, $newContent));
         $this->om->endFlushSuite();
