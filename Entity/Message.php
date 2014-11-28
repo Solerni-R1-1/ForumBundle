@@ -163,6 +163,11 @@ class Message extends AbstractIndexableResourceElement
             'subject' => $doc->forum_subject_id
         ));
 
+        $doc->forum_message_id = $this->getId();
+        $doc->forum_message_url= $this->get('router')->generate('claro_forum_show_message', array(
+            'message' => $doc->forum_message_id
+        ));
+
         $doc->content_t = $this->getContent();
 
         $doc->forum_creator_id = $this->getCreator()->getId();
