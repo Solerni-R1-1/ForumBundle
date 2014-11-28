@@ -4,12 +4,8 @@
             <a href="{{ document.resource_url|path }}"> FORUM</a> | 
             <a href="{{ document.forum_category_url|path }}">{{ document.forum_name }}</a> | 
         </span>
-        créé par 
-        <span class="slrn-sr-elmnt-header">
-            <a href="{{ document.forum_creator_profil_url|path }}">{{ document.owner_name | truncate:13 }}</a>
-        </span>
     </div>
-    <div class="slrn-sr-elmnt-text" ng-bind-html = "document.content_t | truncate:85">
+    <div class="slrn-sr-elmnt-text" ng-bind-html = "document.content_t">
     </div>
     <div><a href="{{ document.forum_subject_url|path }}" class="pink_link">(lire la discussion)</a></div>
     <div class="slrn-sr-elmnt-date">

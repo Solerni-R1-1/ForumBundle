@@ -169,13 +169,18 @@ class Subject extends AbstractIndexableResourceElement
     {
         $doc = parent::fillIndexableDocument($doc);
         
-        $doc->forum_id = $this->getCategory()->getForum()->getId();
-        $doc->forum_name = $this->getCategory()->getForum()->getResourceNode()->getName();
-        $doc->forum_category_id = $this->getCategory()->getId();
-        $doc->forum_category_name = $this->getCategory()->getName();
-        $doc->forum_category_url= $this->get('router')->generate('claro_forum_subjects', array(
-            'category' => $doc->forum_category_id
+        $categorie = $this->getCategory();
+        $forum = $categorie->getForum();
+        
+        $doc->forum_id = $forum->getId();
+        $doc->forum_name = $forum->getResourceNode()->getName();
+
+        $doc->forum_category_id = $categorie->getId();
+        $doc->forum_category_name = $categorie->getName();
+        $doc->forum_category_url= $categorie->get('router')->generate('claro_forum_subjects', array(
+            'category' => $categorie->getId()
         ));
+
         $doc->forum_subject_id = $this->getId();
         $doc->forum_subject_name = $this->getTitle();
         $doc->forum_subject_url= $this->get('router')->generate('claro_forum_messages', array(

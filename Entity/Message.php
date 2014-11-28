@@ -150,13 +150,18 @@ class Message extends AbstractIndexableResourceElement
     {
         $doc = parent::fillIndexableDocument($doc);
 
-        $doc->forum_id = $this->getSubject()->getCategory()->getForum()->getId();
-        $doc->forum_name = $this->getSubject()->getCategory()->getForum()->getResourceNode()->getName();
-        $doc->forum_category_id = $this->getSubject()->getCategory()->getId();
-        $doc->forum_category_name = $this->getSubject()->getCategory()->getName();
-        $doc->forum_category_url= $this->get('router')->generate('claro_forum_subjects', array(
-            'category' => $doc->forum_category_id
+        $categorie = $this->getSubject()->getCategory();
+        $forum = $categorie->getForum();
+        
+        $doc->forum_id = $forum->getId();
+        $doc->forum_name = $forum->getResourceNode()->getName();
+
+        $doc->forum_category_id = $categorie->getId();
+        $doc->forum_category_name = $categorie->getName();
+        $doc->forum_category_url= $categorie->get('router')->generate('claro_forum_subjects', array(
+            'category' => $categorie->getId()
         ));
+
         $doc->forum_subject_id = $this->getSubject()->getId();
         $doc->forum_subject_name = $this->getSubject()->getTitle();
         $doc->forum_subject_url= $this->get('router')->generate('claro_forum_messages', array(

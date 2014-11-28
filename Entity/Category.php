@@ -141,10 +141,20 @@ class Category extends AbstractIndexableResourceElement
     {
         $doc = parent::fillIndexableDocument($doc);
         
-        $doc->forum_id = $this->getForum()->getId();
-        $doc->forum_name = $this->getForum()->getResourceNode()->getName();
-        $doc->content_t = $this->getName();
+        $categorie = $this;
+        $forum = $categorie->getForum();
         
+        $doc->forum_id = $forum->getId();
+        $doc->forum_name = $forum->getResourceNode()->getName();
+
+        $doc->forum_category_id = $categorie->getId();
+        $doc->forum_category_name = $categorie->getName();
+        $doc->forum_category_url= $categorie->get('router')->generate('claro_forum_subjects', array(
+            'category' => $categorie->getId()
+        ));
+        
+        $doc->content_t = $this->getName();
+
         return $doc;
     }
 
