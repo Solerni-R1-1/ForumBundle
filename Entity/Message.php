@@ -176,7 +176,7 @@ class Message extends AbstractIndexableResourceElement
             'publicUrl' => $this->getCreator()->getPublicUrl()
         ));
 
-        $doc->forum_like = $this->getLikes();
+        $doc->forum_message_like = count($this->getLikes());
 
         return $doc;
     }
