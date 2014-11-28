@@ -580,6 +580,14 @@ class Manager
         
         return $boolean;
 
-        
     }
+    
+    public function getPageForSpecificMessage($message, $max) {
+        
+        $messagePosition = $this->messageRepo->CountFromStartToMessage($message);
+        
+        return ceil ( ($messagePosition + 1 ) / $max );
+
+    }
+    
 }

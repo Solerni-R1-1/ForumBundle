@@ -1191,6 +1191,7 @@ class ForumController extends Controller
      * @EXT\Method("GET")
      *
      * @param Message $message
+     * @param int $weight
      */
     public function voteMessageAction(Message $message, User $user, $weight) {
         
@@ -1215,7 +1216,8 @@ class ForumController extends Controller
      * @EXT\ParamConverter("user", options={"authenticatedUser" = true})
      * @EXT\Method("GET")
      *
-     * @param Message $message
+     * @param Category $category
+     * @param Boolean $boolean
      */
     public function categoryUserLockAction(Category $category, User $user, $boolean) {
         
@@ -1234,6 +1236,34 @@ class ForumController extends Controller
         $response->setData(array('hasSetLock' => $boolean));
         
         return $response;
+        
+    }
+    
+    /**
+     * @EXT\Route(
+     *     "/show/message/{message}/max/{max}",
+     *     name="claro_forum_show_message",
+     *     options={"expose"=true},
+     *     defaults={"max"=20}
+     * )
+     * @EXT\ParamConverter("user", options={"authenticatedUser" = true})
+     * @EXT\Method("GET")
+     *
+     * @param Message $message
+     */
+    public function openMessagesToSpecificMessage( Message $message, $max ) {
+        
+        $manager = $this->get('claroline.manager.forum_manager');
+        $page = $manager->getPageForSpecificMessage($message, $max);
+        
+        return new RedirectResponse(
+            $this->generateUrl('claro_forum_messages', array(
+                'subject'   => $message->getSubject()->getId(),
+                'page'      => $page,
+                'max'       => $max,
+                'messageId' => $message->getId()
+            ))
+        );
         
     }
     

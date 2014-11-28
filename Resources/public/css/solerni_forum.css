@@ -483,3 +483,16 @@ i.icon-comment
 .panel-body--forum .tooltip > .tooltip-arrow {
     border-top-color: #999;
 }
+
+.target-msg {
+    border: 2px solid #D90045;
+}
+
+.table-condensed .slrn-table-message.target-msg .row-message:first-child {
+    border-top-color: #D90045;
+}
+
+#messages_table.slrn-forum-table .target-msg .slrn-forum-message-edition .slrn-forum-td {
+    border-bottom: 2px solid #D90045; 
+}
+

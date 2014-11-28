@@ -156,6 +156,7 @@
                     <td>
                         {% for messageArray in pager.currentPageResults %}
                         {% set message, nbLikes, userWeightValue, userNbPosts = messageArray['message'], messageArray['nbLikes'], messageArray['hasVoted'], messageArray['nbCreatorMessages'] %}
+                        <a name="message_{{ message.getId() }}">
                         <table id="msg_{{ message.getId() }}"  class="slrn-table-message">
                             <tr class="row-message">
                                 <td class="slrn-forum-td slrn-forum-td--avatar">
@@ -322,6 +323,19 @@
     {% endif %}
     <script>
         jQuery( document ).ready(function() {
+            
+            jQuery.urlParam = function(name) {
+                var results = new RegExp('[\?&amp;]' + name + '=([^&amp;#]*)').exec(window.location.href);
+                return results[1] || 0;
+            }
+            
+            if ( jQuery.urlParam('messageId') ) {
+                
+                destination = jQuery('#msg_'  + jQuery.urlParam('messageId') ).addClass('target-msg').position().top + 40;
+                jQuery('html,body').animate({scrollTop: destination}, 'fast');
+            }
+            
+            console.log(jQuery.urlParam('messageId'));
             
             function updateIHM( jqXHR, textStatus, element ) {
                 jQuery( '#' + element.data( 'vote-number' ) ).html( jqXHR.numberLikes );

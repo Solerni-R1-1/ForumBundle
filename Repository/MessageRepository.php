@@ -364,4 +364,15 @@ class MessageRepository extends EntityRepository
     
     	return $query->getSingleScalarResult();
     }
+    
+    public function CountFromStartToMessage($message) {
+        $dql = "SELECT COUNT(DISTINCT m)
+    			FROM Claroline\ForumBundle\Entity\Message m
+    			WHERE m.subject = {$message->getSubject()->getId()}
+                AND m.id < {$message->getId()}";
+    	 
+    	$query = $this->_em->createQuery($dql);
+
+    	return $query->getSingleScalarResult();
+    }
 }
