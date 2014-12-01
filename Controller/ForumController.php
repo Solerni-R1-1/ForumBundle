@@ -167,7 +167,13 @@ class ForumController extends Controller
 
         $forum = $category->getForum();
         $collection = new ResourceCollection(array($forum->getResourceNode()));
+        
+        // If category is locked and user cannot moderate, refuse
+        if ( $category->getIsUserLocked() && ! $this->get('security.context')->isGranted('moderate', $collection) ) {
+            throw new AccessDeniedHttpException($collection->getErrorsForDisplay());
+        }
 
+        // If user cannot post, refuse
         if (!$this->get('security.context')->isGranted('post', $collection)) {
             throw new AccessDeniedHttpException($collection->getErrorsForDisplay());
         }

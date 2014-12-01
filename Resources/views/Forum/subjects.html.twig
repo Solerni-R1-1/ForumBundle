@@ -63,9 +63,9 @@
             <div class="navbar row">
                 <div class="col-md-12">
                     {% if isUserLocked %}
-                        {% set btnClasses, btnText = ' btn-gris', 'unlock_subject' %}
+                        {% set btnClasses, btnText, tooltipTitle = ' btn-gris', 'unlock_subject', 'unlock_title' %}
                     {% else %}
-                        {% set btnClasses, btnText = ' btn-primary', 'lock_subject' %}
+                        {% set btnClasses, btnText, tooltipTitle = ' btn-primary', 'lock_subject', 'lock_title' %}
                     {% endif %}
                     <a class="js-trigger-lock btn{{ btnClasses }}"
                        data-current-lock="{{ isUserLocked }}"
@@ -73,6 +73,10 @@
                        data-unlock-url="{{ path('claro_forum_category_userlock', {'category': category.getId(), 'boolean': 0}) }}"
                        data-lock-text="{{'lock_subject'|trans({}, 'forum') }}"
                        data-unlock-text="{{'unlock_subject'|trans({}, 'forum') }}"
+                       data-lock-title="{{'lock_title'|trans({}, 'forum') }}"
+                       data-unlock-title="{{'unlock_title'|trans({}, 'forum') }}"
+                       data-toggle="tooltip"
+                       title="{{ tooltipTitle|trans({}, 'forum') }}"
                        >
                         {{ btnText|trans({}, 'forum') }}
                     </a>
@@ -246,11 +250,19 @@
                 element.data( 'current-lock', currentLock );
                 
                 if ( currentLock == 1 ) {
-                    element.html( element.data('unlock-text') );
-                    element.addClass('btn-gris').removeClass('btn-primary');
+                    element
+                            .html( element.data('unlock-text') )
+                            .addClass('btn-gris').removeClass('btn-primary')
+                            .tooltip('hide')
+                            .attr('data-original-title', element.data('unlock-title'))
+                            .tooltip('fixTitle');
                 } else {
-                   element.html( element.data('lock-text') );
-                    element.addClass('btn-primary').removeClass('btn-gris');
+                    element
+                            .html( element.data('lock-text') )
+                            .addClass('btn-primary').removeClass('btn-gris')
+                            .tooltip('hide')
+                            .attr('data-original-title', element.data('lock-title'))
+                            .tooltip('fixTitle');
                 }
              }
             
