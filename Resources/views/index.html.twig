@@ -57,7 +57,7 @@
                             >
                                 {{ category['name'] }}
                             </a>
-                            <div class="slrn-name-date">{{ category['creation_date'] | widgetForumDate() }}</div>
+                            <div class="slrn-name-date">{{ category['creation_date'] | widgetForumDate(app.request.locale) }}</div>
                             {% if isModerator %}
                             <div class="slrn-forum__tools">
                                 <a href="{{ path('claro_forum_edit_category_form', {'category': category['id']}) }}">
@@ -85,7 +85,7 @@
                             {% endif %}
                             {% if  category['last_message_created'] %}
                             <div>
-                                 {{ category['last_message_created'] | widgetForumDate() }}
+                                 {{ category['last_message_created'] | widgetForumDate(app.request.locale) }}
                             </div>
                             {% endif %}
                         </td>

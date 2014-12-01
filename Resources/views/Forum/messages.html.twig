@@ -47,7 +47,7 @@
               {{ subject.getCreator().getFirstName() }} {{ subject.getCreator().getLastName() }}
           </a>
           </b>
-          {{ subject.getCreationDate() | widgetForumDate()  }}
+          {{ subject.getCreationDate() | widgetForumDate(app.request.locale)  }}
         </div>
     </div>
     {% if firstMessage|default %}
