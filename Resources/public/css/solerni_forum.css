@@ -227,9 +227,9 @@ i.icon-comment
     padding:    1em 0 1em 0;
 }
 
-.slrn-forum-table .slrn-table-message .slrn-message-content {
+.slrn-forum-table .slrn-message-content {
     padding-bottom: 3em;
-    height:         166px;
+    min-height:         166px;
 }
 
 /* forum pagination */

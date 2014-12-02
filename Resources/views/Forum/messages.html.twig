@@ -72,8 +72,18 @@
                          </div>
                      </td>
                     <td class="slrn-forum-td slrn-message-content">
-                        <p>{{ firstMessage.getContent()|raw }}</p>
-                        <p class="text-muted slrn-message-date">{{ firstMessage.getCreationDate()| timeAgo }}</p>
+                        <div class="slrn-message-content_html">{{ firstMessage.getContent()|raw }}</p></div>
+                        <p class="text-muted slrn-message-date">{{ firstMessage.getCreationDate()| timeAgo }}
+                            {% if firstMessage.getlastEditedBy()|default %}
+                               <i>( message 
+                                   {{'edited_by'|trans({}, 'forum')}}
+                                   <a href="{{path('claro_public_profile_view', {'publicUrl':firstMessage.getlastEditedBy().getPublicUrl()})}}">
+                                       {{firstMessage.getlastEditedBy().getFirstName()}} {{firstMessage.getlastEditedBy().getLastName()}}</a>
+                                   {{'edited_on'|trans({}, 'forum')}}
+                                   {{ firstMessage.getUpdated()|intl_date_format() }}
+                               )</i>
+                           {% endif %}
+                        </p>
                     </td>
                 </tr>
                 {# edition tools #}
