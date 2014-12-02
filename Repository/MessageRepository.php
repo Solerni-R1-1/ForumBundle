@@ -30,7 +30,7 @@ class MessageRepository extends EntityRepository
         
         // Order options
         if ( $order == 'POP'  ) {
-            $order = 'nbLikes DESC';
+            $order = 'nbLikes DESC, m.id ASC';
         } else {
             $order = 'm.id ' . $order;
         }
