@@ -166,7 +166,7 @@
                     <td>
                         {% for messageArray in pager.currentPageResults %}
                         {% set message, nbLikes, userWeightValue, userNbPosts = messageArray['message'], messageArray['nbLikes'], messageArray['hasVoted'], messageArray['nbCreatorMessages'] %}
-                        <a name="message_{{ message.getId() }}">
+                        <a name="message_{{ message.getId() }}"></a>
                         <table id="msg_{{ message.getId() }}"  class="slrn-table-message">
                             <tr class="row-message">
                                 <td class="slrn-forum-td slrn-forum-td--avatar">
@@ -186,7 +186,9 @@
                                         {{ message.getCreationDate()|intl_date_format() }}
                                     </div>
                                     <div class="text-center slrn-message-user-nb-messages">
-                                        <p>{{userNbPosts}} posts</p>
+                                        {% set plural = '' %}
+                                        {% if userNbPosts > 1 %}{% set plural = 's' %}{% endif %}
+                                        <p>{{ 'posts_by_user'|trans({'%nb%': userNbPosts, '%plural%': plural}, 'forum') }}</p>
                                     </div>
                                 </td>
                                 <td class="slrn-forum-td slrn-message-content">

@@ -59,3 +59,4 @@ edited_by: 'édité par'
 edited_on: 'le'
 unlock_title: Cliquez pour autoriser tous les utilisateurs à créer des sujets dans ce thème
 lock_title: Cliquez pour limiter la création de sujets aux modérateurs
+posts_by_user: %nb% message%plural%
