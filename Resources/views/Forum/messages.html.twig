@@ -47,7 +47,7 @@
               {{ subject.getCreator().getFirstName() }} {{ subject.getCreator().getLastName() }}
           </a>
           </b>
-          {{ subject.getCreationDate() | widgetForumDate(app.request.locale)  }}
+          {{ subject.getCreationDate() | localizeddate( "full", "none", app.request.locale|default('fr') ) }}
         </div>
     </div>
     {% if firstMessage|default %}

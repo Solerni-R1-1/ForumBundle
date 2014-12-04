@@ -8,7 +8,7 @@
                         <li class="list-group-item slrn-list-group-item">
                             <p class="text-muted slrn-message-header">
                                  <a class="slrn-list-group-link" href="{{ _path('claro_forum_messages', {'subject': message.getSubject().getId() }) }}">
-                                {{ 'forum_last_message_owner'|trans({}, 'lesson-widget') }} {{ message.getCreator().getFirstName() }} {{ message.getCreator().getLastName() }}, {{ message.getCreationDate()| widgetForumDate(app.request.locale) }}</p>
+                                {{ 'forum_last_message_owner'|trans({}, 'lesson-widget') }} {{ message.getCreator().getFirstName() }} {{ message.getCreator().getLastName() }}, {{ message.getCreationDate()| localizeddate( "full", "none", app.request.locale|default('fr') ) }}</p>
                                 </a>
                             <div class="list-group-item-text">
                                 <p>{{ message.getContent()| striptags | textTruncate( 25, ' [...]' ) | raw  }}</p>
@@ -30,7 +30,7 @@
                 {% if nbMessages > 0 %}
                     {% for message in messages %}
                         <li class="list-group-item slrn-list-group-item">
-                            <p class="text-muted slrn-message-header">{{ 'forum_last_message_owner'|trans({}, 'lesson-widget') }} {{ message.getCreator().getFirstName() }} {{ message.getCreator().getLastName() }}, {{ message.getCreationDate()| widgetForumDate(app.request.locale) }}</p>
+                            <p class="text-muted slrn-message-header">{{ 'forum_last_message_owner'|trans({}, 'lesson-widget') }} {{ message.getCreator().getFirstName() }} {{ message.getCreator().getLastName() }}, {{ message.getCreationDate()| localizeddate( "full", "none", app.request.locale|default('fr') ) }}</p>
                             <div class="list-group-item-text">
                                 <p><a class="slrn-list-group-link" href="{{ _path('claro_forum_messages', {'subject': message.getSubject().getId() }) }}">{{ message.getContent()| striptags | textTruncate( 25, ' [...]' ) | raw  }}</a></p>
                             </div>
