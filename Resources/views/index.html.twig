@@ -57,7 +57,7 @@
                             >
                                 {{ category['name'] }}
                             </a>
-                            <div class="slrn-name-date">{{ category['creation_date'] | localizeddate( "full", "none", app.request.locale|default('fr') ) }}</div>
+                            <div class="slrn-name-date">{{ category['creation_date'] | localizeddate( "full", "short", app.request.locale|default('fr') ) }}</div>
                             {% if isModerator %}
                             <div class="slrn-forum__tools">
                                 <a href="{{ path('claro_forum_edit_category_form', {'category': category['id']}) }}">
@@ -85,7 +85,7 @@
                             {% endif %}
                             {% if  category['last_message_created'] %}
                             <div>
-                                 {{ category['last_message_created'] | localizeddate( "full", "none", app.request.locale|default('fr') ) }}
+                                 {{ category['last_message_created'] | localizeddate( "full", "short", app.request.locale|default('fr') ) }}
                             </div>
                             {% endif %}
                         </td>
