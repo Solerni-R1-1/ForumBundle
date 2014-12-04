@@ -47,7 +47,7 @@
               {{ subject.getCreator().getFirstName() }} {{ subject.getCreator().getLastName() }}
           </a>
           </b>
-          {{ subject.getCreationDate() | localizeddate( "full", "short", app.request.locale|default('fr') ) }}
+          {{'on'|trans({}, 'forum')}} {{ subject.getCreationDate() | localizeddate( "full", "none", app.request.locale|default('fr') ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~ subject.getCreationDate() | date('H\\hm') }}
         </div>
     </div>
     {% if firstMessage|default %}
@@ -68,7 +68,7 @@
                             </a>
                          </div>
                          <div class="text-center slrn-message-horodatage">
-                             {{ firstMessage.getCreationDate()|intl_date_format() }}
+                             {{ firstMessage.getCreationDate()|localizeddate( "short", "none", app.request.locale|default('fr') ) ~ ' ' ~ firstMessage.getCreationDate() | date('H\\hm')}}
                          </div>
                      </td>
                     <td class="slrn-forum-td slrn-message-content">
@@ -80,7 +80,7 @@
                                    <a href="{{path('claro_public_profile_view', {'publicUrl':firstMessage.getlastEditedBy().getPublicUrl()})}}">
                                        {{firstMessage.getlastEditedBy().getFirstName()}} {{firstMessage.getlastEditedBy().getLastName()}}</a>
                                    {{'edited_on'|trans({}, 'forum')}}
-                                   {{ firstMessage.getUpdated()|intl_date_format() }}
+                                   {{ firstMessage.getUpdated()|localizeddate( "short", "none", app.request.locale|default('fr') ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~ firstMessage.getUpdated() | date('H\\hm') }}
                                )</i>
                            {% endif %}
                         </p>
@@ -183,7 +183,7 @@
                                     </a>
                                     </div>
                                     <div class="text-center slrn-message-horodatage">
-                                        {{ message.getCreationDate()|intl_date_format() }}
+                                        {{ message.getCreationDate()|localizeddate( "short", "none", app.request.locale|default('fr') ) ~ ' ' ~ firstMessage.getCreationDate() | date('H\\hm') }}
                                     </div>
                                     <div class="text-center slrn-message-user-nb-messages">
                                         {% set plural = '' %}
@@ -200,7 +200,7 @@
                                                 <a href="{{path('claro_public_profile_view', {'publicUrl':message.getlastEditedBy().getPublicUrl()})}}">
                                                     {{message.getlastEditedBy().getFirstName()}} {{message.getlastEditedBy().getLastName()}}</a>
                                                 {{'edited_on'|trans({}, 'forum')}}
-                                                {{ message.getUpdated()|intl_date_format() }}
+                                                {{ message.getUpdated()|localizeddate( "short", "none", app.request.locale|default('fr') ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~ firstMessage.getUpdated() | date('H\\hm')  }}
                                             )</i>
                                         {% endif %}
                                     </p>

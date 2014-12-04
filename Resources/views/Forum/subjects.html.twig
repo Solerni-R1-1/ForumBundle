@@ -141,15 +141,16 @@
                             {{ 'started_by' | trans({}, 'forum') }}
                             <b><a href="{{ path('claro_public_profile_view', {'publicUrl': subject['subject_creator_public_url']}) }}">{{ subject['subject_creator_firstname'] }}
                             {{ subject['subject_creator_lastname'] }}</a></b>,
-                            {{ subject['subject_created']|intl_date_format() }}
+                            {{'on'|trans({}, 'forum')}} {{ subject['subject_created']|localizeddate( "short", "none", app.request.locale|default('fr') ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~  subject['subject_created'] | date('H\\hm')  }}
                         </td>
                         <td>
                             {{ subject['count_messages'] }}
                         </td>
                         <td>
-                            <b><a href="{{ path('claro_public_profile_view', {'publicUrl': subject['last_message_creator_public_url']}) }}">{{ subject['last_message_creator_firstname'] }}
+                            <b><a href="{{ path('claro_public_profile_view', {'publicUrl': subject['last_message_creator_public_url']}) }}">
+                            {{ subject['last_message_creator_firstname'] }}
                             {{ subject['last_message_creator_lastname'] }}</a></b><br/>
-                            {{ subject['last_message_created'] }}
+                            {{'on'|trans({}, 'forum')}} {{ subject['last_message_created']|localizeddate( "short", "none", app.request.locale|default('fr') ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~  subject['subject_created'] | date('H\\hm') }}
                         </td>
                         {% if isModerator %}
                             <td>
