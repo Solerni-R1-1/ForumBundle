@@ -31,6 +31,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration as EXT;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Claroline\CoreBundle\Entity\Resource\ResourceNode;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * ForumController
@@ -82,12 +83,12 @@ class ForumController extends Controller
 	        $moocSession = $em->getRepository('ClarolineCoreBundle:Mooc\\MoocSession')->getMoocSessionByForum($forum);
 	        
 	        return array(
-	            'search' => null,
-	            '_resource' => $forum,
-	            'isModerator' => $isModerator,
-	            'categories' => $categories,
+	            'search'        => null,
+	            '_resource'     => $forum,
+	            'isModerator'   => $isModerator,
+	            'categories'    => $categories,
 	            //'hasSubscribed' => $this->get('claroline.manager.forum_manager')->hasSubscribed($user, $forum),
-	        	'session' => $moocSession
+	        	'session'       => $moocSession
 	        );
         } else {
         	return $this->redirect($this->get('router')->generate('mooc_view', array('moocId' => $forum->getResourceNode()->getWorkspace()->getMooc()->getId(), 'moocName' => $forum->getResourceNode()->getWorkspace()->getMooc()->getTitle())));
@@ -126,6 +127,7 @@ class ForumController extends Controller
 	        $sc = $this->get('security.context');
 	        $canCreateSubject = $sc->isGranted('post', $collection);
 	        $isModerator = $sc->isGranted('moderate', $collection);
+            $isUserLocked = $category->getIsUserLocked();
 	
 	        $moocSession = $em->getRepository('ClarolineCoreBundle:Mooc\\MoocSession')->getMoocSessionByForum($forum);
 	
@@ -134,6 +136,7 @@ class ForumController extends Controller
 	            '_resource' => $forum,
 	            'canCreateSubject' => $canCreateSubject,
 	            'isModerator' => $isModerator,
+                'isUserLocked' => $isUserLocked,
 	            'category' => $category,
 	            'max' => $max,
 	        	'session' => $moocSession
@@ -164,7 +167,13 @@ class ForumController extends Controller
 
         $forum = $category->getForum();
         $collection = new ResourceCollection(array($forum->getResourceNode()));
+        
+        // If category is locked and user cannot moderate, refuse
+        if ( $category->getIsUserLocked() && ! $this->get('security.context')->isGranted('moderate', $collection) ) {
+            throw new AccessDeniedHttpException($collection->getErrorsForDisplay());
+        }
 
+        // If user cannot post, refuse
         if (!$this->get('security.context')->isGranted('post', $collection)) {
             throw new AccessDeniedHttpException($collection->getErrorsForDisplay());
         }
@@ -316,6 +325,12 @@ class ForumController extends Controller
      *     defaults={"page"=1, "max"= 20, "order"="ASC"},
      *     options={"expose"=true}
      * )
+     * @Route(
+     *     "/subject/{subject}/messages/page/{page}/max/",
+     *     name="claro_forum_messages_unordered",
+     *     defaults={"page"=1, "max"= 20, "order"="ASC"},
+     *     options={"expose"=true}
+     * )
      * @EXT\ParamConverter("user", options={"authenticatedUser" = true})
      * @Template()
      *
@@ -327,7 +342,19 @@ class ForumController extends Controller
     {
 
         /* limit order values */
-        $order = ($order === "DESC") ? "DESC" : "ASC";
+        $authorisedValues = ['POP', 'ASC', 'DESC'];
+        if ( ! in_array($order, $authorisedValues ) ) {
+            $order = 'ASC';
+        }
+        
+        /* interpret $max */
+        if ( ! is_numeric($max) ) {
+            if ( $max == 'tout' ) {
+                $max = 9999; /* over nine thousand */
+            } else {
+                $max = 20;
+            }
+        }
 
         $redirect = $this->manageAno(
             $this->get('router')->generate('claro_forum_messages',
@@ -357,7 +384,7 @@ class ForumController extends Controller
 	            'form' => $form->createView(),
 	            'canAnswer' => $canAnswer,
 	            'category' => $subject->getCategory(),
-	            'max' => $max,
+	            'max' => ( $max == 9999 ) ? 'tout' : $max,
                 'page' => $page,
                 'order' => $order,
 	        	'session' => $moocSession
@@ -450,10 +477,12 @@ class ForumController extends Controller
      *     name="claro_forum_edit_message"
      * )
      *
+     * @EXT\ParamConverter("user", options={"authenticatedUser" = true})
+     * 
      * @Template("ClarolineForumBundle:Forum:editMessageForm.html.twig")
      * @param Message $message
      */
-    public function editMessageAction(Message $message)
+    public function editMessageAction(Message $message, User $user)
     {
         $redirect = $this->manageAno(
             $this->get('router')->generate('claro_forum_edit_message',
@@ -472,15 +501,16 @@ class ForumController extends Controller
         }
 
         $oldContent = $message->getContent();
+        
         $form = $this->container->get('form.factory')->create(new MessageType, new Message());
         $form->handleRequest($this->get('request'));
 
         if ($form->isValid()) {
             $newContent = $form->get('content')->getData();
-            $this->get('claroline.manager.forum_manager')->editMessage($message, $oldContent, $newContent);
+            $this->get('claroline.manager.forum_manager')->editMessage($message, $oldContent, $newContent, $user);
 
             return new RedirectResponse(
-                $this->generateUrl('claro_forum_messages', array('subject' => $subject->getId()))
+                $this->generateUrl('claro_forum_show_message', array('message' => $message->getId()))
             );
         }
 
@@ -1159,4 +1189,91 @@ class ForumController extends Controller
             $this->generateUrl('claro_forum_subjects', array('category' => $subject->getCategory()->getId()))
         );
     }
+       
+    /**
+     * @EXT\Route(
+     *     "/vote/message/{message}/{weight}",
+     *     name="claro_forum_message_vote",
+     *     requirements={"weight"="-1|0|1"}
+     * )
+     * @EXT\ParamConverter("user", options={"authenticatedUser" = true})
+     * @EXT\Method("GET")
+     *
+     * @param Message $message
+     * @param int $weight
+     */
+    public function voteMessageAction(Message $message, User $user, $weight) {
+        
+        $manager = $this->get('claroline.manager.forum_manager');
+        $like = $manager->setOrCreateUserVote($message, $user, $weight);
+        
+        $numberLikes = $manager->getNumberLikes($message, 1);
+        
+        $response = new JsonResponse();
+        $response->setData(array('numberLikes' => $numberLikes, 'hasVoted' => $weight));
+        
+        return $response;
+        
+    }
+    
+     /**
+     * @EXT\Route(
+     *     "/category/{category}/is_user_locked/{boolean}",
+     *     name="claro_forum_category_userlock",
+     *     requirements={"boolean"="0|1"}
+     * )
+     * @EXT\ParamConverter("user", options={"authenticatedUser" = true})
+     * @EXT\Method("GET")
+     *
+     * @param Category $category
+     * @param Boolean $boolean
+     */
+    public function categoryUserLockAction(Category $category, User $user, $boolean) {
+        
+        $sc = $this->get('security.context');
+        $collection = new ResourceCollection(array($category->getForum()->getResourceNode()));
+        $isModerator = $sc->isGranted('moderate', $collection);
+        
+        if ( ! $isModerator ) {
+            throw new \Symfony\Component\Security\Core\Exception\AccessDeniedException();
+        }
+        
+        $manager = $this->get('claroline.manager.forum_manager');
+        $isUserLocked = $manager->setCategoryUserLock($category, $boolean);
+        
+        $response = new JsonResponse();
+        $response->setData(array('hasSetLock' => $boolean));
+        
+        return $response;
+        
+    }
+    
+    /**
+     * @EXT\Route(
+     *     "/show/message/{message}/max/{max}",
+     *     name="claro_forum_show_message",
+     *     options={"expose"=true},
+     *     defaults={"max"=20}
+     * )
+     * @EXT\ParamConverter("user", options={"authenticatedUser" = true})
+     * @EXT\Method("GET")
+     *
+     * @param Message $message
+     */
+    public function openMessagesToSpecificMessage( Message $message, $max ) {
+        
+        $manager = $this->get('claroline.manager.forum_manager');
+        $page = $manager->getPageForSpecificMessage($message, $max);
+        
+        return new RedirectResponse(
+            $this->generateUrl('claro_forum_messages', array(
+                'subject'   => $message->getSubject()->getId(),
+                'page'      => $page,
+                'max'       => $max,
+                'messageId' => $message->getId()
+            ))
+        );
+        
+    }
+    
 }

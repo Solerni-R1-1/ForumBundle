@@ -1,6 +1,27 @@
 <div class="slrn-sr-message">
-    <div class="slrn-sr-elmnt-header"> <a href="{{ document.resource_url|path }}"> FORUM | {{ document.forum_name }}</a> | {{ document.owner_name }}</div>
-    <h3><a href="{{ document.forum_subject_url|path }}">{{ document.forum_subject_name }}</a></h3>
+    <div class='row'>
+        <div class='col-md-12'>
+            <span class="slrn-sr-elmnt-header">
+                <a href="{{ document.resource_url|path }}"> FORUM</a> | 
+                <a href="{{ document.forum_category_url|path }}">{{ document.forum_name }}</a> | 
+                <a href="{{ document.forum_subject_url|path }}">{{ document.forum_subject_name }}</a> |
+            </span>
+            posté par 
+            <span class="slrn-sr-elmnt-header">
+                <a href="{{ document.forum_creator_profil_url|path }}">{{ document.forum_creator_name | truncate:13 }}</a>
+            </span>
+        </div>
+        <!--<div class="slrn-like-bar col-md-2" ng-switch="document.forum_message_like">
+            <span class="slrn-like-bar__elem slrn-like-num" ng-switch-when="">0</span>
+            <span class="slrn-like-bar__elem slrn-like-num" ng-switch-default >{{ document.forum_message_like }}</span>
+            <span class="js-message-like slrn-like-bar__elem slrn-like-thumb">
+               + <i class="icon-thumbs-up icon-thumb"></i>
+            </span>
+        </div> -->
+    </div>
+    <div class="slrn-sr-elmnt-text" ng-bind-html = "document.content_t">
+    </div>
+    <div><a href="{{ document.forum_message_url|path }}" class="pink_link">(lire la suite)</a></div>
     <div class="slrn-sr-elmnt-date">
         <span class="slrn-sr-elmnt-date-creation">
             <i class="icon-flag"></i> {{ 'create_at'|trans }} {{ document.creation_date | date : 'MM/dd/yyyy' }}
@@ -9,5 +30,4 @@
             <i class="icon-pencil"></i> {{ 'edit_at'|trans }} {{ document.modification_date | date : 'MM/dd/yyyy' }}
         </span>
     </div>
-    <div ng-bind-html = "document.content"></div>
 </div>

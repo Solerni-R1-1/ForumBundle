@@ -44,7 +44,7 @@
                 <a class="btn btn-default" href="{{ path('claro_forum_categories', { 'forum': category.getForum().getId() }) }}">
                     <i class="fa fa-chevron-left"></i> {{ 'forum_back_to_categories'|trans({}, 'forum') }}
                 </a>
-                {% if canCreateSubject %}
+                {% if ( canCreateSubject and not isUserLocked ) or isModerator %}
                     <a class="btn btn-primary" href="{{ _path('claro_forum_form_subject_creation', {'category': category.getId()}) }}">
                         <i class="fa fa-plus"></i> {{ 'new_subject'|trans({}, 'forum') }}
                     </a>
@@ -59,6 +59,30 @@
                 </div>
             </div>
         </div>
+        {% if isModerator %}
+            <div class="navbar row">
+                <div class="col-md-12">
+                    {% if isUserLocked %}
+                        {% set btnClasses, btnText, tooltipTitle = ' btn-gris', 'unlock_subject', 'unlock_title' %}
+                    {% else %}
+                        {% set btnClasses, btnText, tooltipTitle = ' btn-primary', 'lock_subject', 'lock_title' %}
+                    {% endif %}
+                    <a class="js-trigger-lock btn{{ btnClasses }}"
+                       data-current-lock="{{ isUserLocked }}"
+                       data-lock-url="{{ path('claro_forum_category_userlock', {'category': category.getId(), 'boolean': 1}) }}"
+                       data-unlock-url="{{ path('claro_forum_category_userlock', {'category': category.getId(), 'boolean': 0}) }}"
+                       data-lock-text="{{'lock_subject'|trans({}, 'forum') }}"
+                       data-unlock-text="{{'unlock_subject'|trans({}, 'forum') }}"
+                       data-lock-title="{{'lock_title'|trans({}, 'forum') }}"
+                       data-unlock-title="{{'unlock_title'|trans({}, 'forum') }}"
+                       data-toggle="tooltip"
+                       title="{{ tooltipTitle|trans({}, 'forum') }}"
+                       >
+                        {{ btnText|trans({}, 'forum') }}
+                    </a>
+                </div>
+            </div>
+        {% endif %}
         <div id="subjects-table-container" class="table-responsive">
             <table class="table table-striped table-bordered table-condensed">
                 <thead>
@@ -117,15 +141,16 @@
                             {{ 'started_by' | trans({}, 'forum') }}
                             <b><a href="{{ path('claro_public_profile_view', {'publicUrl': subject['subject_creator_public_url']}) }}">{{ subject['subject_creator_firstname'] }}
                             {{ subject['subject_creator_lastname'] }}</a></b>,
-                            {{ subject['subject_created']|intl_date_format() }}
+                            {{'on'|trans({}, 'forum')}} {{ subject['subject_created']|localizeddate( "short", "none", app.request.locale|default('fr') ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~  subject['subject_created'] | date('H\\hm')  }}
                         </td>
                         <td>
                             {{ subject['count_messages'] }}
                         </td>
                         <td>
-                            <b><a href="{{ path('claro_public_profile_view', {'publicUrl': subject['last_message_creator_public_url']}) }}">{{ subject['last_message_creator_firstname'] }}
+                            <b><a href="{{ path('claro_public_profile_view', {'publicUrl': subject['last_message_creator_public_url']}) }}">
+                            {{ subject['last_message_creator_firstname'] }}
                             {{ subject['last_message_creator_lastname'] }}</a></b><br/>
-                            {{ subject['last_message_created'] }}
+                            {{'on'|trans({}, 'forum')}} {{ subject['last_message_created']|localizeddate( "short", "none", app.request.locale|default('fr') ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~  subject['subject_created'] | date('H\\hm') }}
                         </td>
                         {% if isModerator %}
                             <td>
@@ -213,5 +238,62 @@
                 );
             });
         </script>
+         <script>
+        jQuery( document ).ready(function() {
+                       
+            function displayError(jqXHR, textStatus, error) {
+                alert( 'Le verrouillage du sujet n\'a pas pu être pris en compte : ' + error );
+                return false;
+            }
+            
+            function updateDOM(jqXHR, textStatus, element, currentLock) {
+                currentLock = ( currentLock ==  1 ) ? 0 : 1;
+                element.data( 'current-lock', currentLock );
+                
+                if ( currentLock == 1 ) {
+                    element
+                            .html( element.data('unlock-text') )
+                            .addClass('btn-gris').removeClass('btn-primary')
+                            .tooltip('hide')
+                            .attr('data-original-title', element.data('unlock-title'))
+                            .tooltip('fixTitle');
+                } else {
+                    element
+                            .html( element.data('lock-text') )
+                            .addClass('btn-primary').removeClass('btn-gris')
+                            .tooltip('hide')
+                            .attr('data-original-title', element.data('lock-title'))
+                            .tooltip('fixTitle');
+                }
+             }
+            
+            function AjaxLock( element, actionUrl, currentLock ) {
+                jQuery.ajax({
+                    url: actionUrl,
+                    dataType: 'json',
+                    actionElement: element,
+                    currentLock: currentLock,
+                    success: function( jqXHR, textStatus ) { updateDOM( jqXHR, textStatus, this.actionElement, this.currentLock ) },
+                    error: function( jqXHR, textStatus, error ) { displayError( jqXHR, textStatus, error ) }
+                });
+            }
+            
+            jQuery( '.js-trigger-lock' ).on( 'click', function(e) {
+                e.preventDefault();
+                currentLock = jQuery(this).data( 'current-lock' );
+                
+                if ( currentLock == 1 ) {
+                    actionUrl = jQuery(this).data( 'unlock-url' );
+                }
+                
+                if ( ! currentLock || currentLock == 0 ) {
+                    actionUrl = jQuery(this).data( 'lock-url' );
+                }
+                
+                AjaxLock( jQuery(this), actionUrl, currentLock );
+                
+            });
+        });
+    </script>
     {% endif %}
 {% endblock %}

@@ -19,6 +19,7 @@ use Claroline\ForumBundle\Entity\Subject;
 use Claroline\ForumBundle\Entity\Message;
 use Claroline\ForumBundle\Entity\Notification;
 use Claroline\ForumBundle\Entity\Category;
+use Claroline\ForumBundle\Entity\Like;
 use Claroline\ForumBundle\Event\Log\CreateMessageEvent;
 use Claroline\ForumBundle\Event\Log\CreateSubjectEvent;
 use Claroline\ForumBundle\Event\Log\CreateCategoryEvent;
@@ -55,6 +56,7 @@ class Manager
     private $subjectRepo;
     private $messageRepo;
     private $lastMessageRepo;
+    private $likeRepo;
     private $forumRepo;
     private $messageManager;
     private $translator;
@@ -93,6 +95,7 @@ class Manager
         $this->subjectRepo = $om->getRepository('ClarolineForumBundle:Subject');
         $this->messageRepo = $om->getRepository('ClarolineForumBundle:Message');
         $this->lastMessageRepo = $om->getRepository('ClarolineForumBundle:LastMessage');
+        $this->likeRepo = $om->getRepository('ClarolineForumBundle:Like');
         $this->forumRepo = $om->getRepository('ClarolineForumBundle:Forum');
         $this->dispatcher = $dispatcher;
         $this->messageManager = $messageManager;
@@ -449,12 +452,12 @@ class Manager
      */
     public function getMessagesPager(Subject $subject, $page = 1, $max = 20, $order = "ASC")
     {
-    	$messages = $this->messageRepo->findBySubject($subject->getId(), true, $order);
+        $user = $this->container->get('security.context')->getToken()->getUser();
+    	$messages = $this->messageRepo->findBySubject($subject->getId(), $user->getId(), true, $order);
     
     	return $this->pagerFactory->createPager($messages, $page, $max, false);
     }
     
-
     /**
      * Get the pager for the message list of a subject.
      *
@@ -493,10 +496,11 @@ class Manager
      * @param string $oldContent
      * @param string $newContent
      */
-    public function editMessage(Message $message, $oldContent, $newContent)
+    public function editMessage(Message $message, $oldContent, $newContent, $user)
     {
         $this->om->startFlushSuite();
         $message->setContent($newContent);
+        $message->setlastEditedBy($user);
         $this->om->persist($message);
         $this->dispatch(new EditMessageEvent($message, $oldContent, $newContent));
         $this->om->endFlushSuite();
@@ -529,4 +533,62 @@ class Manager
         $this->dispatch(new EditCategoryEvent($category, $oldName, $newName));
         $this->om->endFlushSuite();
     }
+    
+    public function getNumberLikes(Message $message, $weight = 'any') {
+        $likes = $this->likeRepo->getLikes($message, $weight);
+
+        return count($likes);
+    }
+    
+    /* return Null or Like Weight Value
+     * 
+     */
+    public function getUserLikeValue(Message $message, User $user) {
+        $like = $this->likeRepo->getUserLike($message, $user);
+        
+        if ( $like ) {
+            return $like->getWeight();
+        } 
+        
+        return $like;
+    }
+    
+    public function setOrCreateUserVote(Message $message, User $user, $weight) {
+        
+        $like = $this->likeRepo->getUserLike($message, $user);
+        
+        $this->om->startFlushSuite();
+        
+        if ( $like == null ) {
+            $like = new Like();
+            $like->setMessage($message)->setUser($user)->setWeight($weight);
+        } else {
+            $like->setWeight($weight);
+        }
+
+        $this->om->persist($like);
+        $this->om->endFlushSuite();
+        
+        return $like;
+    }
+    
+    public function setCategoryUserLock($category, $boolean) {
+        
+        $this->om->startFlushSuite();
+        $category->setIsUserLocked($boolean);
+        $this->om->persist($category);
+        $this->om->endFlushSuite();
+        
+        return $boolean;
+
+    }
+    
+    public function getPageForSpecificMessage($message, $max) {
+        
+        $messagePosition = $this->messageRepo->CountFromStartToMessage($message);
+        
+        return ceil ( ($messagePosition + 1 ) / $max );
+
+    }
+    
 }

@@ -81,6 +81,11 @@ class Subject extends AbstractIndexableResourceElement
      * @ORM\Column(type="boolean")
      */
     protected $isSticked = false;
+    
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    protected $isUserLocked = false;
 
     /**
      * Constructor.
@@ -140,7 +145,11 @@ class Subject extends AbstractIndexableResourceElement
     {
         return $this->creationDate;
     }
-
+    
+    public function getUpdated() {
+        return $this->updated;
+    }
+    
     public function getMessages()
     {
         return $this->messages;
@@ -160,12 +169,32 @@ class Subject extends AbstractIndexableResourceElement
     {
         $doc = parent::fillIndexableDocument($doc);
         
-        $doc->forum_id = $this->getCategory()->getForum()->getId();
-        $doc->forum_name = $this->getCategory()->getForum()->getResourceNode()->getName();
-        $doc->forum_category_id = $this->getCategory()->getId();
-        $doc->forum_category_name = $this->getCategory()->getName();
-        $doc->content_t = $this->getTitle();
+        $categorie = $this->getCategory();
+        $forum = $categorie->getForum();
         
+        $doc->forum_id = $forum->getId();
+        $doc->forum_name = $forum->getResourceNode()->getName();
+
+        $doc->forum_category_id = $categorie->getId();
+        $doc->forum_category_name = $categorie->getName();
+        $doc->forum_category_url= $categorie->get('router')->generate('claro_forum_subjects', array(
+            'category' => $categorie->getId()
+        ));
+
+        $doc->forum_subject_id = $this->getId();
+        $doc->forum_subject_name = $this->getTitle();
+        $doc->forum_subject_url= $this->get('router')->generate('claro_forum_messages', array(
+            'subject' => $doc->forum_subject_id
+        ));
+
+        $doc->content_t = $this->getTitle();
+
+        $doc->forum_creator_id = $this->getCreator()->getId();
+        $doc->forum_creator_name = $this->getCreator()->getFirstName().' '.$this->getCreator()->getLastName();
+        $doc->forum_creator_profil_url =  $this->get('router')->generate('claro_public_profile_view', array(
+            'publicUrl' => $this->getCreator()->getPublicUrl()
+        ));
+
         return $doc;
     }
     
@@ -173,4 +202,14 @@ class Subject extends AbstractIndexableResourceElement
     {
         return $this->getCategory()->getForum()->getResourceNode();
     }
+    
+    public function getIsUserLocked() {
+        return $this->isUserLocked;
+    }
+
+    public function setIsUserLocked($isUserLocked) {
+        $this->isUserLocked = $isUserLocked;
+    }
+
+
 }

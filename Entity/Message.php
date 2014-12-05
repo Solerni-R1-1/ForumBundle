@@ -67,6 +67,24 @@ class Message extends AbstractIndexableResourceElement
      * @ORM\JoinColumn(name="user_id")
      */
     protected $creator;
+    
+    /**
+     * @ORM\ManyToOne(
+     *     targetEntity="Claroline\CoreBundle\Entity\User",
+     *     cascade={"persist"}
+     * )
+     * @ORM\JoinColumn(name="last_editor_id")
+     */
+    protected $lastEditedBy;
+    
+    /**
+     * @ORM\OneToMany(
+     *     targetEntity="Claroline\ForumBundle\Entity\Like",
+     *     mappedBy="message",
+     *     cascade={"remove"}
+     * )
+     */
+    protected $likes;
 
     /**
      * Returns the resource id.
@@ -131,21 +149,40 @@ class Message extends AbstractIndexableResourceElement
     public function fillIndexableDocument(&$doc)
     {
         $doc = parent::fillIndexableDocument($doc);
+
+        $categorie = $this->getSubject()->getCategory();
+        $forum = $categorie->getForum();
         
-        $doc->forum_id = $this->getSubject()->getCategory()->getForum()->getId();
-        $doc->forum_name = $this->getSubject()->getCategory()->getForum()->getResourceNode()->getName();
-        $doc->forum_category_id = $this->getSubject()->getCategory()->getId();
-        $doc->forum_category_name = $this->getSubject()->getCategory()->getName();
-        $doc->forum_category_url= $this->get('router')->generate('claro_forum_subjects', array(
-            'category' => $doc->forum_category_id
+        $doc->forum_id = $forum->getId();
+        $doc->forum_name = $forum->getResourceNode()->getName();
+
+        $doc->forum_category_id = $categorie->getId();
+        $doc->forum_category_name = $categorie->getName();
+        $doc->forum_category_url= $categorie->get('router')->generate('claro_forum_subjects', array(
+            'category' => $categorie->getId()
         ));
+
         $doc->forum_subject_id = $this->getSubject()->getId();
         $doc->forum_subject_name = $this->getSubject()->getTitle();
         $doc->forum_subject_url= $this->get('router')->generate('claro_forum_messages', array(
             'subject' => $doc->forum_subject_id
         ));
+
+        $doc->forum_message_id = $this->getId();
+        $doc->forum_message_url= $this->get('router')->generate('claro_forum_show_message', array(
+            'message' => $doc->forum_message_id
+        ));
+
         $doc->content_t = $this->getContent();
-        
+
+        $doc->forum_creator_id = $this->getCreator()->getId();
+        $doc->forum_creator_name = $this->getCreator()->getFirstName().' '.$this->getCreator()->getLastName();
+        $doc->forum_creator_profil_url =  $this->get('router')->generate('claro_public_profile_view', array(
+            'publicUrl' => $this->getCreator()->getPublicUrl()
+        ));
+
+        $doc->forum_message_like = count($this->getLikes());
+
         return $doc;
     }
 
@@ -153,6 +190,19 @@ class Message extends AbstractIndexableResourceElement
     {
         return $this->getSubject()->getCategory()->getForum()->getResourceNode();
     }
+    
+    public function getLikes() {
+        return $this->likes;
+    }
+    
+    public function getlastEditedBy() {
+        return $this->lastEditedBy;
+    }
+
+    public function setlastEditedBy($lastEditedBy) {
+        $this->lastEditedBy = $lastEditedBy;
+    }
+
 
 
 }

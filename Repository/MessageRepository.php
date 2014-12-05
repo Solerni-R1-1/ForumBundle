@@ -25,15 +25,37 @@ use Claroline\ForumBundle\Entity\Category;
 
 class MessageRepository extends EntityRepository
 {
-    public function findBySubject($subjectId, $getQuery = false, $order = "ASC")
+    public function findBySubject($subjectId, $userId, $getQuery = false, $order = "ASC")
     {
+        
+        // Order options
+        if ( $order == 'POP'  ) {
+            $order = 'nbLikes DESC, m.id ASC';
+        } else {
+            $order = 'm.id ' . $order;
+        }
+        
         $dql = "
-            SELECT m, u FROM Claroline\ForumBundle\Entity\Message m
+            SELECT m AS message,
+                    u AS creator,
+                    COUNT(DISTINCT l.user) AS nbLikes,
+                    l2.weight AS hasVoted,
+                    COUNT(DISTINCT m2) AS nbCreatorMessages
+            FROM Claroline\ForumBundle\Entity\Message m
             JOIN m.creator u
             JOIN m.subject subject
-            WHERE subject.id = {$subjectId}
-            ORDER BY m.id {$order}";
+            JOIN Claroline\ForumBundle\Entity\Message m2
+                WITH m2.creator = u
+            LEFT JOIN m.likes l
+                WITH l.weight > 0
+            LEFT JOIN m.likes l2
+                WITH l2.user = {$userId}
 
+            WHERE subject.id = {$subjectId}
+            GROUP BY m.id
+            ORDER BY {$order}
+        ";
+        
         $query = $this->_em->createQuery($dql);
 
         return ($getQuery) ? $query: $query->getResult();
@@ -257,6 +279,17 @@ class MessageRepository extends EntityRepository
     	return $query->getResult();
     }
     
+    public function countUserMessages(User $user) {
+    	$dql = "SELECT count(m)
+    			FROM Claroline\ForumBundle\Entity\Message m
+    			WHERE m.creator = :user";
+    	
+    	$query = $this->_em->createQuery($dql);
+    	$query->setParameter("user", $user);
+    	
+    	return $query->getSingleScalarResult();
+    }
+    
     public function countMessagesForUser(ResourceNode $forum, User $user, \DateTime $from = null, \DateTime $to = null) {
     	$dql = "SELECT count(m) FROM Claroline\ForumBundle\Entity\Message m
                 JOIN m.subject s
@@ -317,5 +350,29 @@ class MessageRepository extends EntityRepository
     	$query->setParameters($parameters);
     	 
     	return $query->getResult();
+    }
+
+    public function countUserMessagesLiked(User $user) {
+    	$dql = "SELECT COUNT(DISTINCT m)
+    			FROM Claroline\ForumBundle\Entity\Message m
+    			JOIN m.likes l
+    				WITH l.weight > 0
+    			WHERE m.creator = :user";
+    	 
+    	$query = $this->_em->createQuery($dql);
+    	$query->setParameter("user", $user);
+    
+    	return $query->getSingleScalarResult();
+    }
+    
+    public function CountFromStartToMessage($message) {
+        $dql = "SELECT COUNT(DISTINCT m)
+    			FROM Claroline\ForumBundle\Entity\Message m
+    			WHERE m.subject = {$message->getSubject()->getId()}
+                AND m.id < {$message->getId()}";
+    	 
+    	$query = $this->_em->createQuery($dql);
+
+    	return $query->getSingleScalarResult();
     }
 }
