@@ -454,7 +454,7 @@ i.icon-comment
     text-align: right;
 }
 
-.forum-to-top {
+.message-tool-link {
     display: inline-block;
     text-align: center;
     padding: .5em;
@@ -463,14 +463,15 @@ i.icon-comment
     position: relative;
     left: .5em;
     line-height: 0;
+    text-decoration: none !important;
 }
 
-.forum-to-top .icon-long-arrow-up {
+.message-tool-link .icon-long-arrow-up {
     height: 35px;
     width: 100%;
 }
 
-.forum-to-top:hover {
+.message-tool-link:hover {
     text-decoration: none;
 }
 
@@ -499,4 +500,17 @@ i.icon-comment
 .slrn-message-horodatage--edited {
     margin-top: 1em;
     font-size: .8em;
+}
+
+.slrn-permalink {
+    width:          100%;
+    margin:         1em 0 0 0;
+    padding:        .3em .5em;
+    border-radius:  4px;
+    text-align:     center;
+    border:         2px solid #EEEEEF;
+}
+
+.slrn-permalink-container {
+    display: none;
 }

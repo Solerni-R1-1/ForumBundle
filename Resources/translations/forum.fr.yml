@@ -62,3 +62,5 @@ lock_title: Cliquez pour limiter la création de sujets aux modérateurs
 posts_by_user: %nb% message%plural%
 at: à
 on: le
+show_permalink: Afficher le permalien
+hide_permalink: Masquer le permalien

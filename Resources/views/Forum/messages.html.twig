@@ -218,7 +218,6 @@
                                         <a class="js-message-like slrn-like-bar__elem slrn-like-thumb{% if userWeightValue == 1 %} active{% endif %}"
                                            data-toggle="tooltip"
                                            title="{% if userWeightValue == 1 %}{{ tooltipUnvote }}{% else %}{{tooltipVote}}{% endif %}"
-                                           data-original-title=""
                                            data-unvote-title="{{ tooltipUnvote }}"
                                            data-vote-title="{{ tooltipVote }}"
                                            data-vote-number="number-likes-{{message.getId()}}"
@@ -232,7 +231,20 @@
                                         <a data-target="msg_{{ message.getId() }}" class="js-trigger-citation forum_citation_link pink_link" href="#">{{'citation_answer'|trans({}, 'forum') }}</a>
                                     </div>
                                     <div class="col-md-4 back-top-top-cell">
-                                        <a data-toggle='tooltip' title="{{'move_to_top'|trans({}, 'forum')}}" href="#" class="forum-to-top js-forum-to-top"><i class="icon-long-arrow-up"></i></a>
+                                        <a data-toggle='tooltip' 
+                                           title="{{'show_permalink'|trans({}, 'forum')}}"
+                                           data-permashow-title="{{'show_permalink'|trans({}, 'forum')}}"
+                                           data-permahide-title="{{'hide_permalink'|trans({}, 'forum')}}"
+                                           href="#" 
+                                           data-target="{{ message.getId() }}" 
+                                           class="message-tool-link js-message-permalink-trigger">
+                                            <i class="icon-link"></i>
+                                        </a>
+                                        <a data-toggle='tooltip' title="{{'move_to_top'|trans({}, 'forum')}}" href="#" class="message-tool-link js-forum-to-top"><i class="icon-long-arrow-up"></i></a>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="col-md-12 text-center slrn-permalink-container slrn-permalink-container_{{ message.getId() }}">
+                                        <input class="slrn-permalink" type="text" readonly value="{{ url('claro_forum_show_message', { 'message': message.getId() }) }}">
                                     </div>
                                 </td>
                             </tr>
@@ -360,9 +372,7 @@
                 destination = jQuery('#msg_'  + jQuery.urlParam('messageId') ).addClass('target-msg').position().top + 40;
                 jQuery('html,body').animate({scrollTop: destination}, 'fast');
             }
-            
-            console.log(jQuery.urlParam('messageId'));
-            
+                       
             function updateIHM( jqXHR, textStatus, element ) {
                 jQuery( '#' + element.data( 'vote-number' ) ).html( jqXHR.numberLikes );
                 
@@ -371,14 +381,14 @@
                             .addClass( 'active' )
                             .tooltip('hide')
                             .attr('data-original-title', element.data('unvote-title'))
-                            .tooltip('fixTitle')
+                            .tooltip('fixTitle');
                             //.tooltip('show')
                 } else {
                     element
                             .removeClass( 'active' )
                             .tooltip('hide')
                             .attr('data-original-title', element.data('vote-title'))
-                            .tooltip('fixTitle')
+                            .tooltip('fixTitle');
                             //.tooltip('show')
                 }
             }
@@ -408,8 +418,9 @@
             jQuery( '.js-message-like' ).on( 'click', function(e) {
                 e.preventDefault();
                 userVote = jQuery(this).data( 'vote-user' );
+                console.log(userVote);
                 
-                if ( userVote == 1 ) {
+                if ( userVote == 1 || userVote == -1 ) {
                     actionUrl = jQuery(this).data( 'vote-neutral' );
                 }
                 
@@ -434,8 +445,37 @@
             
             jQuery('.js-forum-to-top').on ('click', function(e) {
                 e.preventDefault();
-                jQuery('html,body').animate({scrollTop: 0}, 'fast');
+                jQuery( 'html,body' ).animate({scrollTop: 0}, 'fast');
             });
+            
+            jQuery('.js-message-permalink-trigger').on( 'click', function(e) {
+                e.preventDefault();
+                var element = jQuery(this);
+                var target = jQuery('.slrn-permalink-container_' + element.data('target') );
+                
+                if ( target.data('visible') ) {
+                    element
+                        .tooltip('hide')
+                        .attr('data-original-title', element.data('permashow-title'))
+                        .tooltip('fixTitle');
+                    target
+                        .slideUp()
+                        .data('visible', 0);
+                } else {
+                    element
+                        .tooltip('hide')
+                        .attr('data-original-title', element.data('permahide-title'))
+                        .tooltip('fixTitle');
+                    target
+                        .slideDown()
+                        .data('visible', 1);
+                }
+            });
+            
+            jQuery('.slrn-permalink').on( 'click', function() {
+                jQuery(this).select();
+            });
+            
         });
     </script>
 {% endblock %}
