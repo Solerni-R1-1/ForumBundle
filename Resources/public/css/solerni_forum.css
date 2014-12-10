@@ -148,7 +148,19 @@ i.icon-comment
     font-weight:    bold;
 }
 
-.slrn-like-thumb {
+.slrn-like-num__only {
+    border-radius:  5px 5px 5px 5px;
+    color:          #FF004F;
+    font-weight:    bold;
+}
+
+.slrn-like-thumb, .slrn-like-thumb-inactive {
+    border-radius:  0 5px 5px 0;
+    color:          #DDD;
+    cursor:         pointer;
+}
+.slrn-like-thumb-inactive:hover {
+	text-decoration: none;
     border-radius:  0 5px 5px 0;
     color:          #DDD;
     cursor:         pointer;

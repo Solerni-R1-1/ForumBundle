@@ -55,6 +55,7 @@ citation_answer: répondre en citant
 move_to_top: haut de page
 tooltip_vote: Cliquez pour voter pour cette contribution
 tooltip_unvote: Vous avez déjà voté pour cette contribution, cliquez pour annuler votre vote
+tooltip_cant_vote: Vous ne pouvez pas voter pour vos propres messages
 edited_by: 'édité par'
 edited_on: 'le'
 unlock_title: Cliquez pour autoriser tous les utilisateurs à créer des sujets dans ce thème
