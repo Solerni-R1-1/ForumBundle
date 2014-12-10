@@ -439,7 +439,8 @@
                 destination = jQuery('.tiny_editor').position().top - 40;
                 jQuery('html,body').animate({scrollTop: destination}, 'fast');
                 node = targetTiny.dom.select('div#focus');
-                targetTiny.selection.select(node[0]);
+                node = node[node.length - 1];
+                targetTiny.selection.select(node);
                 targetTiny.selection.collapse(false);
             });
             
