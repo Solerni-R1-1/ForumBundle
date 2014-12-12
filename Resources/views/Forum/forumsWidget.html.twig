@@ -11,7 +11,7 @@
                                 {{ 'forum_last_message_owner'|trans({}, 'lesson-widget') }} {{ message.getCreator().getFirstName() }} {{ message.getCreator().getLastName() }}, {{'on'|trans({}, 'forum')}} {{ message.getCreationDate()|localizeddate( "full", "none", app.request.locale|default('fr') ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~  message.getCreationDate() | date('H\\hm')}}</p>
                                 </a>
                             <div class="list-group-item-text">
-                                <p>{{ message.getContent() | removeBlockquote | striptags | textTruncate( 25, ' [...]' ) | raw  }}</p>
+                                <p>{{ message.getContent() | removeTag('blockquote') | striptags | textTruncate( 25, ' [...]' ) | raw  }}</p>
                             </div>
                         </li>
                     {% endfor %}
@@ -32,7 +32,7 @@
                         <li class="list-group-item slrn-list-group-item">
                             <p class="text-muted slrn-message-header">{{ 'forum_last_message_owner'|trans({}, 'lesson-widget') }} {{ message.getCreator().getFirstName() }} {{ message.getCreator().getLastName() }}, {{'on'|trans({}, 'forum')}} {{ message.getCreationDate()|localizeddate( "full", "none", app.request.locale|default('fr') ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~  message.getCreationDate() | date('H\\hm')}}</p>
                             <div class="list-group-item-text">
-                                <p><a class="slrn-list-group-link" href="{{ _path('claro_forum_show_message', {'message': message.getId() }) }}">{{ message.getContent() | removeBlockquote | striptags | textTruncate( 25, ' [...]' ) | raw  }}</a></p>
+                                <p><a class="slrn-list-group-link" href="{{ _path('claro_forum_show_message', {'message': message.getId() }) }}">{{ message.getContent() | removeTag('blockquote') | striptags | textTruncate( 25, ' [...]' ) | raw  }}</a></p>
                             </div>
                         </li>
                     {% endfor %}
