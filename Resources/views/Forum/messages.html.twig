@@ -212,27 +212,27 @@
                                     <div class="slrn-like-bar col-md-4">
                                         <span id="number-likes-{{ message.getId() }}" class="slrn-like-bar__elem slrn-like-num">{{ nbLikes }}</span>
                                         {% if app.security.token.user == message.getCreator() %}
-                                        {% set tooltipCantVote = 'tooltip_cant_vote'|trans({}, 'forum') %}
-                                        <a class="slrn-like-bar__elem slrn-like-thumb-inactive"
-                                           title="{{ tooltipCantVote }}">
-                                           + <i class="icon-thumbs-up icon-thumb"></i>
-                                        </a>
+                                            <span class="slrn-like-bar__elem slrn-like-thumb-inactive"
+                                               data-toggle="tooltip"
+                                               title="{{ 'tooltip_cant_vote'|trans({}, 'forum') }}">
+                                               + <i class="icon-thumbs-up icon-thumb"></i>
+                                            </span>
                                         {% else %}
-                                        {% set likeLink = path('claro_forum_message_vote', {'weight': 1, 'message': message.getId()}) %}
-                                        {% set neutrallikeLink = path('claro_forum_message_vote', {'weight': 0, 'message': message.getId()}) %}
-                                        {% set tooltipVote = 'tooltip_vote'|trans({}, 'forum') %}
-                                        {% set tooltipUnvote = 'tooltip_unvote'|trans({}, 'forum') %}
-                                        <a class="js-message-like slrn-like-bar__elem slrn-like-thumb{% if userWeightValue == 1 %} active{% endif %}"
-                                           data-toggle="tooltip"
-                                           title="{% if userWeightValue == 1 %}{{ tooltipUnvote }}{% else %}{{tooltipVote}}{% endif %}"
-                                           data-unvote-title="{{ tooltipUnvote }}"
-                                           data-vote-title="{{ tooltipVote }}"
-                                           data-vote-number="number-likes-{{message.getId()}}"
-                                           data-vote-user="{{ userWeightValue }}"
-                                           data-vote-like="{{ likeLink }}"
-                                           data-vote-neutral="{{ neutrallikeLink }}">
-                                           + <i class="icon-thumbs-up icon-thumb"></i>
-                                        </a>
+                                            {% set likeLink = path('claro_forum_message_vote', {'weight': 1, 'message': message.getId()}) %}
+                                            {% set neutrallikeLink = path('claro_forum_message_vote', {'weight': 0, 'message': message.getId()}) %}
+                                            {% set tooltipVote = 'tooltip_vote'|trans({}, 'forum') %}
+                                            {% set tooltipUnvote = 'tooltip_unvote'|trans({}, 'forum') %}
+                                            <a class="js-message-like slrn-like-bar__elem slrn-like-thumb{% if userWeightValue == 1 %} active{% endif %}"
+                                               data-toggle="tooltip"
+                                               title="{% if userWeightValue == 1 %}{{ tooltipUnvote }}{% else %}{{tooltipVote}}{% endif %}"
+                                               data-unvote-title="{{ tooltipUnvote }}"
+                                               data-vote-title="{{ tooltipVote }}"
+                                               data-vote-number="number-likes-{{message.getId()}}"
+                                               data-vote-user="{{ userWeightValue }}"
+                                               data-vote-like="{{ likeLink }}"
+                                               data-vote-neutral="{{ neutrallikeLink }}">
+                                               + <i class="icon-thumbs-up icon-thumb"></i>
+                                            </a>
                                         {% endif %}
                                     </div>
                                     <div class="col-md-4">
