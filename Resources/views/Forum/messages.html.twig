@@ -211,6 +211,13 @@
                                 <td class="slrn-forum-td slrn-forum-td--tools">
                                     <div class="slrn-like-bar col-md-4">
                                         <span id="number-likes-{{ message.getId() }}" class="slrn-like-bar__elem slrn-like-num">{{ nbLikes }}</span>
+                                        {% if app.security.token.user == message.getCreator() %}
+                                        {% set tooltipCantVote = 'tooltip_cant_vote'|trans({}, 'forum') %}
+                                        <a class="slrn-like-bar__elem slrn-like-thumb-inactive"
+                                           title="{{ tooltipCantVote }}">
+                                           + <i class="icon-thumbs-up icon-thumb"></i>
+                                        </a>
+                                        {% else %}
                                         {% set likeLink = path('claro_forum_message_vote', {'weight': 1, 'message': message.getId()}) %}
                                         {% set neutrallikeLink = path('claro_forum_message_vote', {'weight': 0, 'message': message.getId()}) %}
                                         {% set tooltipVote = 'tooltip_vote'|trans({}, 'forum') %}
@@ -226,6 +233,7 @@
                                            data-vote-neutral="{{ neutrallikeLink }}">
                                            + <i class="icon-thumbs-up icon-thumb"></i>
                                         </a>
+                                        {% endif %}
                                     </div>
                                     <div class="col-md-4">
                                         <a data-target="msg_{{ message.getId() }}" class="js-trigger-citation forum_citation_link pink_link" href="#">{{'citation_answer'|trans({}, 'forum') }}</a>
@@ -439,7 +447,8 @@
                 destination = jQuery('.tiny_editor').position().top - 40;
                 jQuery('html,body').animate({scrollTop: destination}, 'fast');
                 node = targetTiny.dom.select('div#focus');
-                targetTiny.selection.select(node[0]);
+                node = node[node.length - 1];
+                targetTiny.selection.select(node);
                 targetTiny.selection.collapse(false);
             });
             
