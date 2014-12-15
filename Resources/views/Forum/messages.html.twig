@@ -409,6 +409,9 @@
             function updateDOM(jqXHR, textStatus, element, userVote) {
                 userVote = ( userVote ==  1 ) ? 0 : 1;
                 element.data( 'vote-user', userVote );
+                {% if order == 'POP' %}
+                    window.location.reload();
+                {% endif %}
              }
             
             function AjaxVote( element, actionUrl, userVote ) {
