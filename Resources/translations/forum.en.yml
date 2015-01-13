@@ -48,7 +48,7 @@ most_recent_order: messages les plus récents#GB
 most_ancient_order: messages les plus anciens#GB
 most_popular_order: messages les plus populaires#GB
 orderby: 'trier par :#GB'
-show: 'affichage :#GB'
+show: 'affichage#GB'
 lock_subject: 'Interdire la création de sujets#GB'
 unlock_subject: 'Autoriser la création de sujets#GB'
 citation_answer: répondre en citant#GB
@@ -56,7 +56,7 @@ move_to_top: haut de page#GB
 tooltip_vote: Cliquez pour voter pour cette contribution#GB
 tooltip_unvote: Vous avez déjà voté pour cette contribution, cliquez pour annuler votre vote#GB
 tooltip_cant_vote: Vous ne pouvez pas voter pour vos propres messages#GB
-edited_by: 'édité par#GB'
+edited_by: 'message édité par#GB'
 edited_on: 'le#GB'
 unlock_title: Cliquez pour autoriser tous les utilisateurs à créer des sujets dans ce thème#GB
 lock_title: Cliquez pour limiter la création de sujets aux modérateurs#GB
@@ -65,3 +65,9 @@ at: à#GB
 on: le#GB
 show_permalink: Afficher le permalien#GB
 hide_permalink: Masquer le permalien#GB
+all category_subjects: Tous les sujets du thème#GB
+posts: message%plural%#GB
+show_results_number: Afficher %number% résultats par page#GB
+show_all_results: Afficher tous les résultats#GB
+tout: tout#GB
+has_written: a écrit#GB

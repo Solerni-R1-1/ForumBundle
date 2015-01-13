@@ -1,6 +1,7 @@
 {% from _self import renderPager %}
 
 {% set layout = "ClarolineForumBundle::layout.html.twig" %}
+{% set hourFormat = app.request.locale == 'fr' ? 'H\\hm' : 'h:i A' %}
 
 {% extends layout %}
 
@@ -58,7 +59,7 @@
                                 {{ category['name'] }}
                             </a>
                             <div class="slrn-name-date">
-                                {{ category['creation_date'] | localizeddate( "full", "none", app.request.locale|default('fr') ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~ category['creation_date'] | date('H\\hm') }}
+                                {{'on'|trans({}, 'forum')}} {{ category['creation_date'] | localizeddate( "long", "none", app.request.locale, null, 'd MMMM Y' ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~ category['creation_date'] | date(hourFormat) }}
                             </div>
                             {% if isModerator %}
                             <div class="slrn-forum__tools">
@@ -87,7 +88,7 @@
                             {% endif %}
                             {% if  category['last_message_created'] %}
                             <div class="slrn-name-date">
-                                 {{ category['last_message_created'] | localizeddate( "full", "none", app.request.locale|default('fr') ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~ category['creation_date'] | date('H\\hm')  }}
+                                 {{'on'|trans({}, 'forum')}} {{ category['last_message_created'] | localizeddate( "long", "none", app.request.locale, null, 'd MMMM Y' ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~ category['creation_date'] | date(hourFormat)  }}
                             </div>
                             {% endif %}
                         </td>

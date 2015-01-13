@@ -23,20 +23,21 @@
 
 {% set layout = "ClarolineForumBundle::layout.html.twig" %}
 {% extends layout %}
-
+{% set hourFormat = app.request.locale == 'fr' ? 'H\\hm' : 'h:i A' %}
+        
 {% block title %}{{ _resource.getResourceNode().getName() ~ ' - ' ~ parent() | striptags | raw  }}{% endblock %}
 
 {% block forum_breadcrumb %}
     <ul class="slrn-breadcrumb">
-        <li><a href="{{ path('claro_forum_categories', { 'forum': category.getForum().getId() }) }}">Tous les thèmes</a></li>
-        <li class="active"> Tous les sujets du thème : {{ category.getName() }} </li>
+        <li><a href="{{ path('claro_forum_categories', { 'forum': category.getForum().getId() }) }}">{{'all categories'|trans({}, 'forum')}}</a></li>
+        <li class="active"> {{'all category_subjects'|trans({}, 'forum')}} : {{ category.getName() }} </li>
     </ul>
 {% endblock %}
 
 {% block forum_content %}
     <div class="panel-heading">
         <a class="slrn-read-faq pink_link" href="{{ path( 'solerni_static_page', { 'name': 'cms_faq' } ) }}">{{ 'read_faq'|trans({}, 'platform') }}</a>
-        <h3 class="slrn-panel-title">Tous les sujets du thème : {{ category.getName() }}</h3>
+        <h3 class="slrn-panel-title">{{'all category_subjects'|trans({}, 'forum')}} : {{ category.getName() }}</h3>
     </div>
     <div class="panel-body">
         <div class="navbar row">
@@ -141,7 +142,7 @@
                             {{ 'started_by' | trans({}, 'forum') }}
                             <b><a href="{{ path('claro_public_profile_view', {'publicUrl': subject['subject_creator_public_url']}) }}">{{ subject['subject_creator_firstname'] }}
                             {{ subject['subject_creator_lastname'] }}</a></b>,
-                            {{'on'|trans({}, 'forum')}} {{ subject['subject_created']|localizeddate( "short", "none", app.request.locale|default('fr') ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~  subject['subject_created'] | date('H\\hm')  }}
+                            {{'on'|trans({}, 'forum')}} {{ subject['subject_created']|localizeddate( "short", "none", app.request.locale, null, 'd/MM/Y' ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~  subject['subject_created'] | date(hourFormat)  }}
                         </td>
                         <td>
                             {{ subject['count_messages'] }}
@@ -150,7 +151,7 @@
                             <b><a href="{{ path('claro_public_profile_view', {'publicUrl': subject['last_message_creator_public_url']}) }}">
                             {{ subject['last_message_creator_firstname'] }}
                             {{ subject['last_message_creator_lastname'] }}</a></b><br/>
-                            {{'on'|trans({}, 'forum')}} {{ subject['last_message_created']|localizeddate( "short", "none", app.request.locale|default('fr') ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~  subject['subject_created'] | date('H\\hm') }}
+                            {{'on'|trans({}, 'forum')}} {{ subject['last_message_created']|localizeddate( "short", "none", app.request.locale, null, 'd/MM/Y' ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~  subject['subject_created'] | date(hourFormat) }}
                         </td>
                         {% if isModerator %}
                             <td>
