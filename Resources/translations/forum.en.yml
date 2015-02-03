@@ -1,73 +1,72 @@
-author: Auteur#GB
-back_to: Retour à#GB
-back_to_categories: Retour aux thèmes#GB
-category: Nom du thème#GB
-category_form_name: Thème#GB
-edit_message: Éditer un message#GB
-field_content_required: Le champ contenu est requis.#GB
-forum: Forum#GB
-forum_back_to_categories: Retour à la liste des thèmes#GB
-forum_category_edit: 'Modifier le thème#GB'
-forum_settings: Paramètres du forum#GB
-forum_subject_edit: 'Modifier le sujet#GB'
-forum_subject_form_title: Titre#GB
-forum_subject_form_message: Message#GB
-forum_subject_form_message_content: Contenu#GB
-forum_message_form_content: Contenu#GB
-forum_form_name: Nom#GB
-forum_options_form_subjects: Sujets par page#GB
-forum_options_form_messages: Messages par page#GB
-forum_subject_title_form_title: Titre#GB
-forum_new_message: Un nouveau message a été ajouté dans le sujet "%subject%" du forum "%forum%".#GB
-forum_new_subject: Un nouveau sujet a été ajouté dans le forum "%forum%".#GB
-last_message: Dernier message#GB
-messages: Message#GB
-messages_per_page: Messages par page#GB
-move_message: Déplacer un message#GB
-move_subject: Déplacer un sujet#GB
-move_to: Déplacer vers#GB
-new_category: Ajouter un thème#GB
-new_message: Je réponds#GB
-new_subject: J'ajoute un sujet#GB
-remove_category_confirm_message: Êtes vous sûr de vouloir supprimer ce thème ?#GB
-remove_subject_confirm_message: Êtes vous sûr de vouloir supprimer ce sujet ?#GB
-remove_subjects_confirm_message: Êtes vous sûr de vouloir supprimer ces %count% sujet(s) ?#GB
-responses: Message#GB
-started_by: De#GB
-stick: Épingler#GB
-stuck: Épinglé#GB
-subject: Nom du sujet#GB
-subjets_per_page: Sujets par page#GB
-subscribe_mail_list: Recevoir les notifications#GB
-unstick: Désépingler#GB
-unsubscribe_mail_list: Ne plus recevoir les notifications#GB
-all categories: Tous les thèmes#GB
-post_my_message: Poster mon message#GB
-#GB
-most_recent_order: messages les plus récents#GB
-most_ancient_order: messages les plus anciens#GB
-most_popular_order: messages les plus populaires#GB
-orderby: 'trier par :#GB'
-show: 'affichage#GB'
-lock_subject: 'Interdire la création de sujets#GB'
-unlock_subject: 'Autoriser la création de sujets#GB'
-citation_answer: répondre en citant#GB
-move_to_top: haut de page#GB
-tooltip_vote: Cliquez pour voter pour cette contribution#GB
-tooltip_unvote: Vous avez déjà voté pour cette contribution, cliquez pour annuler votre vote#GB
-tooltip_cant_vote: Vous ne pouvez pas voter pour vos propres messages#GB
-edited_by: 'message édité par#GB'
-edited_on: 'le#GB'
-unlock_title: Cliquez pour autoriser tous les utilisateurs à créer des sujets dans ce thème#GB
-lock_title: Cliquez pour limiter la création de sujets aux modérateurs#GB
-posts_by_user: %nb% message%plural%#GB
-at: à#GB
-on: le#GB
-show_permalink: Afficher le permalien#GB
-hide_permalink: Masquer le permalien#GB
-all category_subjects: Tous les sujets du thème#GB
-posts: message%plural%#GB
-show_results_number: Afficher %number% résultats par page#GB
-show_all_results: Afficher tous les résultats#GB
-tout: tout#GB
-has_written: a écrit#GB
+﻿author: Author
+back_to: Return to
+back_to_categories: Return to themes
+category: Theme name
+category_form_name: Theme
+edit_message: Edit a message
+field_content_required: The content field is required.
+forum: Forum
+forum_back_to_categories: Return to the theme list
+forum_category_edit: 'Change the theme'
+forum_settings: Forum settings
+forum_subject_edit: 'Change the subject'
+forum_subject_form_title: Title
+forum_subject_form_message: Message
+forum_subject_form_message_content: Content
+forum_message_form_content: Content
+forum_form_name: Name
+forum_options_form_subjects: Subjects per page
+forum_options_form_messages: Messages per page
+forum_subject_title_form_title: Title
+forum_new_message: A new message has been added to the "%subject%" subject in the "%forum%" forum.
+forum_new_subject: A new subject has been added in the "%forum%" forum.
+last_message: Last message
+messages: Message
+messages_per_page: Messages per page
+move_message: Move a message
+move_subject: Move a subject
+move_to: Move to
+new_category: Add a theme
+new_message: Reply
+new_subject: Add a subject
+remove_category_confirm_message: Are you sure you wish to delete this theme?
+remove_subject_confirm_message: Are you sure you wish to delete this subject?
+remove_subjects_confirm_message: Are you sure you wish to delete these %count%subject(s)?
+responses: Message
+started_by: From
+stick: Pin
+stuck: Pinned
+subject: Subject name
+subjets_per_page: Subjects per page
+subscribe_mail_list: Receive notifications
+unstick: Unpin
+unsubscribe_mail_list: Do not receive notifications
+all categories: All themes
+post_my_message: Post my message
+most_recent_order: Most recent messages
+most_ancient_order: Oldest messages
+most_popular_order: Most popular messages
+orderby: 'sort by:'
+show: 'display'
+lock_subject: 'Forbid the creation of subjects'
+unlock_subject: 'Authorise the creation of subjects'
+citation_answer: respond quoting
+move_to_top: Top of page
+tooltip_vote: Click to vote for this contribution
+tooltip_unvote: You have already voted for this contribution, click to cancel your vote
+tooltip_cant_vote: You cannot vote for your own messages
+edited_by: 'message edited by'
+edited_on: 'On'
+unlock_title: Click to authorise all users to create subjects in this theme
+lock_title: Click to limit the creation of subjects to moderators
+posts_by_user: %nb% message%plural%
+at: to
+on: on
+show_permalink: Display permalink
+hide_permalink: Hide permalink
+all category_subjects: All subjects for theme
+posts: message%plural%
+show_results_number: Display %number% results per page
+show_all_results: Display all results
+tout: all
+has_written: writing
