@@ -284,7 +284,7 @@ class ForumController extends Controller
         $form = $this->get('form.factory')->create(new SubjectType(), new Subject);
         $form->handleRequest($this->get('request'));
 
-        if ($form->isValid()) {
+        if ( $form->isValid() ) {
             $user = $this->get('security.context')->getToken()->getUser();
             $subject = $form->getData();
             $subject->setCreator($user);
@@ -293,7 +293,7 @@ class ForumController extends Controller
             $this->get('claroline.manager.forum_manager')->createSubject($subject);
             $dataMessage = $form->get('message')->getData();
 
-            if ($dataMessage['content'] !== null) {
+            if ( $dataMessage['content'] ) {
                 $message = new Message();
                 $message->setContent($dataMessage['content']);
                 $message->setCreator($user);
@@ -303,11 +303,14 @@ class ForumController extends Controller
                 return new RedirectResponse(
                     $this->generateUrl('claro_forum_subjects', array('category' => $category->getId()))
                 );
+            } else {
+                $form->get('message')->addError(
+                    new FormError($this->get('translator')->trans('field_content_required', array(), 'forum'))
+                );
             }
         }
 
-        //throw new \Exception($form->getErrorsAsString());
-        $form->get('message')->addError(
+        $form->get('title')->addError(
             new FormError($this->get('translator')->trans('field_content_required', array(), 'forum'))
         );
 
