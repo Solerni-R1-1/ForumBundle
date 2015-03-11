@@ -907,7 +907,6 @@ class ForumController extends Controller
         $token = $sc->getToken($user);
         $roles = $utils->getRoles($token);
 
-
         $moocSession = $this->getDoctrine()
 	        ->getRepository( 'ClarolineCoreBundle:Mooc\\MoocSession' )
 	        ->guessMoocSession($workspace, $user);
@@ -956,11 +955,11 @@ class ForumController extends Controller
     	$em = $this->getDoctrine()->getManager();
 
     	$forum = $em->getRepository('ClarolineForumBundle:Forum')
-    			->getForumFromResourceNode($node);
+            ->getForumFromResourceNode($node);
         	
     	// Get the 3 last messages from all forums from the workspace
     	$messages = $em->getRepository('ClarolineForumBundle:Message')
-    			->findNLast($forum, $roles,3);
+    			->findNLast($forum, $roles, 3);
     
     	return array('widgetType' => 'workspace', 'messages' => $messages, 'isMini' => $isMini, 'forum' => $forum);
     }
