@@ -528,6 +528,6 @@ i.icon-comment
 }
 
 .slrn-message-content .slrn-message-content_html img {
-    max-width:  580px;
+    max-width:  580px !important;
     height:     auto;
 }
