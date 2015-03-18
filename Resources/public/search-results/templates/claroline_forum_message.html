@@ -2,11 +2,11 @@
     <div class='row'>
         <div class='col-md-12'>
             <span class="slrn-sr-elmnt-header">
-                <a href="{{ document.resource_url|path }}"> FORUM</a> | 
+                <a href="{{ document.resource_url|path }}">{{'forum_caps'|trans}}</a> | 
                 <a href="{{ document.forum_category_url|path }}">{{ document.forum_name }}</a> | 
                 <a href="{{ document.forum_subject_url|path }}">{{ document.forum_subject_name }}</a> |
             </span>
-            posté par 
+             {{'posted_by'|trans}}
             <span class="slrn-sr-elmnt-header">
                 <a href="{{ document.forum_creator_profil_url|path }}">{{ document.forum_creator_name | truncate:13 }}</a>
             </span>
@@ -21,13 +21,13 @@
     </div>
     <div class="slrn-sr-elmnt-text" ng-bind-html = "document.content_t">
     </div>
-    <div><a href="{{ document.forum_message_url|path }}" class="pink_link">(lire la suite)</a></div>
+    <div><a href="{{ document.forum_message_url|path }}" class="pink_link">({{'read_more'|trans}})</a></div>
     <div class="slrn-sr-elmnt-date">
         <span class="slrn-sr-elmnt-date-creation">
-            <i class="icon-flag"></i> {{ 'create_at'|trans }} {{ document.creation_date | date : 'MM/dd/yyyy' }}
+            <i class="icon-flag"></i> {{ 'create_at'|trans }} {{ document.creation_date | date : 'dd.MM.yyyy' }}
         </span>
         <span class="slrn-sr-elmnt-date-modification">
-            <i class="icon-pencil"></i> {{ 'edit_at'|trans }} {{ document.modification_date | date : 'MM/dd/yyyy' }}
+            <i class="icon-pencil"></i> {{ 'edit_at'|trans }} {{ document.modification_date | date : 'dd.MM.yyyy' }}
         </span>
     </div>
 </div>

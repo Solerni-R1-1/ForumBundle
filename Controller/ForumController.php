@@ -284,7 +284,7 @@ class ForumController extends Controller
         $form = $this->get('form.factory')->create(new SubjectType(), new Subject);
         $form->handleRequest($this->get('request'));
 
-        if ($form->isValid()) {
+        if ( $form->isValid() ) {
             $user = $this->get('security.context')->getToken()->getUser();
             $subject = $form->getData();
             $subject->setCreator($user);
@@ -293,7 +293,7 @@ class ForumController extends Controller
             $this->get('claroline.manager.forum_manager')->createSubject($subject);
             $dataMessage = $form->get('message')->getData();
 
-            if ($dataMessage['content'] !== null) {
+            if ( $dataMessage['content'] ) {
                 $message = new Message();
                 $message->setContent($dataMessage['content']);
                 $message->setCreator($user);
@@ -303,11 +303,14 @@ class ForumController extends Controller
                 return new RedirectResponse(
                     $this->generateUrl('claro_forum_subjects', array('category' => $category->getId()))
                 );
+            } else {
+                $form->get('message')->addError(
+                    new FormError($this->get('translator')->trans('field_content_required', array(), 'forum'))
+                );
             }
         }
 
-        //throw new \Exception($form->getErrorsAsString());
-        $form->get('message')->addError(
+        $form->get('title')->addError(
             new FormError($this->get('translator')->trans('field_content_required', array(), 'forum'))
         );
 
@@ -907,7 +910,6 @@ class ForumController extends Controller
         $token = $sc->getToken($user);
         $roles = $utils->getRoles($token);
 
-
         $moocSession = $this->getDoctrine()
 	        ->getRepository( 'ClarolineCoreBundle:Mooc\\MoocSession' )
 	        ->guessMoocSession($workspace, $user);
@@ -956,11 +958,11 @@ class ForumController extends Controller
     	$em = $this->getDoctrine()->getManager();
 
     	$forum = $em->getRepository('ClarolineForumBundle:Forum')
-    			->getForumFromResourceNode($node);
+            ->getForumFromResourceNode($node);
         	
     	// Get the 3 last messages from all forums from the workspace
     	$messages = $em->getRepository('ClarolineForumBundle:Message')
-    			->findNLast($forum, $roles,3);
+    			->findNLast($forum, $roles, 3);
     
     	return array('widgetType' => 'workspace', 'messages' => $messages, 'isMini' => $isMini, 'forum' => $forum);
     }

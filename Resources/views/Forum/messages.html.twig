@@ -25,13 +25,14 @@
 
 {% set layout = "ClarolineForumBundle::layout.html.twig" %}
 {% extends layout %}
-
+{% set hourFormat = app.request.locale == 'fr' ? 'H\\hm' : 'h:i A' %}
+        
 {% block title %}{{ _resource.getResourceNode().getName() ~ '(' ~ subject.getTitle() ~ ')' ~ ' - ' ~ parent() | striptags | raw  }}{% endblock %}
     
 {% block forum_breadcrumb %}
     <ul class="slrn-breadcrumb">
-        <li><a href="{{ path('claro_forum_categories', { 'forum': category.getForum().getId() }) }}">Tous les thèmes</a></li>
-        <li><a href="{{ path('claro_forum_subjects', { 'category': category.getId() }) }}">Tous les sujets du thème : {{ category.getName() }}</a></li>
+        <li><a href="{{ path('claro_forum_categories', { 'forum': category.getForum().getId() }) }}">{{ 'all categories'|trans({}, 'forum') }}</a></li>
+        <li><a href="{{ path('claro_forum_subjects', { 'category': category.getId() }) }}">{{'all category_subjects'|trans({}, 'forum')}} : {{ category.getName() }}</a></li>
         <li class="active">{{ subject.getTitle() }}</li>
     </ul>
 {% endblock %}
@@ -47,7 +48,7 @@
               {{ subject.getCreator().getFirstName() }} {{ subject.getCreator().getLastName() }}
           </a>
           </b>
-          {{'on'|trans({}, 'forum')}} {{ subject.getCreationDate() | localizeddate( "full", "none", app.request.locale|default('fr') ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~ subject.getCreationDate() | date('H\\hm') }}
+          {{'on'|trans({}, 'forum')}} {{ subject.getCreationDate() | localizeddate( "long", "none", app.request.locale, null, 'd MMMM Y' ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~ subject.getCreationDate() | date(hourFormat) }}
         </div>
     </div>
     {% if firstMessage|default %}
@@ -68,19 +69,19 @@
                             </a>
                          </div>
                          <div class="text-center slrn-message-horodatage">
-                             {{ firstMessage.getCreationDate()|localizeddate( "short", "none", app.request.locale|default('fr') ) ~ ' ' ~ firstMessage.getCreationDate() | date('H\\hm')}}
+                             {{ firstMessage.getCreationDate()|localizeddate( "short", "none", app.request.locale, null, 'd/MM/Y' ) ~ ' ' ~ firstMessage.getCreationDate() | date(hourFormat) }}
                          </div>
                      </td>
                     <td class="slrn-forum-td slrn-message-content">
                         <div class="slrn-message-content_html">{{ firstMessage.getContent()|raw }}</p></div>
                         <p class="text-muted slrn-message-date">{{ firstMessage.getCreationDate()| timeAgo }}
                             {% if firstMessage.getlastEditedBy()|default %}
-                               <i>( message 
+                               <i>( 
                                    {{'edited_by'|trans({}, 'forum')}}
                                    <a href="{{path('claro_public_profile_view', {'publicUrl':firstMessage.getlastEditedBy().getPublicUrl()})}}">
                                        {{firstMessage.getlastEditedBy().getFirstName()}} {{firstMessage.getlastEditedBy().getLastName()}}</a>
                                    {{'edited_on'|trans({}, 'forum')}}
-                                   {{ firstMessage.getUpdated()|localizeddate( "short", "none", app.request.locale|default('fr') ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~ firstMessage.getUpdated() | date('H\\hm') }}
+                                   {{ firstMessage.getUpdated()|localizeddate( "short", "none", app.request.locale, null, 'd/MM/Y' ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~ firstMessage.getUpdated() | date(hourFormat) }}
                                )</i>
                            {% endif %}
                         </p>
@@ -126,7 +127,7 @@
             </div>
         </div>
         <div class="slrn-forum-meta">
-            <span class="slrn-forum-num-messages">{{ pager.getNbResults() }} messages</span>
+            <span class="slrn-forum-num-messages">{{ pager.getNbResults() }} {{ 'posts'| trans({'%plural%': pager.getNbResults() > 1 ? 's' : '' }, 'forum') }}</span>
         </div>
         <div class="slrn-forum-options-pagination slrn-forum-options-pagination--top">
             {% set options = {
@@ -148,13 +149,13 @@
                 </li>
             </ul>
             <div class="slrn-posts-per-page">
-                <span class="slrn-select__label">{{'show'|trans({}, 'forum')}}</span>
+                <span class="slrn-select__label">{{'show'|trans({}, 'forum')}} : </span>
                 {% set postPerPage = [20,50,100, 'tout'] %}
                 {% for number in postPerPage %}
                     <a class="slrn-posts-per-page__item{% if number == max %} slrn-posts-per-page__item--active{% endif %}" 
                        href="{{ path('claro_forum_messages', {'subject': subject.getId(), 'page': page , 'max': number, 'order': order }) }}"
-                       title="Afficher {{number}} résultats par page">
-                        {{number}}</a>
+                       title="{% if number == 'tout' %}{{'show_all_results'|trans({}, 'forum')}}{% else %}{{'show_results_number'|trans({'%number%': number}, 'forum')}}{% endif %}">
+                        {{number|trans({}, 'forum')}}</a>
                 {% endfor %}
             </div>
             {# generate a div.pagination element#}
@@ -183,7 +184,7 @@
                                     </a>
                                     </div>
                                     <div class="text-center slrn-message-horodatage">
-                                        {{ message.getCreationDate()|localizeddate( "short", "none", app.request.locale|default('fr') ) ~ ' ' ~ firstMessage.getCreationDate() | date('H\\hm') }}
+                                        {{ message.getCreationDate()|localizeddate( "short", "none", app.request.locale, null, 'd/MM/Y' ) ~ ' ' ~ firstMessage.getCreationDate() | date(hourFormat) }}
                                     </div>
                                     <div class="text-center slrn-message-user-nb-messages">
                                         {% set plural = '' %}
@@ -200,7 +201,7 @@
                                                 <a href="{{path('claro_public_profile_view', {'publicUrl':message.getlastEditedBy().getPublicUrl()})}}">
                                                     {{message.getlastEditedBy().getFirstName()}} {{message.getlastEditedBy().getLastName()}}</a>
                                                 {{'edited_on'|trans({}, 'forum')}}
-                                                {{ message.getUpdated()|localizeddate( "short", "none", app.request.locale|default('fr') ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~ firstMessage.getUpdated() | date('H\\hm')  }}
+                                                {{ message.getUpdated()|localizeddate( "short", "none", app.request.locale, null, 'd/MM/Y' ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~ firstMessage.getUpdated() | date(hourFormat)  }}
                                             )</i>
                                         {% endif %}
                                     </p>
@@ -212,27 +213,27 @@
                                     <div class="slrn-like-bar col-md-4">
                                         <span id="number-likes-{{ message.getId() }}" class="slrn-like-bar__elem slrn-like-num">{{ nbLikes }}</span>
                                         {% if app.security.token.user == message.getCreator() %}
-                                        {% set tooltipCantVote = 'tooltip_cant_vote'|trans({}, 'forum') %}
-                                        <a class="slrn-like-bar__elem slrn-like-thumb-inactive"
-                                           title="{{ tooltipCantVote }}">
-                                           + <i class="icon-thumbs-up icon-thumb"></i>
-                                        </a>
+                                            <span class="slrn-like-bar__elem slrn-like-thumb-inactive"
+                                               data-toggle="tooltip"
+                                               title="{{ 'tooltip_cant_vote'|trans({}, 'forum') }}">
+                                               + <i class="icon-thumbs-up icon-thumb"></i>
+                                            </span>
                                         {% else %}
-                                        {% set likeLink = path('claro_forum_message_vote', {'weight': 1, 'message': message.getId()}) %}
-                                        {% set neutrallikeLink = path('claro_forum_message_vote', {'weight': 0, 'message': message.getId()}) %}
-                                        {% set tooltipVote = 'tooltip_vote'|trans({}, 'forum') %}
-                                        {% set tooltipUnvote = 'tooltip_unvote'|trans({}, 'forum') %}
-                                        <a class="js-message-like slrn-like-bar__elem slrn-like-thumb{% if userWeightValue == 1 %} active{% endif %}"
-                                           data-toggle="tooltip"
-                                           title="{% if userWeightValue == 1 %}{{ tooltipUnvote }}{% else %}{{tooltipVote}}{% endif %}"
-                                           data-unvote-title="{{ tooltipUnvote }}"
-                                           data-vote-title="{{ tooltipVote }}"
-                                           data-vote-number="number-likes-{{message.getId()}}"
-                                           data-vote-user="{{ userWeightValue }}"
-                                           data-vote-like="{{ likeLink }}"
-                                           data-vote-neutral="{{ neutrallikeLink }}">
-                                           + <i class="icon-thumbs-up icon-thumb"></i>
-                                        </a>
+                                            {% set likeLink = path('claro_forum_message_vote', {'weight': 1, 'message': message.getId()}) %}
+                                            {% set neutrallikeLink = path('claro_forum_message_vote', {'weight': 0, 'message': message.getId()}) %}
+                                            {% set tooltipVote = 'tooltip_vote'|trans({}, 'forum') %}
+                                            {% set tooltipUnvote = 'tooltip_unvote'|trans({}, 'forum') %}
+                                            <a class="js-message-like slrn-like-bar__elem slrn-like-thumb{% if userWeightValue == 1 %} active{% endif %}"
+                                               data-toggle="tooltip"
+                                               title="{% if userWeightValue == 1 %}{{ tooltipUnvote }}{% else %}{{tooltipVote}}{% endif %}"
+                                               data-unvote-title="{{ tooltipUnvote }}"
+                                               data-vote-title="{{ tooltipVote }}"
+                                               data-vote-number="number-likes-{{message.getId()}}"
+                                               data-vote-user="{{ userWeightValue }}"
+                                               data-vote-like="{{ likeLink }}"
+                                               data-vote-neutral="{{ neutrallikeLink }}">
+                                               + <i class="icon-thumbs-up icon-thumb"></i>
+                                            </a>
                                         {% endif %}
                                     </div>
                                     <div class="col-md-4">
@@ -409,6 +410,9 @@
             function updateDOM(jqXHR, textStatus, element, userVote) {
                 userVote = ( userVote ==  1 ) ? 0 : 1;
                 element.data( 'vote-user', userVote );
+                {% if order == 'POP' %}
+                    window.location.reload();
+                {% endif %}
              }
             
             function AjaxVote( element, actionUrl, userVote ) {
@@ -442,7 +446,7 @@
             
             jQuery('.js-trigger-citation').on ('click', function() {
                 targetTiny = tinymce.editors[0]; 
-                citation = '<blockquote><i>' + jQuery( '#' + jQuery(this).data('target') + ' .slrn-message-username' ).html() + ' a écrit:</i>' + jQuery( '#' + jQuery(this).data('target') + ' .slrn-message-content_html' ).html() + '</blockquote><div id="focus">&nbsp;</div>';
+                citation = '<blockquote><i>' + jQuery( '#' + jQuery(this).data('target') + ' .slrn-message-username' ).html() + ' {{'has_written'|trans({}, 'forum')}} :</i>' + jQuery( '#' + jQuery(this).data('target') + ' .slrn-message-content_html' ).html() + '</blockquote><div id="focus">&nbsp;</div>';
                 targetTiny.execCommand('mceInsertRawHTML', false, citation );
                 destination = jQuery('.tiny_editor').position().top - 40;
                 jQuery('html,body').animate({scrollTop: destination}, 'fast');

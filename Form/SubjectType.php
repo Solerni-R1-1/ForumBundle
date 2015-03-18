@@ -20,7 +20,7 @@ class SubjectType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('title', 'text', array('required' => true));
-        $builder->add('message', new MessageType(), array('mapped' => false));
+        $builder->add('message', new MessageType(), array('mapped' => false, 'required' => true));
     }
 
     public function getName()
