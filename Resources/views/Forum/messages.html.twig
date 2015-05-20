@@ -25,7 +25,7 @@
 
 {% set layout = "ClarolineForumBundle::layout.html.twig" %}
 {% extends layout %}
-{% set hourFormat = app.request.locale == 'fr' ? 'H\\hm' : 'h:i A' %}
+{% set hourFormat = app.request.locale == 'fr' ? 'H\\hi' : 'h:i A' %}
         
 {% block title %}{{ _resource.getResourceNode().getName() ~ '(' ~ subject.getTitle() ~ ')' ~ ' - ' ~ parent() | striptags | raw  }}{% endblock %}
     
@@ -184,7 +184,7 @@
                                     </a>
                                     </div>
                                     <div class="text-center slrn-message-horodatage">
-                                        {{ message.getCreationDate()|localizeddate( "short", "none", app.request.locale, null, 'd/MM/Y' ) ~ ' ' ~ firstMessage.getCreationDate() | date(hourFormat) }}
+                                        {{ message.getCreationDate()|localizeddate( "short", "none", app.request.locale, null, 'd/MM/Y' ) ~ ' ' ~ message.getCreationDate() | date(hourFormat) }}
                                     </div>
                                     <div class="text-center slrn-message-user-nb-messages">
                                         {% set plural = '' %}
@@ -201,7 +201,7 @@
                                                 <a href="{{path('claro_public_profile_view', {'publicUrl':message.getlastEditedBy().getPublicUrl()})}}">
                                                     {{message.getlastEditedBy().getFirstName()}} {{message.getlastEditedBy().getLastName()}}</a>
                                                 {{'edited_on'|trans({}, 'forum')}}
-                                                {{ message.getUpdated()|localizeddate( "short", "none", app.request.locale, null, 'd/MM/Y' ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~ firstMessage.getUpdated() | date(hourFormat)  }}
+                                                {{ message.getUpdated()|localizeddate( "short", "none", app.request.locale, null, 'd/MM/Y' ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~ message.getUpdated() | date(hourFormat)  }}
                                             )</i>
                                         {% endif %}
                                     </p>
