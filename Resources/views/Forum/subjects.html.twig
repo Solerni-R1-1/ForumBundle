@@ -23,7 +23,7 @@
 
 {% set layout = "ClarolineForumBundle::layout.html.twig" %}
 {% extends layout %}
-{% set hourFormat = app.request.locale == 'fr' ? 'H\\hm' : 'h:i A' %}
+{% set hourFormat = app.request.locale == 'fr' ? 'H\\hi' : 'h:i A' %}
         
 {% block title %}{{ _resource.getResourceNode().getName() ~ ' - ' ~ parent() | striptags | raw  }}{% endblock %}
 
@@ -151,7 +151,7 @@
                             <b><a href="{{ path('claro_public_profile_view', {'publicUrl': subject['last_message_creator_public_url']}) }}">
                             {{ subject['last_message_creator_firstname'] }}
                             {{ subject['last_message_creator_lastname'] }}</a></b><br/>
-                            {{'on'|trans({}, 'forum')}} {{ subject['last_message_created']|localizeddate( "short", "none", app.request.locale, null, 'd/MM/Y' ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~  subject['subject_created'] | date(hourFormat) }}
+                            {{'on'|trans({}, 'forum')}} {{ subject['last_message_created']|localizeddate( "short", "none", app.request.locale, null, 'd/MM/Y' ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~  subject['last_message_created'] | date(hourFormat) }}
                         </td>
                         {% if isModerator %}
                             <td>

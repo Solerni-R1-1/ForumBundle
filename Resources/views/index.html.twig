@@ -1,7 +1,7 @@
 {% from _self import renderPager %}
 
 {% set layout = "ClarolineForumBundle::layout.html.twig" %}
-{% set hourFormat = app.request.locale == 'fr' ? 'H\\hm' : 'h:i A' %}
+{% set hourFormat = app.request.locale == 'fr' ? 'H\\hi' : 'h:i A' %}
 
 {% extends layout %}
 
@@ -88,7 +88,7 @@
                             {% endif %}
                             {% if  category['last_message_created'] %}
                             <div class="slrn-name-date">
-                                 {{'on'|trans({}, 'forum')}} {{ category['last_message_created'] | localizeddate( "long", "none", app.request.locale, null, 'd MMMM Y' ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~ category['creation_date'] | date(hourFormat)  }}
+                                 {{'on'|trans({}, 'forum')}} {{ category['last_message_created'] | localizeddate( "long", "none", app.request.locale, null, 'd MMMM Y' ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~ category['last_message_created'] | date(hourFormat)  }}
                             </div>
                             {% endif %}
                         </td>
