@@ -26,9 +26,9 @@
 {% set layout = "ClarolineForumBundle::layout.html.twig" %}
 {% extends layout %}
 {% set hourFormat = app.request.locale == 'fr' ? 'H\\hi' : 'h:i A' %}
-        
+
 {% block title %}{{ _resource.getResourceNode().getName() ~ '(' ~ subject.getTitle() ~ ')' ~ ' - ' ~ parent() | striptags | raw  }}{% endblock %}
-    
+
 {% block forum_breadcrumb %}
     <ul class="slrn-breadcrumb">
         <li><a href="{{ path('claro_forum_categories', { 'forum': category.getForum().getId() }) }}">{{ 'all categories'|trans({}, 'forum') }}</a></li>
@@ -42,11 +42,15 @@
         <a class="slrn-read-faq pink_link" href="{{ path( 'solerni_static_page', { 'name': 'cms_faq' } ) }}">{{ 'read_faq'|trans({}, 'platform') }}</a>
         <h3 class="slrn-panel-title">{{ subject.getTitle() }}</h3>
         <div class="slrn-name-date">
-          {{ 'started_by' | trans({}, 'forum') }} 
+          {{ 'started_by' | trans({}, 'forum') }}
           <b>
-          <a href="{{path('claro_public_profile_view', {'publicUrl':subject.getCreator().getPublicUrl()})}}">
+          {% if subject.getCreator().getPublicUrl()|default %}
+            <a href="{{path('claro_public_profile_view', {'publicUrl':subject.getCreator().getPublicUrl()})}}">
+                {{ subject.getCreator().getFirstName() }} {{ subject.getCreator().getLastName() }}
+            </a>
+          {% else %}
               {{ subject.getCreator().getFirstName() }} {{ subject.getCreator().getLastName() }}
-          </a>
+          {% endif %}
           </b>
           {{'on'|trans({}, 'forum')}} {{ subject.getCreationDate() | localizeddate( "long", "none", app.request.locale, null, 'd MMMM Y' ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~ subject.getCreationDate() | date(hourFormat) }}
         </div>
@@ -64,9 +68,13 @@
                          {% endif %}
                          </div>
                          <div class="text-center slrn-message-username">
-                            <a href="{{path('claro_public_profile_view', {'publicUrl':firstMessage.getCreator().getPublicUrl()})}}">
-                               {{ firstMessage.getCreator().getFirstName() }} {{ firstMessage.getCreator().getLastName() }}
-                            </a>
+                             {% if firstMessage.getCreator().getPublicUrl()|default %}
+                                <a href="{{path('claro_public_profile_view', {'publicUrl':firstMessage.getCreator().getPublicUrl()})}}">
+                                   {{ firstMessage.getCreator().getFirstName() }} {{ firstMessage.getCreator().getLastName() }}
+                                </a>
+                             {% else %}
+                                {{ firstMessage.getCreator().getFirstName() }} {{ firstMessage.getCreator().getLastName() }}
+                             {% endif %}
                          </div>
                          <div class="text-center slrn-message-horodatage">
                              {{ firstMessage.getCreationDate()|localizeddate( "short", "none", app.request.locale, null, 'd/MM/Y' ) ~ ' ' ~ firstMessage.getCreationDate() | date(hourFormat) }}
@@ -76,10 +84,15 @@
                         <div class="slrn-message-content_html">{{ firstMessage.getContent()|raw }}</p></div>
                         <p class="text-muted slrn-message-date">{{ firstMessage.getCreationDate()| timeAgo }}
                             {% if firstMessage.getlastEditedBy()|default %}
-                               <i>( 
+                               <i>(
                                    {{'edited_by'|trans({}, 'forum')}}
-                                   <a href="{{path('claro_public_profile_view', {'publicUrl':firstMessage.getlastEditedBy().getPublicUrl()})}}">
-                                       {{firstMessage.getlastEditedBy().getFirstName()}} {{firstMessage.getlastEditedBy().getLastName()}}</a>
+                                   {% if firstMessage.getlastEditedBy().getPublicUrl()|default %}
+                                        <a href="{{path('claro_public_profile_view', {'publicUrl':firstMessage.getlastEditedBy().getPublicUrl()})}}">
+                                            {{firstMessage.getlastEditedBy().getFirstName()}} {{firstMessage.getlastEditedBy().getLastName()}}
+                                        </a>
+                                   {% else %}
+                                        {{firstMessage.getlastEditedBy().getFirstName()}} {{firstMessage.getlastEditedBy().getLastName()}}
+                                   {% endif %}
                                    {{'edited_on'|trans({}, 'forum')}}
                                    {{ firstMessage.getUpdated()|localizeddate( "short", "none", app.request.locale, null, 'd/MM/Y' ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~ firstMessage.getUpdated() | date(hourFormat) }}
                                )</i>
@@ -152,7 +165,7 @@
                 <span class="slrn-select__label">{{'show'|trans({}, 'forum')}} : </span>
                 {% set postPerPage = [20,50,100, 'tout'] %}
                 {% for number in postPerPage %}
-                    <a class="slrn-posts-per-page__item{% if number == max %} slrn-posts-per-page__item--active{% endif %}" 
+                    <a class="slrn-posts-per-page__item{% if number == max %} slrn-posts-per-page__item--active{% endif %}"
                        href="{{ path('claro_forum_messages', {'subject': subject.getId(), 'page': page , 'max': number, 'order': order }) }}"
                        title="{% if number == 'tout' %}{{'show_all_results'|trans({}, 'forum')}}{% else %}{{'show_results_number'|trans({'%number%': number}, 'forum')}}{% endif %}">
                         {{number|trans({}, 'forum')}}</a>
@@ -179,9 +192,13 @@
                                     {% endif %}
                                     </div>
                                     <div class="text-center slrn-message-username">
-                                    <a href="{{path('claro_public_profile_view', {'publicUrl':message.getCreator().getPublicUrl()})}}">
-                                       {{ message.getCreator().getFirstName() }} {{ message.getCreator().getLastName() }}
-                                    </a>
+                                    {% if message.getCreator().getPublicUrl()|default %}
+                                        <a href="{{path('claro_public_profile_view', {'publicUrl':message.getCreator().getPublicUrl()})}}">
+                                           {{ message.getCreator().getFirstName() }} {{ message.getCreator().getLastName() }}
+                                        </a>
+                                    {% else %}
+                                        {{ message.getCreator().getFirstName() }} {{ message.getCreator().getLastName() }}
+                                    {% endif %}
                                     </div>
                                     <div class="text-center slrn-message-horodatage">
                                         {{ message.getCreationDate()|localizeddate( "short", "none", app.request.locale, null, 'd/MM/Y' ) ~ ' ' ~ message.getCreationDate() | date(hourFormat) }}
@@ -196,7 +213,7 @@
                                     <div class="slrn-message-content_html">{{ message.getContent()|raw }}</p></div>
                                     <p class="text-muted slrn-message-date">{{ message.getCreationDate()| timeAgo }}
                                          {% if message.getlastEditedBy()|default %}
-                                            <i>( message 
+                                            <i>( message
                                                 {{'edited_by'|trans({}, 'forum')}}
                                                 <a href="{{path('claro_public_profile_view', {'publicUrl':message.getlastEditedBy().getPublicUrl()})}}">
                                                     {{message.getlastEditedBy().getFirstName()}} {{message.getlastEditedBy().getLastName()}}</a>
@@ -240,12 +257,12 @@
                                         <a data-target="msg_{{ message.getId() }}" class="js-trigger-citation forum_citation_link pink_link" href="#">{{'citation_answer'|trans({}, 'forum') }}</a>
                                     </div>
                                     <div class="col-md-4 back-top-top-cell">
-                                        <a data-toggle='tooltip' 
+                                        <a data-toggle='tooltip'
                                            title="{{'show_permalink'|trans({}, 'forum')}}"
                                            data-permashow-title="{{'show_permalink'|trans({}, 'forum')}}"
                                            data-permahide-title="{{'hide_permalink'|trans({}, 'forum')}}"
-                                           href="#" 
-                                           data-target="{{ message.getId() }}" 
+                                           href="#"
+                                           data-target="{{ message.getId() }}"
                                            class="message-tool-link js-message-permalink-trigger">
                                             <i class="icon-link"></i>
                                         </a>
@@ -366,7 +383,7 @@
     {% endif %}
     <script>
         jQuery( document ).ready(function() {
-            
+
             jQuery.urlParam = function(name) {
                 var results = new RegExp('[\?&amp;]' + name + '=([^&amp;#]*)').exec(window.location.href);
                 if ( results ) {
@@ -375,16 +392,16 @@
                     return false;
                 }
             }
-            
+
             if ( jQuery.urlParam('messageId') ) {
-                
+
                 destination = jQuery('#msg_'  + jQuery.urlParam('messageId') ).addClass('target-msg').position().top + 40;
                 jQuery('html,body').animate({scrollTop: destination}, 'fast');
             }
-                       
+
             function updateIHM( jqXHR, textStatus, element ) {
                 jQuery( '#' + element.data( 'vote-number' ) ).html( jqXHR.numberLikes );
-                
+
                 if ( jqXHR.hasVoted == 1 ) {
                     element
                             .addClass( 'active' )
@@ -401,12 +418,12 @@
                             //.tooltip('show')
                 }
             }
-            
+
             function displayError(jqXHR, textStatus, error) {
                 alert( 'Votre vote n\'a pas pu être pris en compte : ' + error );
                 return false;
             }
-            
+
             function updateDOM(jqXHR, textStatus, element, userVote) {
                 userVote = ( userVote ==  1 ) ? 0 : 1;
                 element.data( 'vote-user', userVote );
@@ -414,7 +431,7 @@
                     window.location.reload();
                 {% endif %}
              }
-            
+
             function AjaxVote( element, actionUrl, userVote ) {
                 jQuery.ajax({
                     url: actionUrl,
@@ -426,26 +443,26 @@
                     complete: function( jqXHR, textStatus ) { updateDOM( jqXHR, textStatus, this.actionElement, this.userVote ) }
                 });
             }
-            
+
             jQuery( '.js-message-like' ).on( 'click', function(e) {
                 e.preventDefault();
                 userVote = jQuery(this).data( 'vote-user' );
                 console.log(userVote);
-                
+
                 if ( userVote == 1 || userVote == -1 ) {
                     actionUrl = jQuery(this).data( 'vote-neutral' );
                 }
-                
+
                 if ( ! userVote || userVote == 0 ) {
                     actionUrl = jQuery(this).data( 'vote-like' );
                 }
-                
+
                 AjaxVote( jQuery(this), actionUrl, userVote );
-                
+
             });
-            
+
             jQuery('.js-trigger-citation').on ('click', function() {
-                targetTiny = tinymce.editors[0]; 
+                targetTiny = tinymce.editors[0];
                 citation = '<blockquote><i>' + jQuery( '#' + jQuery(this).data('target') + ' .slrn-message-username' ).html() + ' {{'has_written'|trans({}, 'forum')}} :</i>' + jQuery( '#' + jQuery(this).data('target') + ' .slrn-message-content_html' ).html() + '</blockquote><div id="focus">&nbsp;</div>';
                 targetTiny.execCommand('mceInsertRawHTML', false, citation );
                 destination = jQuery('.tiny_editor').position().top - 40;
@@ -455,17 +472,17 @@
                 targetTiny.selection.select(node);
                 targetTiny.selection.collapse(false);
             });
-            
+
             jQuery('.js-forum-to-top').on ('click', function(e) {
                 e.preventDefault();
                 jQuery( 'html,body' ).animate({scrollTop: 0}, 'fast');
             });
-            
+
             jQuery('.js-message-permalink-trigger').on( 'click', function(e) {
                 e.preventDefault();
                 var element = jQuery(this);
                 var target = jQuery('.slrn-permalink-container_' + element.data('target') );
-                
+
                 if ( target.data('visible') ) {
                     element
                         .tooltip('hide')
@@ -484,11 +501,11 @@
                         .data('visible', 1);
                 }
             });
-            
+
             jQuery('.slrn-permalink').on( 'click', function() {
                 jQuery(this).select();
             });
-            
+
         });
     </script>
 {% endblock %}

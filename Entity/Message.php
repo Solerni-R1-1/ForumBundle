@@ -67,7 +67,7 @@ class Message extends AbstractIndexableResourceElement
      * @ORM\JoinColumn(name="user_id")
      */
     protected $creator;
-    
+
     /**
      * @ORM\ManyToOne(
      *     targetEntity="Claroline\CoreBundle\Entity\User",
@@ -76,7 +76,7 @@ class Message extends AbstractIndexableResourceElement
      * @ORM\JoinColumn(name="last_editor_id")
      */
     protected $lastEditedBy;
-    
+
     /**
      * @ORM\OneToMany(
      *     targetEntity="Claroline\ForumBundle\Entity\Like",
@@ -152,7 +152,7 @@ class Message extends AbstractIndexableResourceElement
 
         $categorie = $this->getSubject()->getCategory();
         $forum = $categorie->getForum();
-        
+
         $doc->forum_id = $forum->getId();
         $doc->forum_name = $forum->getResourceNode()->getName();
 
@@ -177,9 +177,13 @@ class Message extends AbstractIndexableResourceElement
 
         $doc->forum_creator_id = $this->getCreator()->getId();
         $doc->forum_creator_name = $this->getCreator()->getFirstName().' '.$this->getCreator()->getLastName();
-        $doc->forum_creator_profil_url =  $this->get('router')->generate('claro_public_profile_view', array(
-            'publicUrl' => $this->getCreator()->getPublicUrl()
-        ));
+        if ( $this->getCreator()->getPublicUrl() ) {
+            $doc->forum_creator_profil_url =  $this->get('router')->generate('claro_public_profile_view', array(
+                'publicUrl' => $this->getCreator()->getPublicUrl()
+            ));
+        } else {
+            $doc->forum_creator_profil_url = '#undefined';
+        }
 
         $doc->forum_message_like = count($this->getLikes());
 
@@ -190,11 +194,11 @@ class Message extends AbstractIndexableResourceElement
     {
         return $this->getSubject()->getCategory()->getForum()->getResourceNode();
     }
-    
+
     public function getLikes() {
         return $this->likes;
     }
-    
+
     public function getlastEditedBy() {
         return $this->lastEditedBy;
     }
