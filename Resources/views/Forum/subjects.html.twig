@@ -23,8 +23,8 @@
 
 {% set layout = "ClarolineForumBundle::layout.html.twig" %}
 {% extends layout %}
-{% set hourFormat = app.request.locale == 'fr' ? 'H\\hm' : 'h:i A' %}
-        
+{% set hourFormat = app.request.locale == 'fr' ? 'H\\hi' : 'h:i A' %}
+
 {% block title %}{{ _resource.getResourceNode().getName() ~ ' - ' ~ parent() | striptags | raw  }}{% endblock %}
 
 {% block forum_breadcrumb %}
@@ -140,22 +140,32 @@
                            {% endif %}
                             <br>
                             {{ 'started_by' | trans({}, 'forum') }}
-                            <b><a href="{{ path('claro_public_profile_view', {'publicUrl': subject['subject_creator_public_url']}) }}">{{ subject['subject_creator_firstname'] }}
-                            {{ subject['subject_creator_lastname'] }}</a></b>,
+                            {% if subject['subject_creator_public_url']|default %}
+                                <b><a href="{{ path('claro_public_profile_view', {'publicUrl': subject['subject_creator_public_url']}) }}">{{ subject['subject_creator_firstname'] }}
+                                {{ subject['subject_creator_lastname'] }}</a>
+                                </b>
+                            {% else %}
+                                {{ subject['subject_creator_lastname'] }}
+                            {% endif %},
                             {{'on'|trans({}, 'forum')}} {{ subject['subject_created']|localizeddate( "short", "none", app.request.locale, null, 'd/MM/Y' ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~  subject['subject_created'] | date(hourFormat)  }}
                         </td>
                         <td>
                             {{ subject['count_messages'] }}
                         </td>
                         <td>
-                            <b><a href="{{ path('claro_public_profile_view', {'publicUrl': subject['last_message_creator_public_url']}) }}">
-                            {{ subject['last_message_creator_firstname'] }}
-                            {{ subject['last_message_creator_lastname'] }}</a></b><br/>
-                            {{'on'|trans({}, 'forum')}} {{ subject['last_message_created']|localizeddate( "short", "none", app.request.locale, null, 'd/MM/Y' ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~  subject['subject_created'] | date(hourFormat) }}
+                            {% if subject['subject_creator_public_url']|default %}
+                                <b><a href="{{ path('claro_public_profile_view', {'publicUrl': subject['last_message_creator_public_url']}) }}">
+                                {{ subject['last_message_creator_firstname'] }}
+                                {{ subject['last_message_creator_lastname'] }}</a></b><br/>
+                            {% else %}
+                                {{ subject['last_message_creator_firstname'] }} 
+                                {{ subject['last_message_creator_lastname'] }}
+                            {% endif %}
+                            {{'on'|trans({}, 'forum')}} {{ subject['last_message_created']|localizeddate( "short", "none", app.request.locale, null, 'd/MM/Y' ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~  subject['last_message_created'] | date(hourFormat) }}
                         </td>
                         {% if isModerator %}
                             <td>
-                                {% if _resource.categories|length > 1 %} 
+                                {% if _resource.categories|length > 1 %}
                                     <div class="dropdown">
                                         <a id="dLabel-{{ subject.id }}" role="button" data-toggle="dropdown" data-target="#" href="#">
                                         {{ 'move_to' | trans({}, 'forum') }} <span class="caret"></span>
@@ -241,16 +251,16 @@
         </script>
          <script>
         jQuery( document ).ready(function() {
-                       
+
             function displayError(jqXHR, textStatus, error) {
                 alert( 'Le verrouillage du sujet n\'a pas pu être pris en compte : ' + error );
                 return false;
             }
-            
+
             function updateDOM(jqXHR, textStatus, element, currentLock) {
                 currentLock = ( currentLock ==  1 ) ? 0 : 1;
                 element.data( 'current-lock', currentLock );
-                
+
                 if ( currentLock == 1 ) {
                     element
                             .html( element.data('unlock-text') )
@@ -267,7 +277,7 @@
                             .tooltip('fixTitle');
                 }
              }
-            
+
             function AjaxLock( element, actionUrl, currentLock ) {
                 jQuery.ajax({
                     url: actionUrl,
@@ -278,21 +288,21 @@
                     error: function( jqXHR, textStatus, error ) { displayError( jqXHR, textStatus, error ) }
                 });
             }
-            
+
             jQuery( '.js-trigger-lock' ).on( 'click', function(e) {
                 e.preventDefault();
                 currentLock = jQuery(this).data( 'current-lock' );
-                
+
                 if ( currentLock == 1 ) {
                     actionUrl = jQuery(this).data( 'unlock-url' );
                 }
-                
+
                 if ( ! currentLock || currentLock == 0 ) {
                     actionUrl = jQuery(this).data( 'lock-url' );
                 }
-                
+
                 AjaxLock( jQuery(this), actionUrl, currentLock );
-                
+
             });
         });
     </script>

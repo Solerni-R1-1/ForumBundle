@@ -1,7 +1,7 @@
 {% from _self import renderPager %}
 
 {% set layout = "ClarolineForumBundle::layout.html.twig" %}
-{% set hourFormat = app.request.locale == 'fr' ? 'H\\hm' : 'h:i A' %}
+{% set hourFormat = app.request.locale == 'fr' ? 'H\\hi' : 'h:i A' %}
 
 {% extends layout %}
 
@@ -17,7 +17,7 @@
         <div class="navbar row">
 
             <div class="col-md-8">
-                
+
                 <a class="btn btn-primary" href="{{ _path('claro_forum_form_category_creation', {'forum': _resource.getId()}) }}">
                     {{ 'new_category'|trans({}, 'forum') }}
                 </a>
@@ -31,7 +31,7 @@
                         <a class="btn btn-primary" href="{{ _path('claro_forum_subscribe', {'forum': _resource.getId()}) }}">
                             {{ 'subscribe_mail_list'|trans({}, 'forum') }}
                         </a>
-                
+
                     {% endif %}
                 {% endif %#}
             </div>
@@ -66,7 +66,7 @@
                                 <a href="{{ path('claro_forum_edit_category_form', {'category': category['id']}) }}">
                                     <i class="icon-pencil"></i> {{ 'edit' | trans({}, 'platform') }}
                                 </a>
-                            
+
                                 <a id="delete-category" href="{{ path('claro_forum_delete_category', {'category': category['id']}) }}">
                                     <i class="icon-trash"></i> {{ 'delete' | trans({}, 'platform') }}
                                 </a>
@@ -78,17 +78,22 @@
                         </td>
                         <td>
                             {% if category['last_message_creator_firstname'] %}
-                                {{ 'started_by' | trans({}, 'forum') }} 
+                                {{ 'started_by' | trans({}, 'forum') }}
                                 <b>
-                                <a href="{{ path('claro_public_profile_view', {'publicUrl': category['last_message_creator_public_url']}) }}">
+                                {% if category['last_message_creator_public_url']|default %}
+                                    <a href="{{ path('claro_public_profile_view', {'publicUrl': category['last_message_creator_public_url']}) }}">
+                                        {{ category['last_message_creator_firstname'] }}
+                                        {{ category['last_message_creator_lastname'] }}
+                                    </a>
+                                {% else %}
                                     {{ category['last_message_creator_firstname'] }}
                                     {{ category['last_message_creator_lastname'] }}
-                                </a>
+                                {% endif %}
                                 </b>
                             {% endif %}
                             {% if  category['last_message_created'] %}
                             <div class="slrn-name-date">
-                                 {{'on'|trans({}, 'forum')}} {{ category['last_message_created'] | localizeddate( "long", "none", app.request.locale, null, 'd MMMM Y' ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~ category['creation_date'] | date(hourFormat)  }}
+                                 {{'on'|trans({}, 'forum')}} {{ category['last_message_created'] | localizeddate( "long", "none", app.request.locale, null, 'd MMMM Y' ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~ category['last_message_created'] | date(hourFormat)  }}
                             </div>
                             {% endif %}
                         </td>

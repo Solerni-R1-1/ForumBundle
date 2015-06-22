@@ -1,5 +1,5 @@
 {% set nbMessages = messages|length %}
-{% set hourFormat = app.request.locale == 'fr' ? 'H\\hm' : 'h:i A' %}
+{% set hourFormat = app.request.locale == 'fr' ? 'H\\hi' : 'h:i A' %}
     {% if isMini %}
         <div id="desktop-widget-pager" class="slrn-widget-forum-mini">
             <h3 class="slrn-widget-forum__title">{{ 'last_messages_title'|trans({}, 'lesson-widget') }}</h3>

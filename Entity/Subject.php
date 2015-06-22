@@ -61,7 +61,7 @@ class Subject extends AbstractIndexableResourceElement
     /**
      * @ORM\OneToMany(
      *     targetEntity="Claroline\ForumBundle\Entity\Message",
-     *     mappedBy="subject", 
+     *     mappedBy="subject",
      *     cascade={"remove"}
      * )
      * @ORM\OrderBy({"id" = "ASC"})
@@ -81,7 +81,7 @@ class Subject extends AbstractIndexableResourceElement
      * @ORM\Column(type="boolean")
      */
     protected $isSticked = false;
-    
+
     /**
      * @ORM\Column(type="boolean")
      */
@@ -145,11 +145,11 @@ class Subject extends AbstractIndexableResourceElement
     {
         return $this->creationDate;
     }
-    
+
     public function getUpdated() {
         return $this->updated;
     }
-    
+
     public function getMessages()
     {
         return $this->messages;
@@ -164,14 +164,14 @@ class Subject extends AbstractIndexableResourceElement
     {
         return $this->isSticked;
     }
-    
+
     public function fillIndexableDocument(&$doc)
     {
         $doc = parent::fillIndexableDocument($doc);
-        
+
         $categorie = $this->getCategory();
         $forum = $categorie->getForum();
-        
+
         $doc->forum_id = $forum->getId();
         $doc->forum_name = $forum->getResourceNode()->getName();
 
@@ -191,18 +191,22 @@ class Subject extends AbstractIndexableResourceElement
 
         $doc->forum_creator_id = $this->getCreator()->getId();
         $doc->forum_creator_name = $this->getCreator()->getFirstName().' '.$this->getCreator()->getLastName();
-        $doc->forum_creator_profil_url =  $this->get('router')->generate('claro_public_profile_view', array(
-            'publicUrl' => $this->getCreator()->getPublicUrl()
-        ));
+        if ( $this->getCreator()->getPublicUrl() ) {
+            $doc->forum_creator_profil_url =  $this->get('router')->generate('claro_public_profile_view', array(
+                'publicUrl' => $this->getCreator()->getPublicUrl()
+            ));
+        } else {
+            $doc->forum_creator_profil_url = '#undefined';
+        }
 
         return $doc;
     }
-    
+
     public function getResourceNode()
     {
         return $this->getCategory()->getForum()->getResourceNode();
     }
-    
+
     public function getIsUserLocked() {
         return $this->isUserLocked;
     }
