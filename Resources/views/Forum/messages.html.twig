@@ -447,7 +447,6 @@
             jQuery( '.js-message-like' ).on( 'click', function(e) {
                 e.preventDefault();
                 userVote = jQuery(this).data( 'vote-user' );
-                console.log(userVote);
 
                 if ( userVote == 1 || userVote == -1 ) {
                     actionUrl = jQuery(this).data( 'vote-neutral' );
