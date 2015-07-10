@@ -51,14 +51,14 @@
                     </a>
                 {% endif %}
             </div>
-            <div class="col-md-4 pull-right">
+            {#<div class="col-md-4 pull-right">
                 <div class="input-group">
                     <select class="form-control input-md" id="max-select">
                         {{ renderOptions([20, 50, 100, 200, 500], max is defined ? max : 20) }}
                     </select>
                     <span class="input-group-addon">{{ 'subjets_per_page'|trans({}, 'forum') }}</span>
                 </div>
-            </div>
+            </div>#}
         </div>
         {% if isModerator %}
             <div class="navbar row">
@@ -158,7 +158,7 @@
                                 {{ subject['last_message_creator_firstname'] }}
                                 {{ subject['last_message_creator_lastname'] }}</a></b><br/>
                             {% else %}
-                                {{ subject['last_message_creator_firstname'] }} 
+                                {{ subject['last_message_creator_firstname'] }}
                                 {{ subject['last_message_creator_lastname'] }}
                             {% endif %}
                             {{'on'|trans({}, 'forum')}} {{ subject['last_message_created']|localizeddate( "short", "none", app.request.locale, null, 'd/MM/Y' ) ~ ' '  ~ 'at'|trans({}, 'forum') ~ ' ' ~  subject['last_message_created'] | date(hourFormat) }}
