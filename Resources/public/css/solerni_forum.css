@@ -3,19 +3,19 @@ To change this license header, choose License Headers in Project Properties.
 To change this template file, choose Tools | Templates
 and open the template in the editor.
 */
-/* 
+/*
     Created on : 5 mars 2014, 12:08:39
     Author     : Orange / SII
     Description: Custom CSS for Forum Override
 */
 /* not used or included. Will be when override forums */
 
-#subjects_table .slrn-forum-table__th 
+#subjects_table .slrn-forum-table__th
 {
     text-transform: uppercase;
 }
 
-#subjects_table.slrn-forum-table, 
+#subjects_table.slrn-forum-table,
 #subjects_table.slrn-forum-table th,
 #subjects_table.slrn-forum-table td
 {
@@ -49,8 +49,17 @@ and open the template in the editor.
     padding-right:   1em;
 }
 
+#messages_table {
+    width:          100%;
+    max-width:      100%;
+    table-layout:   fixed;
+}
+
 .slrn-table-message {
-    width: 100%;
+    width:          100%;
+    max-width:      100%;
+    table-layout:   fixed;
+    word-wrap:      break-word;
 }
 
 #subjects_table .slrn-forum__tools > a {
@@ -60,7 +69,7 @@ and open the template in the editor.
 #subjects_table .slrn-forum__tools {
     margin-top: 1.2em;
 }
-    
+
 #subjects_table .slrn-forum-table__th-category {
     width: 50%;
 }
@@ -71,7 +80,7 @@ and open the template in the editor.
 }
 
 #subjects_table .slrn-forum-table__th-lastmsg {
-    
+
 }
 
 .slrn-forum-table .link-category {
@@ -166,7 +175,7 @@ i.icon-comment
     cursor:         pointer;
 }
 
-.slrn-like-thumb:hover, 
+.slrn-like-thumb:hover,
 .slrn-like-thumb.active {
     text-decoration:    none;
     color:              #FF004F;
@@ -323,7 +332,7 @@ i.icon-comment
     display: none;
 }
 
-.slrn-posts-per-page__item--active, 
+.slrn-posts-per-page__item--active,
 .slrn-posts-per-page__item--active:hover,
 .slrn-forum-options-pagination .pagination .active a,
 .slrn-forum-options-pagination .pagination .active a:hover {
@@ -377,7 +386,7 @@ i.icon-comment
 }
 
 .slrn-selected__inner {
-    padding: 12px 30px 12px 10px; 
+    padding: 12px 30px 12px 10px;
 }
 
 .slrn-select__item .caret {
@@ -445,16 +454,16 @@ i.icon-comment
 
 .slrn-message-content_html blockquote {
     padding:10px 20px;
-    margin:0 0 20px; 
-    border: 1px solid #A5B2BD; 
-    border-left:5px solid #A5B2BD; 
+    margin:0 0 20px;
+    border: 1px solid #A5B2BD;
+    border-left:5px solid #A5B2BD;
     background-color: #EEEEEF;
 }
 
 .slrn-message-content_html blockquote p {
     font-size:1em;
     font-weight:normal;
-    line-height:1.25; 
+    line-height:1.25;
     margin: .5em;
 }
 
@@ -506,7 +515,7 @@ i.icon-comment
 }
 
 #messages_table.slrn-forum-table .target-msg .slrn-forum-message-edition .slrn-forum-td {
-    border-bottom: 2px solid #D90045; 
+    border-bottom: 2px solid #D90045;
 }
 
 .slrn-message-horodatage--edited {
