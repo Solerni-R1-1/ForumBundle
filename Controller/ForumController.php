@@ -1085,7 +1085,7 @@ class ForumController extends Controller
     {
         $redirect = $this->manageAno(
             $this->get('router')->generate('claro_message_move_form',
-                    array ( 'message' => $message->getId(), 'newSubject' => $newSubject) ) );
+                    array ( 'message' => $message->getId(), 'newSubject' => $newSubject->getId()) ) );
         if (FALSE !== $redirect) {
             return new RedirectResponse($redirect);
         }
@@ -1116,7 +1116,7 @@ class ForumController extends Controller
     {
         $redirect = $this->manageAno(
             $this->get('router')->generate('claro_subject_move',
-                    array ( 'subject' => $subject->getId(), 'newCategory' => $newCategory) ) );
+                    array ( 'subject' => $subject->getId(), 'newCategory' => $newCategory->getId()) ) );
         if (FALSE !== $redirect) {
             return new RedirectResponse($redirect);
         }
