@@ -253,6 +253,11 @@ i.icon-comment
     min-height:         166px;
 }
 
+.slrn-forum-table .slrn-forum-td--date-top-message {
+    border: none;
+}
+
+
 /* forum pagination */
 
 .slrn-forum-meta {
