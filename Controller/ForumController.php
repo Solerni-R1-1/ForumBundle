@@ -325,13 +325,13 @@ class ForumController extends Controller
      * @Route(
      *     "/subject/{subject}/messages/page/{page}/max/{max}/order/{order}",
      *     name="claro_forum_messages",
-     *     defaults={"page"=1, "max"= 20, "order"="ASC"},
+     *     defaults={"page"=1, "max"= 20, "order"="USER"},
      *     options={"expose"=true}
      * )
      * @Route(
      *     "/subject/{subject}/messages/page/{page}/max/",
      *     name="claro_forum_messages_unordered",
-     *     defaults={"page"=1, "max"= 20, "order"="ASC"},
+     *     defaults={"page"=1, "max"= 20, "order"="USER"},
      *     options={"expose"=true}
      * )
      * @EXT\ParamConverter("user", options={"authenticatedUser" = true})
@@ -341,13 +341,13 @@ class ForumController extends Controller
      * @param integer $page
      * @param integer $max
      */
-    public function messagesAction(Subject $subject, $page, $max, $user, $order)
+    public function messagesAction(Subject $subject, $page, $max, User $user, $order)
     {
 
         /* limit order values */
-        $authorisedValues = ['POP', 'ASC', 'DESC'];
+        $authorisedValues = ['USER', 'POP', 'ASC', 'DESC'];
         if ( ! in_array($order, $authorisedValues ) ) {
-            $order = 'ASC';
+            $order = 'USER';
         }
 
         /* interpret $max */
@@ -368,7 +368,41 @@ class ForumController extends Controller
 
         $forum = $subject->getCategory()->getForum();
         if ($this->checkAccess($forum, false)) {
-        	$em = $this->getDoctrine()->getManager();
+
+            $em = $this->getDoctrine()->getManager();
+
+            if ($order === 'USER') {
+                switch ($user->getForumOrder()) {
+                    case User::FORUM_ORDER_ASC:
+                        $order = 'ASC';
+                        break;
+                    case User::FORUM_ORDER_DESC:
+                        $order = 'DESC';
+                        break;
+                    case User::FORUM_ORDER_POP:
+                        $order = 'POP';
+                        break;
+                    default:
+                        $order = 'ASC';
+                        break;
+                }
+            } else {
+                switch ($order) {
+                    case 'ASC':
+                        $user->setForumOrder(User::FORUM_ORDER_ASC);
+                        break;
+                    case 'DESC':
+                        $user->setForumOrder(User::FORUM_ORDER_DESC);
+                        break;
+                    case 'POP':
+                        $user->setForumOrder(User::FORUM_ORDER_POP);
+                        break;
+
+                }
+
+                $em->persist($user);
+                $em->flush();
+            }
 	        $isModerator = $this->get('security.context')->isGranted('moderate', new ResourceCollection(array($forum->getResourceNode())));
             $firstMessage = $this->getDoctrine()->getRepository( 'ClarolineForumBundle:Message' )->findInitialBySubject($subject->getid());
 	        $pager = $this->get('claroline.manager.forum_manager')->getMessagesPager($subject, $page, $max, $order);
