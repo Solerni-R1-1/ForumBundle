@@ -185,6 +185,7 @@
                     <td>
                         {% for messageArray in pager.currentPageResults %}
                         {% set message, nbLikes, userWeightValue, userNbPosts = messageArray['message'], messageArray['nbLikes'], messageArray['hasVoted'], messageArray['nbCreatorMessages'] %}
+                        {% if firstMessage.getId() != message.getId() %}
                         <a name="message_{{ message.getId() }}"></a>
                         <table id="msg_{{ message.getId() }}"  class="slrn-table-message">
                             <tr class="row-message">
@@ -306,6 +307,7 @@
                                 </tr>
                              {% endif %}
                         </table>
+                        {% endif %}
                         {% endfor %}
                     </td>
                 </tr>
