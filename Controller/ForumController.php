@@ -32,12 +32,29 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration as EXT;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Claroline\CoreBundle\Entity\Resource\ResourceNode;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use JMS\DiExtraBundle\Annotation as DI;
+
 
 /**
  * ForumController
  */
 class ForumController extends Controller
 {
+    private $mailManager;
+
+    /**
+     * @DI\InjectParams({
+     *     "mailManager"        = @DI\Inject("claroline.manager.mail_manager")
+     * })
+     */
+    public function __construct(
+        MailManager $mailManager
+    ) {
+        $this->mailManager = $mailManager;
+    }
+
+
+
 
     private function manageAno($nextUrl){
         if( $this->get('security.context')->getToken()->getUser() == 'anon.' ){
@@ -248,6 +265,19 @@ class ForumController extends Controller
         if ($form->isValid()) {
             $category = $form->getData();
             $this->get('claroline.manager.forum_manager')->createCategory($forum, $category->getName());
+
+
+            //*//*/*/**/ AJOUTER THEME
+
+
+            $users = $this->get('security.context')->getToken()->getUser();
+            $em = $this->getDoctrine()->getManager();
+            $moocSession = $em->getRepository('ClarolineCoreBundle:Mooc\\MoocSession')->getMoocSessionByForum($forum);
+            $titleDispositif =  $forum->getResourceNode()->getWorkspace()->getMooc()->getTitle();
+            $lien =   generateUrl('claro_forum_categories', array('forum' => $forum->getId()));
+            $this->mailManager->sendNotificationMessage($users, "theme",  $moocSession, null, $titleDispositif, $lien);
+
+
         }
 
         return new RedirectResponse(
@@ -292,6 +322,11 @@ class ForumController extends Controller
             $subject->setCategory($category);
             $this->get('claroline.manager.forum_manager')->createSubject($subject);
             $dataMessage = $form->get('message')->getData();
+
+
+            //*//*/*/**/ AJOUTER SUJET
+
+
 
             if ( $dataMessage['content'] ) {
                 $message = new Message();
@@ -1247,6 +1282,10 @@ class ForumController extends Controller
 
         $response = new JsonResponse();
         $response->setData(array('numberLikes' => $numberLikes, 'hasVoted' => $weight));
+
+        /////////////////////////////LIKE
+
+
 
         return $response;
 
