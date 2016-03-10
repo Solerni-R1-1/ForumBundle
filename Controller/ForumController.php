@@ -268,7 +268,7 @@ class ForumController extends Controller
 
 
             //*//*/*/**/ AJOUTER THEME
-
+/*
 
             $users = $this->get('security.context')->getToken()->getUser();
             $em = $this->getDoctrine()->getManager();
@@ -276,7 +276,7 @@ class ForumController extends Controller
             $titleDispositif =  $forum->getResourceNode()->getWorkspace()->getMooc()->getTitle();
             $lien =   generateUrl('claro_forum_categories', array('forum' => $forum->getId()));
             $this->mailManager->sendNotificationMessage($users, "theme",  $moocSession, null, $titleDispositif, $lien);
-
+*/
 
         }
 
