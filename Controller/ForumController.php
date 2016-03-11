@@ -40,19 +40,6 @@ use JMS\DiExtraBundle\Annotation as DI;
  */
 class ForumController extends Controller
 {
-    private $mailManager;
-
-    /**
-     * @DI\InjectParams({
-     *     "mailManager"        = @DI\Inject("claroline.manager.mail_manager")
-     * })
-     */
-    public function __construct(
-        MailManager $mailManager
-    ) {
-        $this->mailManager = $mailManager;
-    }
-
 
 
 
@@ -64,6 +51,8 @@ class ForumController extends Controller
             return $route;
         }
         return FALSE;
+
+
     }
 
 
