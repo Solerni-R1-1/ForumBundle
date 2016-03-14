@@ -267,7 +267,6 @@ class ForumController extends Controller
             $category = $form->getData();
             $this->get('claroline.manager.forum_manager')->createCategory($forum, $category->getName());
 
-
             //*//*/*/**/ AJOUTER THEME
 
 
@@ -275,9 +274,8 @@ class ForumController extends Controller
             $em = $this->getDoctrine()->getManager();
             $moocSession = $em->getRepository('ClarolineCoreBundle:Mooc\\MoocSession')->getMoocSessionByForum($forum);
             $titleDispositif =  $forum->getResourceNode()->getWorkspace()->getMooc()->getTitle();
-          //  $lien =   generateUrl('claro_forum_categories', array('forum' => $forum->getId()));
+            $lien = $this->generateUrl('claro_forum_categories', array('forum' => $forum->getId()));
             $this->mailManager->sendNotificationMessage($users, "theme",  $moocSession, null, $titleDispositif, "");
-
 
         }
 
@@ -325,10 +323,6 @@ class ForumController extends Controller
             $dataMessage = $form->get('message')->getData();
 
 
-            //*//*/*/**/ AJOUTER SUJET
-
-
-
             if ( $dataMessage['content'] ) {
                 $message = new Message();
                 $message->setContent($dataMessage['content']);
@@ -336,15 +330,18 @@ class ForumController extends Controller
                 $message->setSubject($subject);
                 $this->get('claroline.manager.forum_manager')->createMessage($message);
 
-
+                //*//*/*/**/ AJOUTER SUJET
                 $users = $this->get('security.context')->getToken()->getUser();
                 $em = $this->getDoctrine()->getManager();
                 $moocSession = $em->getRepository('ClarolineCoreBundle:Mooc\\MoocSession')->getMoocSessionByForum($forum);
                 $titleDispositif =  $forum->getResourceNode()->getWorkspace()->getMooc()->getTitle();
-                //  $lien =   generateUrl('claro_forum_categories', array('forum' => $forum->getId()));
-                $this->mailManager->sendNotificationMessage($users, "sujet",  $moocSession, null, $titleDispositif, "");
+                $router = $this->get('router');
+                //$liens =   generateUrl('claro_forum_categories', array('forum' => $forum->getId()));
+                $lien =  $router->generate('claro_forum_categories', array('forum' => $forum->getId()));
 
-
+              //  print ($liens);
+                print ($lien);
+                $this->mailManager->sendNotificationMessage($users, "sujet",  $moocSession, null, $titleDispositif, $lien);
 
 
                 return new RedirectResponse(
