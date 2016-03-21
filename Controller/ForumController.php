@@ -529,7 +529,9 @@ class ForumController extends Controller
                     $em = $this->getDoctrine()->getManager();
                     $moocSession = $em->getRepository('ClarolineCoreBundle:Mooc\\MoocSession')->getMoocSessionByForum($forum);
                     $router = $this->get('router');
-                    $lien =  $router->generate('claro_forum_messages', array('subject' => $subject->getId()), true);
+                    //$lien =  $router->generate('claro_forum_messages', array('subject' => $subject->getId()), true);
+                    //$lien =  $router->generate('claro_forum_messages', array('subject' => $subject->getId()), true);
+                    $lien = $this->get('router')->generate('claro_forum_show_message', array('message' => $message->getId()), true);
 
                     $this->mailManager->sendNotificationMessage($userCible, "citation",  $moocSession, $user, $message->getSubject()->getTitle(), $lien);
 
@@ -1324,8 +1326,9 @@ class ForumController extends Controller
 
             $forum =  $message->getSubject()->getCategory()->getForum();
             $em = $this->getDoctrine()->getManager();
-            $lien = $this->get('router')->generate('claro_forum_messages', array('subject' => $message->getSubject()->getId()), true);
             $moocsession = $em->getRepository('ClarolineCoreBundle:Mooc\\MoocSession')->getMoocSessionByForum($forum);
+            $lien = $this->get('router')->generate('claro_forum_show_message', array('message' => $message->getId()), true);
+
 
             $this->mailManager->sendNotificationMessage($message->getCreator(), "like", $moocsession , $user, $message->getSubject()->getTitle(), $lien);
 
