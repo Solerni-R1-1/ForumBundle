@@ -472,6 +472,10 @@ i.icon-comment
     margin: .5em;
 }
 
+.slrn-message-content_html a {
+    color: #ff004f;
+}
+
 .forum_citation_link {
     line-height: 35px;
 }
